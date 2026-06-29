@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react';
 import MetricsRow from './MetricsRow';
 import SearchConsole from './SearchConsole';
 import ResultsView from './ResultsView';
-import DailyIntelligenceHub from './DailyIntelligenceHub';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
 
@@ -81,8 +80,6 @@ export default function DashboardShell() {
           onFeedback={handleFeedback}
         />
       </div>
-
-      {activeVertical && <DailyIntelligenceHub vertical={activeVertical} />}
     </div>
   );
 }
