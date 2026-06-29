@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIE Campaign Outreach Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #0b57d0;
+            --on-primary: #ffffff;
+            --primary-container: #d3e3fd;
+            --surface: #ffffff;
+            --surface-container: #f0f4f9;
+            --surface-container-high: #e9ebf0;
+            --on-surface-default: #1b1c1d;
+            --on-surface-de-emphasis: #444746;
+            --stroke-default: #dcdfe5;
+            --positive: #146c2e;
+            --positive-surface: #c4eed0;
+            --negative: #b3261e;
+            --negative-surface: #ffcdd2;
+            --font-sans: "Google Sans", sans-serif;
+            --font-mono: "Google Sans Code", monospace;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #a8c7fa;
+                --on-primary: #062e6f;
+                --primary-container: #1f3760;
+                --surface: #101218;
+                --surface-container: #282a2c;
+                --surface-container-high: #3a3f50;
+                --on-surface-default: #ffffff;
+                --on-surface-de-emphasis: #c4c7c5;
+                --stroke-default: #2d2f38;
+                --positive: #6dd58c;
+                --positive-surface: #1f3025;
+                --negative: #f2b8b5;
+                --negative-surface: #381a21;
+            }
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--surface-container);
+            color: var(--on-surface-default);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <header class="bg-[var(--surface)] border-b border-[var(--stroke-default)] px-6 py-3 flex justify-between items-center z-10">
+        <div class="flex items-center gap-3">
+            <span class="material-icons text-[var(--primary)] text-3xl">campaign</span>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight">Index Intelligence Engine</h1>
+                <p class="text-xs text-[var(--on-surface-de-emphasis)]">Outreach Dispatcher & campaign workspace v1.0</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <select id="campaignContext" onchange="switchCampaign()" class="bg-[var(--surface-container-high)] border border-[var(--stroke-default)] rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                <option value="slurry_concrete">Concrete Slurry Outbound Campaign</option>
+                <option value="grease_trap">Grease Trapping High-Volume Dialer</option>
+                <option value="asbestos_abatement">Asbestos Remediation Key Accounts</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="flex-1 grid grid-cols-12 overflow-hidden">
+
+        <main class="col-span-8 p-6 overflow-y-auto flex flex-col gap-6">
+
+            <section class="grid grid-cols-3 gap-4">
+                <div class="bg-[var(--surface)] p-5 border border-[var(--stroke-default)] rounded-2xl relative overflow-hidden flex flex-col justify-between">
+                    <span class="text-xs font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Outreach Conversion</span>
+                    <span class="text-3xl font-bold mt-2" id="statConversion">14.8%</span>
+                    <div class="mt-3 py-1.5 px-3 bg-[var(--surface-container)] rounded-lg text-center" id="formulaConversion"></div>
+                </div>
+                <div class="bg-[var(--surface)] p-5 border border-[var(--stroke-default)] rounded-2xl relative overflow-hidden flex flex-col justify-between">
+                    <span class="text-xs font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Connection Ratio</span>
+                    <span class="text-3xl font-bold mt-2" id="statConnection">84.2%</span>
+                    <div class="mt-3 py-1.5 px-3 bg-[var(--surface-container)] rounded-lg text-center" id="formulaConnection"></div>
+                </div>
+                <div class="bg-[var(--surface)] p-5 border border-[var(--stroke-default)] rounded-2xl relative overflow-hidden flex flex-col justify-between">
+                    <span class="text-xs font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Campaign Velocity</span>
+                    <span class="text-3xl font-bold mt-2 text-[var(--positive)]" id="statVelocity">Active</span>
+                    <div class="mt-3 text-xs text-center text-[var(--on-surface-de-emphasis)]">Lock expiration set to 15m</div>
+                </div>
+            </section>
+
+            <section class="bg-[var(--surface)] border border-[var(--stroke-default)] rounded-2xl p-6 flex flex-col gap-4">
+                <div class="flex justify-between items-center border-b border-[var(--stroke-default)] pb-4">
+                    <h2 class="text-base font-bold flex items-center gap-2">
+                        <span class="material-icons text-[var(--primary)]">reorder</span> Active Target Lock Queue
+                    </h2>
+                    <button onclick="acquireTargets()" class="bg-[var(--primary)] hover:opacity-90 text-[var(--on-primary)] text-sm font-medium px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm transition">
+                        <span class="material-icons text-sm">download</span> Fetch Next 3 Targets
+                    </button>
+                </div>
+
+                <div class="flex flex-col gap-3" id="queueContainer"></div>
+            </section>
+
+        </main>
+
+        <aside class="col-span-4 bg-[var(--surface)] border-l border-[var(--stroke-default)] p-6 overflow-y-auto flex flex-col gap-6">
+
+            <div class="border-b border-[var(--stroke-default)] pb-4">
+                <span class="text-[11px] uppercase tracking-wider font-bold text-[var(--on-surface-de-emphasis)]">Active Target Focus</span>
+                <h3 class="text-lg font-bold mt-1" id="focusName">No Active Target Selected</h3>
+                <span class="inline-flex mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold" id="focusPriorityBadge">Standing By</span>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <div class="bg-[var(--surface-container)] p-3.5 rounded-xl">
+                    <div class="text-xs text-[var(--on-surface-de-emphasis)]">Capability Crawler Signal</div>
+                    <p class="text-xs font-medium mt-1.5 leading-relaxed italic text-[var(--on-surface-default)]" id="focusCrawler">Select a target lead in the workspace deck to inspect auto-discovered assets & keyword matches.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[var(--surface-container)] p-3.5 rounded-xl">
+                        <div class="text-xs text-[var(--on-surface-de-emphasis)]">Phone</div>
+                        <p class="text-xs font-mono font-medium mt-1" id="focusPhone">-</p>
+                    </div>
+                    <div class="bg-[var(--surface-container)] p-3.5 rounded-xl">
+                        <div class="text-xs text-[var(--on-surface-de-emphasis)]">Email</div>
+                        <p class="text-xs font-mono font-medium mt-1 truncate" id="focusEmail">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="interactionForm" onsubmit="logInteraction(event)" class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Outreach Modality</label>
+                    <select id="logType" class="bg-[var(--surface-container-high)] border border-[var(--stroke-default)] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                        <option value="CALL">Outgoing Voice Dial</option>
+                        <option value="EMAIL">Outbound Custom Outreach Email</option>
+                        <option value="LINKEDIN">LinkedIn Personal Connection Touch</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Structured Outcome Match</label>
+                    <select id="logOutcome" class="bg-[var(--surface-container-high)] border border-[var(--stroke-default)] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                        <option value="connected_interested">Connected: Highly Interested & Hooked</option>
+                        <option value="sent_proposal">Connected: Sent Structured Quote proposal</option>
+                        <option value="left_voicemail">No Answer: Voicemail dropped successfully</option>
+                        <option value="busy">No Answer: Line Busy / Callback set</option>
+                        <option value="connected_not_interested">Connected: Out-of-market / Rejected</option>
+                        <option value="out_of_service">System Error: Disconnected Number</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Outreach Notes / Log Record</label>
+                    <textarea id="logNotes" placeholder="Record feedback parameters (e.g. key asset verification dates, gatekeeper details, next callback times)..." rows="3" class="bg-[var(--surface-container-high)] border border-[var(--stroke-default)] rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"></textarea>
+                </div>
+
+                <button type="submit" id="submitBtn" disabled class="bg-[var(--primary)] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed text-[var(--on-primary)] text-sm font-medium py-3 rounded-xl flex justify-center items-center gap-2 shadow-md transition mt-2">
+                    <span class="material-icons text-sm">playlist_add_check</span> Submit & Auto-Advance Lead status
+                </button>
+            </form>
+
+            <div class="mt-auto border-t border-[var(--stroke-default)] pt-4">
+                <span class="text-[10px] font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-widest flex items-center gap-1">
+                    <span class="material-icons text-xs text-[var(--primary)] animate-pulse">radio_button_checked</span> Real-Time System Telemetry
+                </span>
+                <div class="mt-2 bg-[#141619] text-[#a8ffb2] font-mono text-[10px] p-3 rounded-xl h-24 overflow-y-auto" id="consoleTelemetry">
+                    [Dispatcher init] Advisory locks set and waiting for campaign load triggers...
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+
+    <script>
+        const MOCK_CAMPAIGNS = {
+            slurry_concrete: {
+                vertical: "Concrete Slurry Outbound Campaign",
+                conversion: "14.8%",
+                connection: "82.1%",
+                formulaCon: "\\text{Rate} = \\left( \\frac{\\text{Won}}{\\text{Contacted}} \\right) \\times 100",
+                formulaConn: "\\text{Ratio} = \\left( \\frac{\\text{Logged}}{\\text{Assigned}} \\right) \\times 100",
+                queue: [
+                    { id: "lead-101", name: "Metro Slurry Management", city: "Hayward", priority: "A", score: 96, phone: "(510) 555-0120", email: "operations@metroslurry.com", crawl: "[Verified Match] Active vacuum truck fleet and high-capacity centrifugal filter press systems confirmed on sub-page crawl." },
+                    { id: "lead-102", name: "Industrial Hydro-Vac LLC", city: "Union City", priority: "B", score: 84, phone: "(510) 555-8814", email: "disposal@industrialhydro.com", crawl: "Crawl signals confirm ongoing grease containment logistics but concrete dewatering is unconfirmed." },
+                    { id: "lead-103", name: "Western Sludge Recovery", city: "Fremont", priority: "C", score: 62, phone: "(510) 555-4012", email: "info@westernsludge.com", crawl: "Direct regulatory match for NAICS 562211 - Hazardous Waste. No active website found." }
+                ]
+            },
+            grease_trap: {
+                vertical: "Grease Trapping High-Volume Dialer",
+                conversion: "22.4%",
+                connection: "68.2%",
+                formulaCon: "\\text{Conv} = \\left( \\frac{\\text{Proposal}}{\\text{Total Contact}} \\right)",
+                formulaConn: "\\text{Conn} = \\left( \\frac{\\text{Dials}}{\\text{Entities}} \\right)",
+                queue: [
+                    { id: "lead-201", name: "Pure Kitchen Recycling", city: "Los Angeles", priority: "A", score: 95, phone: "(310) 555-9011", email: "pickup@purekitchen.com", crawl: "[Verified Match] Active heavy fleet interceptor vacuum pumps and holding tanks in service." },
+                    { id: "lead-202", name: "Culinary Waste Management", city: "Culver City", priority: "A", score: 91, phone: "(310) 555-1422", email: "service@culinarywaste.com", crawl: "Keywords match restaurant grease trap pumping and deep kitchen filter replacement." }
+                ]
+            },
+            asbestos_abatement: {
+                vertical: "Asbestos Remediation Key Accounts",
+                conversion: "31.5%",
+                connection: "91.3%",
+                formulaCon: "\\text{Rate} = \\frac{\\text{Signed contracts}}{\\text{Proposals}}",
+                formulaConn: "\\text{Ratio} = \\frac{\\text{Interaction Count}}{\\text{Allocations}}",
+                queue: [
+                    { id: "lead-301", name: "Precision Remediation LLC", city: "Fremont", priority: "A", score: 99, phone: "(510) 555-1992", email: "safety@precisionhaz.com", crawl: "[Verified Match] Licensed asbestos & lead remediation facility. HEPA negative air systems detected." }
+                ]
+            }
+        };
+
+        let currentActiveLead = null;
+
+        function buildFormulas() {
+            const ctxKey = document.getElementById('campaignContext').value;
+            const data = MOCK_CAMPAIGNS[ctxKey];
+            katex.render(data.formulaCon, document.getElementById('formulaConversion'), { throwOnError: false });
+            katex.render(data.formulaConn, document.getElementById('formulaConnection'), { throwOnError: false });
+        }
+
+        function logTelemetry(text) {
+            const consoleBox = document.getElementById('consoleTelemetry');
+            consoleBox.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${text}`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function populateQueue(ctxKey) {
+            const data = MOCK_CAMPAIGNS[ctxKey];
+            const container = document.getElementById('queueContainer');
+            container.innerHTML = '';
+
+            document.getElementById('statConversion').innerText = data.conversion;
+            document.getElementById('statConnection').innerText = data.connection;
+
+            if (data.queue.length === 0) {
+                container.innerHTML = '<div class="text-center py-8 text-sm text-[var(--on-surface-de-emphasis)] italic">All targets successfully locked or processed in this workspace. Try fetching next batch.</div>';
+                return;
+            }
+
+            data.queue.forEach(lead => {
+                const badgeStyle = lead.priority === 'A'
+                    ? 'bg-[var(--positive-surface)] text-[var(--positive)]'
+                    : lead.priority === 'B'
+                        ? 'bg-[var(--primary-container)] text-[var(--primary)]'
+                        : 'bg-[var(--surface-container-high)] text-[var(--on-surface-de-emphasis)]';
+
+                const div = document.createElement('div');
+                div.className = "bg-[var(--surface-container)] hover:bg-[var(--surface-container-high)] border border-[var(--stroke-default)] rounded-xl p-4 flex justify-between items-center cursor-pointer transition";
+                div.onclick = () => selectTarget(lead);
+                div.innerHTML = `
+                    <div class="flex flex-col gap-1">
+                        <h4 class="text-sm font-bold">${lead.name}</h4>
+                        <span class="text-xs text-[var(--on-surface-de-emphasis)] flex items-center gap-1">
+                            <span class="material-icons text-xs">place</span> ${lead.city}, CA
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${badgeStyle}">${lead.priority}</span>
+                        <div class="text-right">
+                            <div class="text-xs text-[var(--on-surface-de-emphasis)]">MIE Score</div>
+                            <div class="text-xs font-bold font-mono">${lead.score}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function selectTarget(lead) {
+            currentActiveLead = lead;
+            logTelemetry(`[Acquire Lock] Company locked to dispatcher session: ID: ${lead.id}`);
+
+            document.getElementById('focusName').innerText = lead.name;
+            document.getElementById('focusPhone').innerText = lead.phone;
+            document.getElementById('focusEmail').innerText = lead.email;
+            document.getElementById('focusCrawler').innerText = lead.crawl;
+
+            const badge = document.getElementById('focusPriorityBadge');
+            badge.innerText = `Priority ${lead.priority}`;
+            badge.className = "inline-flex mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold " + (
+                lead.priority === 'A' ? 'bg-[var(--positive-surface)] text-[var(--positive)]' :
+                lead.priority === 'B' ? 'bg-[var(--primary-container)] text-[var(--primary)]' :
+                'bg-[var(--surface-container-high)] text-[var(--on-surface-de-emphasis)]'
+            );
+
+            document.getElementById('submitBtn').disabled = false;
+
+            anime({
+                targets: '#focusName',
+                translateY: [-5, 0],
+                opacity: [0, 1],
+                duration: 400,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        function acquireTargets() {
+            logTelemetry(`[Acquire Queue] Querying DB get_next_outreach_queue for next available priorities...`);
+            anime({
+                targets: '#queueContainer div',
+                scale: [0.98, 1],
+                opacity: [0.5, 1],
+                delay: anime.stagger(100),
+                duration: 600,
+                easing: 'easeOutElastic(1, .8)'
+            });
+            setTimeout(() => {
+                logTelemetry(`[DB Lock success] 3 records locked using SKIP LOCKED database transaction gating.`);
+            }, 500);
+        }
+
+        function logInteraction(event) {
+            event.preventDefault();
+            if (!currentActiveLead) return;
+
+            logTelemetry(`[Submit Log] Inserting log transaction onto public.outreach_logs...`);
+
+            setTimeout(() => {
+                logTelemetry(`[DB Trigger Execution] Trigger processed outreach progression outcome hook successfully.`);
+                logTelemetry(`[Lead Progression Committed] Company status updated dynamically based on outcome parameter.`);
+
+                const ctxKey = document.getElementById('campaignContext').value;
+                MOCK_CAMPAIGNS[ctxKey].queue = MOCK_CAMPAIGNS[ctxKey].queue.filter(l => l.id !== currentActiveLead.id);
+
+                currentActiveLead = null;
+                document.getElementById('focusName').innerText = "No Active Target Selected";
+                document.getElementById('focusPhone').innerText = "-";
+                document.getElementById('focusEmail').innerText = "-";
+                document.getElementById('focusCrawler').innerText = "Select a target lead in the workspace deck to inspect auto-discovered assets & keyword matches.";
+
+                const badge = document.getElementById('focusPriorityBadge');
+                badge.innerText = "Standing By";
+                badge.className = "inline-flex mt-2 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[var(--surface-container-high)] text-[var(--on-surface-de-emphasis)]";
+
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('logNotes').value = '';
+
+                populateQueue(ctxKey);
+            }, 400);
+        }
+
+        function switchCampaign() {
+            const val = document.getElementById('campaignContext').value;
+            logTelemetry(`[Header Context trigger] Swapping active pipeline segment to: '${val}'`);
+            buildFormulas();
+            populateQueue(val);
+        }
+
+        window.onload = () => {
+            buildFormulas();
+            populateQueue('slurry_concrete');
+        };
+    </script>
+</body>
+</html>

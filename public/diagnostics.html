@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIE Real-Time Diagnostics Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0b57d0;
+            --on-primary: #ffffff;
+            --primary-container: #d3e3fd;
+            --surface: #ffffff;
+            --surface-container: #f0f4f9;
+            --surface-container-high: #e9ebf0;
+            --on-surface-default: #1b1c1d;
+            --on-surface-de-emphasis: #444746;
+            --stroke-default: #dcdfe5;
+            --positive: #146c2e;
+            --positive-surface: #c4eed0;
+            --negative: #b3261e;
+            --negative-surface: #ffcdd2;
+            --font-sans: "Google Sans", sans-serif;
+            --font-mono: "Google Sans Code", monospace;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #a8c7fa;
+                --on-primary: #062e6f;
+                --primary-container: #1f3760;
+                --surface: #101218;
+                --surface-container: #282a2c;
+                --surface-container-high: #3a3f50;
+                --on-surface-default: #ffffff;
+                --on-surface-de-emphasis: #c4c7c5;
+                --stroke-default: #2d2f38;
+                --positive: #6dd58c;
+                --positive-surface: #1f3025;
+                --negative: #f2b8b5;
+                --negative-surface: #381a21;
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--surface-container);
+            color: var(--on-surface-default);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header-bar {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--stroke-default);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .header-title .material-icons { color: var(--primary); }
+
+        .context-selector {
+            background: var(--surface-container-high);
+            border: 1px solid var(--stroke-default);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            color: var(--on-surface-default);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .workspace-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 0;
+        }
+
+        .control-sidebar {
+            background-color: var(--surface);
+            border-right: 1px solid var(--stroke-default);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar-section { display: flex; flex-direction: column; gap: 12px; }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--on-surface-de-emphasis);
+        }
+
+        .diagnostic-card {
+            background: var(--surface-container);
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px solid var(--stroke-default);
+        }
+
+        .card-label { font-size: 12px; color: var(--on-surface-de-emphasis); margin-bottom: 4px; }
+
+        .card-value { font-size: 14px; font-family: var(--font-mono); font-weight: 500; color: var(--on-surface-default); }
+
+        .main-dashboard {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+        }
+
+        .metric-cards-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--stroke-default);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .kpi-card.positive::before { background: var(--positive); }
+        .kpi-card.negative::before { background: var(--negative); }
+
+        .kpi-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--on-surface-de-emphasis);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--on-surface-default);
+            line-height: 1.1;
+        }
+
+        .formula-container {
+            margin-top: 8px;
+            font-size: 11px;
+            background: var(--surface-container);
+            padding: 4px 8px;
+            border-radius: 6px;
+            width: fit-content;
+        }
+
+        .table-panel {
+            background: var(--surface);
+            border: 1px solid var(--stroke-default);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .table-header { display: flex; justify-content: space-between; align-items: center; }
+        .table-title { font-size: 16px; font-weight: 500; }
+
+        .pipeline-table-wrapper { overflow-x: auto; }
+
+        .pipeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .pipeline-table th {
+            padding: 12px 16px;
+            font-weight: 500;
+            color: var(--on-surface-de-emphasis);
+            border-bottom: 1px solid var(--stroke-default);
+        }
+
+        .pipeline-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--surface-container);
+        }
+
+        .priority-badge {
+            display: inline-flex;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .priority-badge.A { background: var(--positive-surface); color: var(--positive); }
+        .priority-badge.B { background: var(--primary-container); color: var(--primary); }
+        .priority-badge.C { background: var(--surface-container-high); color: var(--on-surface-de-emphasis); }
+
+        .btn {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.9; }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--stroke-default);
+            color: var(--on-surface-default);
+        }
+
+        .btn-outline:hover { background: var(--surface-container-high); }
+
+        .simulation-console {
+            background: #141619;
+            color: #a8ffb2;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            border-radius: 12px;
+            padding: 16px;
+            height: 120px;
+            overflow-y: auto;
+            border: 1px solid #2d2f38;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-bar">
+        <div class="header-title">
+            <span class="material-icons">query_stats</span>
+            <span>Index Intelligence Engine Diagnostic Portal</span>
+        </div>
+        <div>
+            <select class="context-selector" id="clientContext" onchange="switchClientContext()">
+                <option value="slurry_concrete">slurry_concrete (Concrete Slurry)</option>
+                <option value="grease_trap">grease_trap (Grease Traps)</option>
+                <option value="asbestos_abatement">asbestos_abatement (Asbestos Abatement)</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="workspace-grid">
+
+        <aside class="control-sidebar">
+
+            <div class="sidebar-section">
+                <span class="section-title">Tenant Active RLS Target</span>
+                <div class="diagnostic-card">
+                    <div class="card-label">Organization ID</div>
+                    <div class="card-value" id="valOrgId">org_4f89_e3a2</div>
+                    <div class="card-label" style="margin-top: 8px;">Subscription Quota</div>
+                    <div class="card-value" id="valQuota">Trialing (starter) - 500 Max</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <span class="section-title">Enriched Vector Vectors</span>
+                <div class="diagnostic-card" style="display: flex; flex-direction: column; gap: 8px;">
+                    <div>
+                        <div class="card-label">NAICS Targets</div>
+                        <div class="card-value" id="valNaics" style="font-size: 11px;">562211, 562219</div>
+                    </div>
+                    <div>
+                        <div class="card-label">Positive Equipment Keywords</div>
+                        <div class="card-value" id="valPosKeywords" style="font-size: 11px;">vacuum, filter press</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <span class="section-title">Discovery Orchestration</span>
+                <button class="btn" onclick="triggerDiscoverySim()">
+                    <span class="material-icons">bolt</span>
+                    Run Discovery Sync
+                </button>
+                <button class="btn btn-outline" onclick="resetDatabaseSim()">
+                    <span class="material-icons">restore</span>
+                    Reset Mock Syncs
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <span class="section-title">Real-Time Sync Logs</span>
+                <div class="simulation-console" id="consoleLogs">
+                    [System Initialized] Standing by for X-IIE-Client-Context simulation trigger...
+                </div>
+            </div>
+
+        </aside>
+
+        <main class="main-dashboard">
+
+            <div class="metric-cards-row">
+
+                <div class="kpi-card">
+                    <div class="kpi-title">Total Discovered Pipeline</div>
+                    <div class="kpi-value" id="kpiTotalLeads">142</div>
+                    <div class="card-label" style="margin-top: 8px;">Unique DB Entities Linked</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-title">Contact Enrichment</div>
+                    <div class="kpi-value" id="kpiEnrichment">74.2%</div>
+                    <div class="formula-container" id="formulaEnrichment"></div>
+                </div>
+
+                <div class="kpi-card positive">
+                    <div class="kpi-title">Pipeline Conversion</div>
+                    <div class="kpi-value" id="kpiConversion">18.4%</div>
+                    <div class="formula-container" id="formulaConversion"></div>
+                </div>
+
+            </div>
+
+            <div class="table-panel">
+                <div class="table-header">
+                    <div class="table-title" id="tableTitle">Target Pipeline: slurry_concrete</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline" onclick="exportCSV()">
+                            <span class="material-icons">download</span> Export Base64 CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pipeline-table-wrapper">
+                    <table class="pipeline-table">
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Zip</th>
+                                <th>Priority Group</th>
+                                <th>MIE Score</th>
+                                <th>Status</th>
+                                <th>Capability Signal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pipelineRows"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script>
+        const MOCK_DB = {
+            slurry_concrete: {
+                orgId: "org-0b57-d3e3",
+                quota: "starter (500 Max)",
+                naics: "562211 - Hazardous Waste Treatment",
+                positives: "Vacuum Truck, Filter Press, Dewatering",
+                totalLeads: 184,
+                enrichment: 84.5,
+                conversion: 14.8,
+                companies: [
+                    { name: "Metro Slurry Management", zip: "94544", priority: "A", score: 96, status: "WON", notes: "[Verified Match] Active vacuum truck and filter press configurations identified." },
+                    { name: "Svenson Operations", zip: "94544", priority: "A", score: 88, status: "QUALIFIED", notes: "Registry match for environmental logistics support." },
+                    { name: "Industrial Hydro-Vac", zip: "94540", priority: "B", score: 76, status: "CALLED", notes: "Apollo verified email sequence active." }
+                ]
+            },
+            grease_trap: {
+                orgId: "org-9ac2-ffe3",
+                quota: "pro (5000 Max)",
+                naics: "562219 - Non-Hazardous Recovery",
+                positives: "Interceptor, Vacuum Tanker, Hydro-jet",
+                totalLeads: 412,
+                enrichment: 68.2,
+                conversion: 22.4,
+                companies: [
+                    { name: "Pure Kitchen Recycling", zip: "90210", priority: "A", score: 95, status: "WON", notes: "[Verified Match] Active heavy fleet interceptor vacuum pumps in play." },
+                    { name: "Grease Trap Experts", zip: "90211", priority: "B", score: 82, status: "INTERESTED", notes: "Crawl patterns confirmed industrial kitchen interceptor pumping." },
+                    { name: "Regional Waste Logistics", zip: "90215", priority: "C", score: 64, status: "EMAILED", notes: "No direct equipment match verified on main domain." }
+                ]
+            },
+            asbestos_abatement: {
+                orgId: "org-ff88-29ab",
+                quota: "enterprise (Unlimited)",
+                naics: "562910 - Remediation Services",
+                positives: "Negative Air, Decon Unit, HEPA",
+                totalLeads: 890,
+                enrichment: 91.3,
+                conversion: 31.5,
+                companies: [
+                    { name: "Remediation Group USA", zip: "10001", priority: "A", score: 99, status: "WON", notes: "[Verified Match] Highly certified air scrubber inventory mapped directly." },
+                    { name: "Safe Abatement Corp", zip: "10003", priority: "A", score: 90, status: "QUALIFIED", notes: "Apollo enriched lead details synced perfectly." },
+                    { name: "Precision Hazardous LLC", zip: "10010", priority: "B", score: 79, status: "NOT_CONTACTED", notes: "Negative air tracking signals discovered on sub-domain crawl." }
+                ]
+            }
+        };
+
+        function renderFormulas() {
+            katex.render(
+                "\\text{Rate} = \\left(\\frac{\\text{Enriched}}{\\text{Total}}\\right) \\times 100",
+                document.getElementById('formulaEnrichment'),
+                { throwOnError: false }
+            );
+            katex.render(
+                "\\text{Conversion} = \\left(\\frac{\\text{Won}}{\\text{Contacted}}\\right) \\times 100",
+                document.getElementById('formulaConversion'),
+                { throwOnError: false }
+            );
+        }
+
+        function updateDashboard(contextKey) {
+            const data = MOCK_DB[contextKey];
+            document.getElementById('valOrgId').innerText = data.orgId;
+            document.getElementById('valQuota').innerText = data.quota;
+            document.getElementById('valNaics').innerText = data.naics;
+            document.getElementById('valPosKeywords').innerText = data.positives;
+            document.getElementById('kpiTotalLeads').innerText = data.totalLeads;
+            document.getElementById('kpiEnrichment').innerText = data.enrichment + "%";
+            document.getElementById('kpiConversion').innerText = data.conversion + "%";
+            document.getElementById('tableTitle').innerText = `Target Pipeline: ${contextKey}`;
+
+            const tbody = document.getElementById('pipelineRows');
+            tbody.innerHTML = '';
+
+            data.companies.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 500;">${c.name}</td>
+                    <td>${c.zip}</td>
+                    <td><span class="priority-badge ${c.priority}">${c.priority}</span></td>
+                    <td style="font-family: var(--font-mono); font-weight: 700;">${c.score}</td>
+                    <td><span style="font-size: 11px; font-weight: 500;">${c.status}</span></td>
+                    <td style="color: var(--on-surface-de-emphasis); max-width: 320px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" title="${c.notes}">${c.notes}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function switchClientContext() {
+            const val = document.getElementById('clientContext').value;
+            writeLog(`[Header Trigger] Switch Client Context to '${val}'`);
+            writeLog(`Enforcing RLS Isolation boundary for organization_id: ...`);
+            updateDashboard(val);
+        }
+
+        function writeLog(text) {
+            const consoleBox = document.getElementById('consoleLogs');
+            consoleBox.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${text}`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function triggerDiscoverySim() {
+            const val = document.getElementById('clientContext').value;
+            writeLog(`[IIE Pipeline Init] Discovering leads using positive keywords and target NAICS codes...`);
+            anime({ targets: '.kpi-card', scale: [1, 1.05, 1], duration: 400, easing: 'easeInOutQuad' });
+            setTimeout(() => {
+                writeLog(`[Places Hook] Discovery API successfully fetched local profiles matching geography.`);
+                writeLog(`[Apollo Hook] Enrichment process populated emails and titles with matching token records.`);
+                writeLog(`[Gemini Hook] Real-time crawl extracted signal configurations.`);
+                writeLog(`[System Sync] Completed sync. 3 database records committed safely.`);
+            }, 600);
+        }
+
+        function resetDatabaseSim() {
+            writeLog(`[Database] Truncating local temporary memory cache...`);
+            setTimeout(() => { writeLog(`[Database Init] Re-running initial database schemas.`); switchClientContext(); }, 300);
+        }
+
+        function exportCSV() {
+            const val = document.getElementById('clientContext').value;
+            writeLog(`[Export] Packaging base64 pipeline elements for file: ${val}-market-index.csv`);
+            alert(`Ready to stream CSV. Check local API endpoint routes for full multi-tenant export arrays.`);
+        }
+
+        window.onload = () => { renderFormulas(); updateDashboard('slurry_concrete'); };
+    </script>
+</body>
+</html>

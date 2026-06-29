@@ -1,0 +1,9 @@
+{
+  "workspaceId": "REPLACE_WITH_YOUR_INFISICAL_PROJECT_ID",
+  "defaultEnvironment": "dev",
+  "gitBranchToEnvironmentMapping": {
+    "main": "prod",
+    "dev": "dev",
+    "staging": "staging"
+  }
+}

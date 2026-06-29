@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIE Real-Time Performance & Governance Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --primary: #0b57d0;
+            --on-primary: #ffffff;
+            --primary-container: #d3e3fd;
+            --surface: #ffffff;
+            --surface-container: #f0f4f9;
+            --surface-container-high: #e9ebf0;
+            --on-surface-default: #1b1c1d;
+            --on-surface-de-emphasis: #444746;
+            --stroke-default: #dcdfe5;
+            --positive: #146c2e;
+            --positive-surface: #c4eed0;
+            --negative: #b3261e;
+            --negative-surface: #ffcdd2;
+            --font-sans: "Google Sans", sans-serif;
+            --font-mono: "Google Sans Code", monospace;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #a8c7fa;
+                --on-primary: #062e6f;
+                --primary-container: #1f3760;
+                --surface: #101218;
+                --surface-container: #1b1d24;
+                --surface-container-high: #242730;
+                --on-surface-default: #ffffff;
+                --on-surface-de-emphasis: #c4c7c5;
+                --stroke-default: #2d313d;
+                --positive: #6dd58c;
+                --positive-surface: #1f3025;
+                --negative: #f2b8b5;
+                --negative-surface: #381a21;
+            }
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--surface-container);
+            color: var(--on-surface-default);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--stroke-default); border-radius: 4px; }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <header class="bg-[var(--surface)] border-b border-[var(--stroke-default)] px-6 py-4 flex justify-between items-center z-20">
+        <div class="flex items-center gap-3">
+            <span class="material-icons text-[var(--primary)] text-3xl animate-pulse">troubleshoot</span>
+            <div>
+                <h1 class="text-base font-bold tracking-tight">System Observability & CRUD Governance</h1>
+                <p class="text-xs text-[var(--on-surface-de-emphasis)]">Index Intelligence Multi-Tenant Audit Engine v1.0</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="bg-[var(--surface-container-high)] border border-[var(--stroke-default)] px-3 py-1.5 rounded-lg flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-[var(--positive)]"></span>
+                <span class="text-xs font-bold uppercase tracking-wider text-[var(--on-surface-de-emphasis)]" id="telemetryStatus">Telemetry Live</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 grid grid-cols-12 overflow-hidden">
+
+        <main class="col-span-8 p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6">
+
+            <section class="grid grid-cols-3 gap-4">
+
+                <div class="bg-[var(--surface)] p-5 border border-[var(--stroke-default)] rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-sm">
+                    <span class="text-[10px] font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-widest">Total API Costs</span>
+                    <span class="text-3xl font-bold mt-2 text-[var(--primary)]" id="statCost">$0.024215</span>
+                    <div class="mt-4 p-2 bg-[var(--surface-container)] rounded-xl text-[10px] flex items-center justify-center border border-[var(--stroke-default)]" id="formulaCost"></div>
+                </div>
+
+                <div class="bg-[var(--surface)] p-5 border border-[var(--stroke-default)] rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-sm">
+                    <span class="text-[10px] font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-widest">Mean Queue Latency</span>
+                    <span class="text-3xl font-bold mt-2" id="statAvgLatency">421 ms</span>
+                    <div class="mt-4 p-2 bg-[var(--surface-container)] rounded-xl text-[10px] flex items-center justify-center border border-[var(--stroke-default)]" id="formulaLatency"></div>
+                </div>
+
+                <div class="bg-[var(--surface)] p-5 border border-[var(--stroke-default)] rounded-2xl relative overflow-hidden flex flex-col justify-between shadow-sm">
+                    <span class="text-[10px] font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-widest">Failure Threshold</span>
+                    <span class="text-3xl font-bold mt-2 text-[var(--negative)]" id="statFailureRate">1.4%</span>
+                    <div class="mt-4 p-2 bg-[var(--surface-container)] rounded-xl text-[10px] flex items-center justify-center border border-[var(--stroke-default)]" id="formulaFailure"></div>
+                </div>
+
+            </section>
+
+            <section class="bg-[var(--surface)] border border-[var(--stroke-default)] rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+                <div class="flex justify-between items-center border-b border-[var(--stroke-default)] pb-4">
+                    <h2 class="text-sm font-bold flex items-center gap-2">
+                        <span class="material-icons text-[var(--primary)]">list_alt</span> Real-Time Audit Telemetry Streams
+                    </h2>
+                    <div class="flex gap-2">
+                        <button onclick="injectSimulatedSuccess()" class="bg-[var(--primary)] text-[var(--on-primary)] hover:opacity-90 text-xs font-medium px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+                            <span class="material-icons text-xs">add_task</span> Success Trace
+                        </button>
+                        <button onclick="injectSimulatedFailure()" class="bg-[var(--negative-surface)] text-[var(--negative)] hover:opacity-90 text-xs font-medium px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+                            <span class="material-icons text-xs">error</span> Failure Trace
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="text-[var(--on-surface-de-emphasis)] border-b border-[var(--stroke-default)]">
+                                <th class="pb-3 font-semibold">Trace ID</th>
+                                <th class="pb-3 font-semibold">Provider</th>
+                                <th class="pb-3 font-semibold">Action Type</th>
+                                <th class="pb-3 font-semibold">Latency</th>
+                                <th class="pb-3 font-semibold text-right">Cost</th>
+                                <th class="pb-3 font-semibold text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="telemetryRows" class="divide-y divide-[var(--stroke-default)] text-[var(--on-surface-default)]"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+
+        <aside class="col-span-4 bg-[var(--surface)] border-l border-[var(--stroke-default)] p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6 shadow-md z-10">
+
+            <div class="border-b border-[var(--stroke-default)] pb-4">
+                <span class="text-[10px] uppercase tracking-widest font-bold text-[var(--on-surface-de-emphasis)]">Governance Panel</span>
+                <h3 class="text-base font-bold mt-1">Dynamic Vertical Tuning (CRUD)</h3>
+                <p class="text-[11px] text-[var(--on-surface-de-emphasis)] mt-1 leading-relaxed">Modify global target NAICS parameters, equipment identifiers, and matching weights dynamically below.</p>
+            </div>
+
+            <form id="crudConfigForm" onsubmit="submitVerticalTuning(event)" class="flex flex-col gap-4">
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Vertical Target Niche</label>
+                    <select id="crudSlug" onchange="loadSelectedVerticalMetadata()" class="bg-[var(--surface-container-high)] border border-[var(--stroke-default)] rounded-xl px-3 py-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--on-surface-default)]">
+                        <option value="slurry_concrete">Concrete Slurry Outbound</option>
+                        <option value="grease_trap">Commercial Grease Trap Pumping</option>
+                        <option value="asbestos_abatement">Asbestos Remediation Key Accounts</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Target NAICS Multi-Codes (Comma Separated)</label>
+                    <input type="text" id="crudNaics" value="562211, 562219" class="bg-[var(--surface-container-high)] border border-[var(--stroke-default)] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--on-surface-default)] font-mono">
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[10px] font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Scraper Match Keywords (Comma Separated)</label>
+                    <input type="text" id="crudKeywords" value="Vacuum Truck, Centrifugal Filter, Dewatering" class="bg-[var(--surface-container-high)] border border-[var(--stroke-default)] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--on-surface-default)]">
+                </div>
+
+                <div class="flex flex-col gap-3 bg-[var(--surface-container)] p-4 rounded-xl border border-[var(--stroke-default)]">
+                    <span class="text-[10px] font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-wider">Weighted Scoring Multipliers</span>
+
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex justify-between text-[11px] font-medium text-[var(--on-surface-de-emphasis)]">
+                            <span>Proximity Score Weight</span>
+                            <span id="weightDistLabel">30%</span>
+                        </div>
+                        <input type="range" id="weightDist" min="0" max="100" value="30" oninput="updateWeightBalance('dist')" class="w-full accent-[var(--primary)] h-1.5 bg-[var(--stroke-default)] rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex justify-between text-[11px] font-medium text-[var(--on-surface-de-emphasis)]">
+                            <span>Contact Completeness Weight</span>
+                            <span id="weightContactLabel">40%</span>
+                        </div>
+                        <input type="range" id="weightContact" min="0" max="100" value="40" oninput="updateWeightBalance('contact')" class="w-full accent-[var(--primary)] h-1.5 bg-[var(--stroke-default)] rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex justify-between text-[11px] font-medium text-[var(--on-surface-de-emphasis)]">
+                            <span>Crawl Asset Signal Weight</span>
+                            <span id="weightAssetLabel">30%</span>
+                        </div>
+                        <input type="range" id="weightAsset" min="0" max="100" value="30" oninput="updateWeightBalance('asset')" class="w-full accent-[var(--primary)] h-1.5 bg-[var(--stroke-default)] rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div class="text-[10px] text-center text-[var(--negative)] font-bold hidden" id="weightSumError">
+                        Error: Total weight calculations must balance to exactly 100%
+                    </div>
+                </div>
+
+                <button type="submit" id="saveCrudBtn" class="bg-[var(--primary)] text-[var(--on-primary)] hover:opacity-90 text-xs font-semibold py-3 rounded-xl flex justify-center items-center gap-2 shadow-sm transition">
+                    <span class="material-icons text-sm">cloud_upload</span> Commit Weight Vector Settings
+                </button>
+
+            </form>
+
+            <div class="border-t border-[var(--stroke-default)] pt-4 mt-auto">
+                <span class="text-[10px] font-bold text-[var(--on-surface-de-emphasis)] uppercase tracking-widest flex items-center gap-1.5">
+                    <span class="material-icons text-xs text-[var(--primary)] animate-pulse">terminal</span> Telemetry Pipeline Audit logs
+                </span>
+                <div class="mt-2 bg-[#101218] text-[#9effad] font-mono text-[10px] p-3 rounded-xl h-24 overflow-y-auto custom-scrollbar" id="telemetryConsole">
+                    [System Boot] Ready to stream observability traces...
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+
+    <div id="toastNotification" class="fixed bottom-6 left-6 bg-[var(--surface-container-high)] text-[var(--on-surface-default)] border border-[var(--stroke-default)] px-4 py-3 rounded-2xl shadow-xl z-50 flex items-center gap-2 opacity-0 transform translate-y-4 pointer-events-none transition-all duration-300">
+        <span class="material-icons text-[var(--primary)]" id="toastIcon">info</span>
+        <span class="text-xs font-medium" id="toastMessage">Success</span>
+    </div>
+
+    <script>
+        const AUDIT_TRACE_MOCK = {
+            totalCalls: 342, failureCalls: 5, accumulatedCost: 0.024215, averageLatencyMs: 421,
+            traces: [
+                { id: "tr-948a", provider: "gemini_grounding", action: "Grounding Crawler: Svenson", latency: 1240, cost: 0.000450, success: true },
+                { id: "tr-21ab", provider: "google_places", action: "Google Search: Hayward CA", latency: 320, cost: 0.000180, success: true },
+                { id: "tr-04fe", provider: "apollo", action: "Contact Enrichment: Svenson", latency: 154, cost: 0.000080, success: true },
+                { id: "tr-889d", provider: "system_adapter", action: "Deduplication Merge Trace", latency: 12, cost: 0.000000, success: true }
+            ]
+        };
+
+        const VERTICAL_METADATA_STORE = {
+            slurry_concrete: { naics: "562211, 562219", keywords: "Vacuum Truck, Centrifugal Filter, Dewatering", dist: 30, contact: 40, asset: 30 },
+            grease_trap: { naics: "562219, 562910", keywords: "Interceptor, Vacuum Tanker, Hydro-jet", dist: 40, contact: 30, asset: 30 },
+            asbestos_abatement: { naics: "562910, 541620", keywords: "HEPA Negative Air, Asbestos Filter, Air Scrubber", dist: 20, contact: 50, asset: 30 }
+        };
+
+        function renderObsFormulas() {
+            katex.render("\\text{Cost} = \\sum C_{provider}", document.getElementById('formulaCost'), { throwOnError: false });
+            katex.render("\\text{Latency} = \\frac{1}{N}\\sum L_i", document.getElementById('formulaLatency'), { throwOnError: false });
+            katex.render("\\text{Fail}\\% = \\left( \\frac{F}{N} \\right) \\times 100", document.getElementById('formulaFailure'), { throwOnError: false });
+        }
+
+        function triggerToast(message, icon) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastMessage').innerText = message;
+            document.getElementById('toastIcon').innerText = icon || 'info';
+            toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            toast.classList.add('opacity-1', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                toast.classList.remove('opacity-1', 'translate-y-0');
+            }, 3000);
+        }
+
+        function terminalLog(text) {
+            const consoleBox = document.getElementById('telemetryConsole');
+            consoleBox.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${text}`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function renderTelemetryTraces() {
+            const tbody = document.getElementById('telemetryRows');
+            tbody.innerHTML = '';
+            AUDIT_TRACE_MOCK.traces.forEach(t => {
+                const badgeStyle = t.success ? 'bg-[var(--positive-surface)] text-[var(--positive)]' : 'bg-[var(--negative-surface)] text-[var(--negative)]';
+                const providerStyle = t.provider === 'gemini_grounding' ? 'text-[var(--primary)] font-semibold' : '';
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-[var(--surface-container)] transition";
+                tr.innerHTML = `
+                    <td class="py-3 font-mono font-bold">${t.id}</td>
+                    <td class="py-3 ${providerStyle}">${t.provider}</td>
+                    <td class="py-3 text-[var(--on-surface-de-emphasis)]">${t.action}</td>
+                    <td class="py-3 font-medium font-mono">${t.latency} ms</td>
+                    <td class="py-3 font-mono text-right">$${t.cost.toFixed(6)}</td>
+                    <td class="py-3 text-right">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${badgeStyle}">${t.success ? 'Success' : 'Failed'}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('statCost').innerText = `$${AUDIT_TRACE_MOCK.accumulatedCost.toFixed(6)}`;
+            document.getElementById('statAvgLatency').innerText = `${AUDIT_TRACE_MOCK.averageLatencyMs} ms`;
+            const rate = ((AUDIT_TRACE_MOCK.failureCalls / AUDIT_TRACE_MOCK.totalCalls) * 100).toFixed(1);
+            document.getElementById('statFailureRate').innerText = `${rate}%`;
+        }
+
+        function loadSelectedVerticalMetadata() {
+            const key = document.getElementById('crudSlug').value;
+            const meta = VERTICAL_METADATA_STORE[key];
+            document.getElementById('crudNaics').value = meta.naics;
+            document.getElementById('crudKeywords').value = meta.keywords;
+            document.getElementById('weightDist').value = meta.dist;
+            document.getElementById('weightContact').value = meta.contact;
+            document.getElementById('weightAsset').value = meta.asset;
+            updateWeightLabels();
+            terminalLog(`[CRUD Configuration] Loaded parameters for: '${key}'`);
+        }
+
+        function updateWeightBalance() {
+            const dist = parseInt(document.getElementById('weightDist').value);
+            const contact = parseInt(document.getElementById('weightContact').value);
+            const asset = parseInt(document.getElementById('weightAsset').value);
+            const sum = dist + contact + asset;
+            const errorBox = document.getElementById('weightSumError');
+            const submitBtn = document.getElementById('saveCrudBtn');
+            if (sum !== 100) {
+                errorBox.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-40', 'cursor-not-allowed');
+            } else {
+                errorBox.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-40', 'cursor-not-allowed');
+            }
+            updateWeightLabels();
+        }
+
+        function updateWeightLabels() {
+            document.getElementById('weightDistLabel').innerText = `${document.getElementById('weightDist').value}%`;
+            document.getElementById('weightContactLabel').innerText = `${document.getElementById('weightContact').value}%`;
+            document.getElementById('weightAssetLabel').innerText = `${document.getElementById('weightAsset').value}%`;
+        }
+
+        function submitVerticalTuning(event) {
+            event.preventDefault();
+            const key = document.getElementById('crudSlug').value;
+            terminalLog(`[CRUD DB Commit] Executing public.upsert_vertical_configuration on vertical '${key}'...`);
+            VERTICAL_METADATA_STORE[key] = {
+                naics: document.getElementById('crudNaics').value,
+                keywords: document.getElementById('crudKeywords').value,
+                dist: parseInt(document.getElementById('weightDist').value),
+                contact: parseInt(document.getElementById('weightContact').value),
+                asset: parseInt(document.getElementById('weightAsset').value)
+            };
+            anime({ targets: '#saveCrudBtn', scale: [1, 0.96, 1], duration: 300, easing: 'easeInOutQuad' });
+            setTimeout(() => {
+                terminalLog(`[DB Commit Success] Vertical targeting updates committed successfully.`);
+                triggerToast('Vertical Configuration Committed Safely', 'done_all');
+            }, 500);
+        }
+
+        function injectSimulatedSuccess() {
+            const providers = ['google_places', 'apollo', 'gemini_grounding', 'system_adapter'];
+            const randomProv = providers[Math.floor(Math.random() * providers.length)];
+            const randomLatency = randomProv === 'gemini_grounding' ? Math.floor(Math.random() * 800) + 1000 : Math.floor(Math.random() * 300) + 50;
+            const randomCost = randomProv === 'gemini_grounding' ? 0.000450 : randomProv === 'google_places' ? 0.000180 : 0.000080;
+            const newTrace = { id: `tr-${Math.random().toString(36).substring(2, 6)}`, provider: randomProv, action: `Injected Success Trace Activity Logs`, latency: randomLatency, cost: randomCost, success: true };
+            AUDIT_TRACE_MOCK.traces.unshift(newTrace);
+            if (AUDIT_TRACE_MOCK.traces.length > 6) AUDIT_TRACE_MOCK.traces.pop();
+            AUDIT_TRACE_MOCK.totalCalls += 1;
+            AUDIT_TRACE_MOCK.accumulatedCost += randomCost;
+            AUDIT_TRACE_MOCK.averageLatencyMs = Math.round(AUDIT_TRACE_MOCK.traces.reduce((a, t) => a + t.latency, 0) / AUDIT_TRACE_MOCK.traces.length);
+            terminalLog(`[Audit Trace Injected] Success logging verified for provider: '${randomProv}' (${randomLatency}ms)`);
+            renderTelemetryTraces();
+            anime({ targets: '#telemetryRows tr:first-child', opacity: [0, 1], translateX: [-20, 0], duration: 400, easing: 'easeOutQuad' });
+        }
+
+        function injectSimulatedFailure() {
+            const newTrace = { id: `tr-${Math.random().toString(36).substring(2, 6)}`, provider: "gemini_grounding", action: "Crawler Error: Connection Timeout Failure Exception", latency: 5000, cost: 0.000000, success: false };
+            AUDIT_TRACE_MOCK.traces.unshift(newTrace);
+            if (AUDIT_TRACE_MOCK.traces.length > 6) AUDIT_TRACE_MOCK.traces.pop();
+            AUDIT_TRACE_MOCK.totalCalls += 1;
+            AUDIT_TRACE_MOCK.failureCalls += 1;
+            AUDIT_TRACE_MOCK.averageLatencyMs = Math.round(AUDIT_TRACE_MOCK.traces.reduce((a, t) => a + t.latency, 0) / AUDIT_TRACE_MOCK.traces.length);
+            terminalLog(`[Audit Failure Injected] logged error on public.provider_audits traces.`);
+            renderTelemetryTraces();
+            anime({ targets: '#telemetryRows tr:first-child', backgroundColor: ['rgba(239, 68, 68, 0.2)', 'rgba(0, 0, 0, 0)'], duration: 800, easing: 'easeOutQuad' });
+        }
+
+        window.onload = () => { renderObsFormulas(); renderTelemetryTraces(); loadSelectedVerticalMetadata(); };
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+{
+  "name": "index-intelligence-engine",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "infisical run --env=dev -- next dev",
+    "dev:next": "next dev",
+    "build": "next build",
+    "build:local": "infisical run --env=prod -- next build",
+    "start": "next start",
+    "lint": "eslint",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@google/genai": "^2.9.0",
+    "@infisical/sdk": "^5.0.2",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.108.2",
+    "@upstash/redis": "^1.38.0",
+    "lucide-react": "^0.575.0",
+    "next": "^16.2.9",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^3.7.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^5.0.1",
+    "@storybook/addon-a11y": "^10.2.12",
+    "@storybook/addon-docs": "^10.2.12",
+    "@storybook/addon-onboarding": "^10.2.12",
+    "@storybook/addon-vitest": "^10.2.12",
+    "@storybook/nextjs-vite": "^10.2.12",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitest/browser-playwright": "^4.0.18",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.6",
+    "eslint-plugin-storybook": "^10.2.12",
+    "playwright": "^1.58.2",
+    "storybook": "^10.2.12",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
+  }
+}

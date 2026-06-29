@@ -1,0 +1,42 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { LayoutDashboard, Search, TrendingUp, Layers, Settings } from 'lucide-react';
+
+const items = [
+  { icon: LayoutDashboard, label: 'Overview', href: '/dashboard' },
+  { icon: Search,          label: 'Search',   href: '/dashboard/search' },
+  { icon: TrendingUp,      label: 'Markets',  href: '/dashboard/markets' },
+  { icon: Layers,          label: 'Campaigns',href: '/dashboard/campaigns' },
+  { icon: Settings,        label: 'Settings', href: '/dashboard/settings' },
+];
+
+export default function MobileBottomNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="mobile-nav">
+      {items.map(({ icon: Icon, label, href }) => {
+        const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={`mobile-nav-item ${active ? 'active' : ''}`}
+            aria-label={label}
+          >
+            <Icon
+              className="w-6 h-6"
+              strokeWidth={active ? 2.5 : 1.8}
+              style={{ color: active ? 'var(--color-red)' : 'var(--color-muted)' }}
+            />
+            <span style={{ color: active ? 'var(--color-red)' : 'var(--color-muted)' }}>
+              {label}
+            </span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}

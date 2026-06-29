@@ -1,0 +1,78 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write # Required for OIDC (Infisical + GitHub Pages)
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      # Fetch secrets from Infisical at runtime using OIDC (no static API keys needed)
+      - name: Inject secrets from Infisical
+        uses: Infisical/secrets-action@v1
+        with:
+          method: "oidc"
+          identity-id: ${{ secrets.INFISICAL_MACHINE_IDENTITY_ID }}
+          env-slug: "prod"
+          project-slug: ${{ secrets.INFISICAL_PROJECT_SLUG }}
+          export-type: "env"
+
+      - name: Build project
+        run: npm run build
+
+      # Critical: Disable Jekyll to allow _next folder to be served
+      - name: Create .nojekyll file
+        run: touch out/.nojekyll
+
+      # Safety catch — confirm build output exists
+      - name: Verify build output
+        run: |
+          if [ -d "./out" ]; then
+            echo "Success: 'out' directory exists."
+            ls -R ./out | head -n 20
+          else
+            echo "Error: 'out' directory NOT found. Checking for '.next' instead..."
+            ls -d .*/ */
+            exit 1
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./out
+          overwrite: true
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
