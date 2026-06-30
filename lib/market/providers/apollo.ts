@@ -1,4 +1,5 @@
 import { Company, Contact } from '@/types/company';
+import { redis, redisAvailable } from '@/lib/redis';
 
 export interface ApolloEnrichResult {
   companyFields: Partial<Company>;
@@ -8,6 +9,25 @@ export interface ApolloEnrichResult {
 export class ApolloAdapter {
   name = 'apollo';
 
+  private normalizeDomain(url: string): string {
+    try {
+      const parsed = new URL(
+        url.startsWith('http') ? url : `https://${url}`
+      );
+      return parsed.hostname
+        .replace(/^www\./i, '')
+        .trim()
+        .toLowerCase();
+    } catch {
+      return url
+        .replace(/^https?:\/\//i, '')
+        .replace(/^www\./i, '')
+        .split('/')[0]
+        .trim()
+        .toLowerCase();
+    }
+  }
+
   async enrich(company: Partial<Company>): Promise<ApolloEnrichResult> {
     const empty: ApolloEnrichResult = { companyFields: {}, contacts: [] };
     const apiKey = process.env.APOLLO_API_KEY;
@@ -16,10 +36,15 @@ export class ApolloAdapter {
     }
 
     try {
-      const cleanDomain = company.website
-        .replace(/^https?:\/\//i, '')
-        .replace(/^www\./i, '')
-        .split('/')[0];
+      const cleanDomain = this.normalizeDomain(company.website);
+      const cacheKey = `apollo:${cleanDomain}`;
+
+      if (redisAvailable()) {
+        const cached = await redis!.get(cacheKey);
+        if (cached) {
+          return cached as ApolloEnrichResult;
+        }
+      }
 
       const response = await fetch('https://api.apollo.io/v1/organizations/enrich', {
         method: 'POST',
@@ -32,48 +57,51 @@ export class ApolloAdapter {
       });
 
       if (!response.ok) {
+        console.warn(`[Apollo] HTTP ${response.status}`);
         return empty;
       }
 
       const data = await response.json();
-      const org = data.organization || {};
+      if (data.error) {
+        console.warn('[Apollo] API Error:', data.error);
+        return empty;
+      }
+
+      const org = data.organization;
+      if (!org) return empty;
 
       const now = new Date().toISOString();
 
-      const apolloDescriptionParts: string[] = [];
-
-      if (org.short_description) {
-        apolloDescriptionParts.push(org.short_description);
-      }
-
-      if (Array.isArray(org.keywords) && org.keywords.length > 0) {
-        apolloDescriptionParts.push(org.keywords.join(' '));
-      } else if (typeof org.keywords === 'string' && org.keywords) {
-        apolloDescriptionParts.push(org.keywords);
-      }
-
-      if (org.industry) {
-        apolloDescriptionParts.push(org.industry);
-      }
-
-      if (Array.isArray(org.sic_codes) && org.sic_codes.length > 0) {
-        apolloDescriptionParts.push(org.sic_codes.join(' '));
-      }
-
-      if (org.raw_description && org.raw_description !== org.short_description) {
-        apolloDescriptionParts.push((org.raw_description as string).slice(0, 400));
-      }
-
-      const apolloDescription = apolloDescriptionParts
+      const parts: string[] = [];
+      [
+        org.short_description,
+        org.raw_description?.slice(0, 500),
+        org.industry,
+        org.subindustry,
+        org.revenue_range,
+      ]
         .filter(Boolean)
-        .join(' | ')
-        .trim() || undefined;
+        .forEach(v => parts.push(v));
+
+      if (Array.isArray(org.keywords)) {
+        parts.push(org.keywords.join(' '));
+      } else if (typeof org.keywords === 'string' && org.keywords) {
+        parts.push(org.keywords);
+      }
+
+      if (Array.isArray(org.technologies)) {
+        parts.push(org.technologies.join(' '));
+      }
+
+      const apolloDescription = parts.join(' | ').trim() || undefined;
 
       const companyFields: Partial<Company> = {
-        email: org.primary_contact_email || undefined,
+        email: company.email || org.primary_contact_email || undefined,
         phone: company.phone || org.phone || undefined,
         apolloDescription,
-        source: `${company.source}+${this.name}`,
+        source: company.source
+          ? `${company.source}+apollo`
+          : 'apollo',
       };
 
       const contacts: Partial<Contact>[] = [];
@@ -91,9 +119,15 @@ export class ApolloAdapter {
         });
       }
 
-      return { companyFields, contacts };
+      const result: ApolloEnrichResult = { companyFields, contacts };
+
+      if (redisAvailable()) {
+        await redis!.set(cacheKey, result, { ex: 60 * 60 * 24 * 30 });
+      }
+
+      return result;
     } catch (err) {
-      console.error('Apollo Enrichment execution failure:', err);
+      console.error('[Apollo] Enrichment failure:', err);
       return empty;
     }
   }

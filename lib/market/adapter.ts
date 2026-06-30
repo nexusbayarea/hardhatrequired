@@ -142,10 +142,14 @@ export class IndexIntelligenceEngine {
 
       const apolloResult = await this.apolloAdapter.enrich(base);
 
-      // Merge Apollo fields into base so buildAnalysisText + signalExtractor see apolloDescription
+      // Merge Apollo fields — base (provider data) wins for contacts, Apollo augments
       const mergedBase: Partial<Company> = {
-        ...base,
         ...apolloResult.companyFields,
+        ...base,
+        source: base.source
+          ? `${base.source}+apollo`
+          : apolloResult.companyFields.source || 'apollo',
+        apolloDescription: apolloResult.companyFields.apolloDescription || base.apolloDescription,
       };
 
       // Stage 2a: Fast JSON-LD scrape before signal extraction (skips LLM if structured data found)
