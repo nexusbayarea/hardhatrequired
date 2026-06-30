@@ -591,6 +591,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     ],
     signals: {
       primary: [
+        { term: 'elevator', weight: 25 },
         { term: 'elevator inspection', weight: 25 },
         { term: 'lift certification', weight: 25 },
         { term: 'elevator testing', weight: 25 },
