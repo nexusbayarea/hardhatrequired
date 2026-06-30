@@ -156,7 +156,9 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     ],
     signals: {
       primary: [
-        { term: 'asbestos', weight: 25 },
+        { term: 'asbestos', weight: 30 },
+        { term: 'abatement', weight: 25 },
+        { term: 'environmental', weight: 20 },
         { term: 'lead abatement', weight: 25 },
         { term: 'hazmat remediation', weight: 25 },
         { term: 'environmental remediation', weight: 25 },
@@ -166,6 +168,8 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'demolition', weight: 10 },
         { term: 'air monitoring', weight: 10 },
         { term: 'encapsulation', weight: 10 },
+        { term: 'hazardous', weight: 10 },
+        { term: 'remediation', weight: 10 },
         { term: 'OSHA', weight: 10 },
         { term: 'HAZWOPER', weight: 10 },
         { term: 'EPA', weight: 10 },
@@ -336,12 +340,15 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     ],
     signals: {
       primary: [
+        { term: 'recycling', weight: 25 },
         { term: 'scrap metal', weight: 25 },
         { term: 'metal recycling', weight: 25 },
         { term: 'ferrous scrap', weight: 25 },
         { term: 'non-ferrous scrap', weight: 25 },
       ],
       secondary: [
+        { term: 'metal', weight: 10 },
+        { term: 'scrap', weight: 10 },
         { term: 'metal processing', weight: 10 },
         { term: 'scrap yard', weight: 10 },
         { term: 'metal shredding', weight: 10 },
@@ -379,6 +386,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     ],
     signals: {
       primary: [
+        { term: 'marine', weight: 25 },
         { term: 'marine construction', weight: 25 },
         { term: 'seawall', weight: 25 },
         { term: 'bulkhead', weight: 25 },
@@ -388,6 +396,8 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'commercial dredging', weight: 10 },
         { term: 'pile driving', weight: 10 },
         { term: 'marine infrastructure', weight: 10 },
+        { term: 'dock', weight: 10 },
+        { term: 'construction', weight: 5 },
       ],
       negative: [
         { term: 'boat rental', weight: -30 },
@@ -396,7 +406,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
-    baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
+    baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
     createdAt: NOW,
     providers: createSearchOnlyProviders([tomtom, overpass]),
   },
@@ -647,14 +657,19 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'test and balance', weight: 25 },
         { term: 'air balancing', weight: 25 },
         { term: 'HVAC balancing', weight: 25 },
+        { term: 'commercial HVAC', weight: 25 },
       ],
       secondary: [
+        { term: 'heating', weight: 10 },
+        { term: 'air conditioning', weight: 10 },
+        { term: 'air service', weight: 10 },
         { term: 'CFM', weight: 10 },
         { term: 'airflow testing', weight: 10 },
         { term: 'TAB contractor', weight: 10 },
       ],
       negative: [
         { term: 'window AC', weight: -30 },
+        { term: 'residential', weight: -40 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,

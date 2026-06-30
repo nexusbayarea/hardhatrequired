@@ -18,6 +18,7 @@ const NAICS_TO_OSM_TAGS: Record<string, string[]> = {
   '811310': ['industrial=generator', 'man_made=power_generator'],
   '811490': ['industrial=maintenance', 'man_made=test_equipment'],
   '238290': ['industrial=elevator', 'man_made=elevator_shaft'],
+  '541350': ['office=testing_laboratory', 'industrial=testing', 'office=building_inspector'],
   '561790': ['industrial=cleaning_plant', 'amenity=industrial_kitchen'],
   '541380': ['office=testing_laboratory', 'industrial=testing'],
 };

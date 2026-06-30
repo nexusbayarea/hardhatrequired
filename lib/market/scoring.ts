@@ -8,6 +8,7 @@ export interface ScoreBreakdown {
   categoryBonus: number;
   apolloBonus: number;
   regulatoryBonus: number;
+  webScrapeBonus: number;
   negativePenalty: number;
   historicalFeedbackBonus: number;
   total: number;
@@ -60,6 +61,7 @@ export function calculateLeadScore(
     categoryBonus: 0,
     apolloBonus: 0,
     regulatoryBonus: 0,
+    webScrapeBonus: 0,
     negativePenalty: 0,
     historicalFeedbackBonus: 0,
     total: 0,
@@ -136,6 +138,25 @@ export function calculateLeadScore(
     }
     if (company.googleRating && company.googleRating >= 4.2) {
       score += 5;
+    }
+
+    // Web scrape bonuses
+    let webScrapeBonus = 0;
+    if (company.scrapedIsCommercial) {
+      webScrapeBonus += 15;
+    }
+    if (company.scrapedKeywords?.length) {
+      webScrapeBonus += Math.min(25, company.scrapedKeywords.length * 5);
+    }
+    if (company.scrapedLicenseNumbers?.length) {
+      webScrapeBonus += 10;
+    }
+    if (company.scrapedIsResidential) {
+      webScrapeBonus -= 20;
+    }
+    if (webScrapeBonus !== 0) {
+      score += webScrapeBonus;
+      breakdown.webScrapeBonus = webScrapeBonus;
     }
 
     const dist = distanceMiles ?? company.distanceMiles;

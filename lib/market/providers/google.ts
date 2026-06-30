@@ -106,6 +106,17 @@ export const GOOGLE_TYPE_TO_VERTICAL_SIGNALS: Record<string, CategorySignal[]> =
     { term: 'fuel tank', weight: 5, strength: 'weak' },
     { term: 'UST', weight: 5, strength: 'weak' },
   ],
+  general_contractor: [
+    { term: 'contractor', weight: 2, strength: 'weak' },
+    { term: 'construction', weight: 2, strength: 'weak' },
+  ],
+  consultant: [
+    { term: 'consulting', weight: 3, strength: 'weak' },
+    { term: 'environmental', weight: 3, strength: 'weak' },
+  ],
+  service: [
+    { term: 'service', weight: 1, strength: 'weak' },
+  ],
 };
 
 export class GooglePlacesProvider implements DiscoveryProvider {
@@ -295,9 +306,14 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       const categorySignals = extractCategorySignals(allTypes, verticalConfig);
 
       const hasStrongSignals = categorySignals.some((s) => s.strength === 'strong');
-      const hasUsefulNameSignal = searchQueries.some((term) =>
-        (p.displayName?.text || '').toLowerCase().includes(term.toLowerCase())
+
+      const nameLower = (p.displayName?.text || '').toLowerCase();
+      const queryWords = new Set(
+        searchQueries.flatMap(q =>
+          q.toLowerCase().split(/\s+/).filter(w => w.length >= 4)
+        )
       );
+      const hasUsefulNameSignal = [...queryWords].some(w => nameLower.includes(w));
 
       const weakOnly =
         categorySignals.length > 0 &&

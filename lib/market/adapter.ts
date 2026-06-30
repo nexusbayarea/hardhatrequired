@@ -1,6 +1,7 @@
 import { Company, Contact, SearchFilters } from '@/types/company';
 import { VerticalConfig } from '@/types/config';
 import { VerticalConfigWithProviders, isIrrelevant } from './registry';
+import { getEnterpriseOverlay } from './enterpriseOverlay';
 import { ApolloAdapter } from './providers/apollo';
 import { KeywordSignalExtractor } from './signals';
 import { calculateLeadScore, buildAnalysisText } from './scoring';
@@ -8,6 +9,7 @@ import { geocodeZip, haversineDistance } from '@/lib/geo';
 import { getCompanyProfile, getBlacklistedVerticalCompanies } from '@/lib/feedback/storage';
 import { getFeedbackAdjustment } from '@/lib/feedback/trust';
 import { FastJsonLdScraper } from '@/lib/market/scrapers/fastScraper';
+import { scrapeCompanyWebsite } from '@/lib/market/workers/enrichmentScraper';
 
 export class IndexIntelligenceEngine {
   private apolloAdapter = new ApolloAdapter();
@@ -175,6 +177,15 @@ export class IndexIntelligenceEngine {
         }
       }
 
+      // Stage 2b: Full web scrape for keyword matching, commercial detection, license extraction
+      if (mergedBase.website) {
+        const scrapeResult = await scrapeCompanyWebsite(mergedBase.website, config.equipmentKeywords || []);
+        mergedBase.scrapedIsCommercial = scrapeResult.isCommercial;
+        mergedBase.scrapedIsResidential = scrapeResult.isResidential;
+        mergedBase.scrapedKeywords = scrapeResult.matchedKeywords;
+        mergedBase.scrapedLicenseNumbers = scrapeResult.licenseNumbers;
+      }
+
       // Stage 3: Rich signal extraction across all available data
       const signalText = buildAnalysisText(mergedBase);
       const signalResult = this.signalExtractor.extract(
@@ -230,6 +241,31 @@ export class IndexIntelligenceEngine {
         ...c,
         id: `${contactId}-${i}`
       })) as Contact[]);
+    }
+
+    // Stage 6: Enterprise overlay — inject known market leaders not found by providers
+    const enterpriseCompanies = getEnterpriseOverlay(config.id, filters.zip, radiusFilter);
+    for (const ec of enterpriseCompanies) {
+      const alreadyIncluded = finalizedCompanies.some(fc =>
+        fc.companyName?.toLowerCase().includes(ec.companyName?.toLowerCase().split(' - ')[0]?.toLowerCase() || '')
+      );
+      if (!alreadyIncluded) {
+        const now = new Date().toISOString();
+        finalizedCompanies.push({
+          ...ec,
+          organizationId: organizationId || '',
+          verticalId: config.id,
+          enrichmentScore: 130,
+          priority: 'A',
+          status: 'NOT_CONTACTED',
+          matchedSignals: ['enterprise_overlay'],
+          confidence: 100,
+          relevanceReason: `Enterprise market leader — ${ec.notes || 'injected via overlay'}`,
+          createdAt: now,
+          updatedAt: now,
+        } as Company);
+        console.log(`[ENTERPRISE] ${ec.companyName} — injected at 130/A (enterprise overlay)`);
+      }
     }
 
     const gradeOrder: Record<string, number> = { A: 0, B: 1, C: 2, D: 3 };

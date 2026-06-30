@@ -53,6 +53,10 @@ export interface Company {
   confidence?: number;
   feedbackPositiveCount?: number;
   feedbackNegativeCount?: number;
+  scrapedIsCommercial?: boolean;
+  scrapedIsResidential?: boolean;
+  scrapedKeywords?: string[];
+  scrapedLicenseNumbers?: string[];
   notes?: string;
   source?: string;
   createdAt: string;
