@@ -38,11 +38,15 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     slug: 'slurry_concrete',
     industryName: 'Concrete Slurry Recycling & Disposal',
     searchQueries: [
-      'concrete slurry recycling',
-      'slurry disposal',
-      'concrete washout service',
-      'concrete recycling',
-      'construction waste removal'
+      'slurry disposal concrete recycling',
+      'concrete washout slurry',
+      'concrete slurry',
+      'concrete recycling center',
+      'construction waste removal recycling',
+      'slurry',
+      'concrete reclaiming',
+      'ready mix reclaiming',
+      'industrial waste concrete'
     ],
     targetNaicsCodes: ['562211', '238110', '562112'],
     equipmentKeywords: [

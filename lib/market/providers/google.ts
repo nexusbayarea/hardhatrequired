@@ -72,7 +72,105 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       }
     }
 
+    if (params.lat && params.lng) {
+      try {
+        const nearbyResults = await this.searchNearby(
+          params.lat, params.lng, Math.min((params.radius || 50) * 1609, 50000),
+          params.verticalConfig
+        );
+        for (const r of nearbyResults) {
+          const key = (r.companyName || '').toLowerCase().trim();
+          if (!seen.has(key)) {
+            seen.add(key);
+            allResults.push(r);
+          }
+        }
+      } catch (err) {
+        console.error('[GooglePlacesProvider] Nearby search failed:', err);
+      }
+    }
+
     return allResults;
+  }
+
+  async searchNearby(
+    lat: number, lng: number, radiusMeters: number,
+    verticalConfig?: VerticalConfig
+  ): Promise<Partial<Company>[]> {
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (!apiKey) return [];
+
+    const includedTypes = [
+      'recycling_center', 'concrete_contractor', 'waste_management_service',
+      'construction_company', 'demolition_contractor', 'ready_mix_concrete_supplier',
+      'excavating_contractor', 'industrial_equipment_supplier',
+      'environmental_consultant', 'hazardous_waste_disposal',
+    ];
+
+    const url = 'https://places.googleapis.com/v1/places:searchNearby';
+    const body = {
+      includedTypes,
+      locationRestriction: {
+        circle: { center: { latitude: lat, longitude: lng }, radius: radiusMeters },
+      },
+      maxResultCount: 20,
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask':
+            'places.id,places.displayName,places.formattedAddress,places.location,' +
+            'places.internationalPhoneNumber,places.websiteUri,' +
+            'places.primaryType,places.types,places.primaryTypeDisplayName',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) return [];
+
+      const data = await response.json();
+      const rawPlaces: GooglePlace[] = data.places || [];
+
+      return rawPlaces.map((p) => {
+        const placeLat = p.location?.latitude;
+        const placeLng = p.location?.longitude;
+        const distanceMiles =
+          lat != null && lng != null && placeLat != null && placeLng != null
+            ? Math.round(haversineDistance(lat, lng, placeLat, placeLng) * 10) / 10
+            : undefined;
+
+        const allTypes: string[] = (p.types || []).filter(
+          (t) => t !== 'establishment' && t !== 'point_of_interest'
+        );
+        if (p.primaryType) allTypes.unshift(p.primaryType);
+
+        const categorySignals = extractCategorySignals(allTypes, verticalConfig);
+
+        const now = new Date().toISOString();
+        return {
+          id: p.id,
+          companyName: p.displayName?.text || 'Unindexed Business',
+          address: p.formattedAddress,
+          phone: p.internationalPhoneNumber,
+          website: p.websiteUri,
+          notes: `nearby: ${(p.primaryType || '').replace(/_/g, ' ')}` || undefined,
+          googleCategorySignals: categorySignals.length > 0 ? categorySignals : undefined,
+          latitude: placeLat,
+          longitude: placeLng,
+          distanceMiles,
+          source: this.name,
+          status: 'NOT_CONTACTED' as const,
+          createdAt: now,
+          updatedAt: now,
+        };
+      });
+    } catch {
+      return [];
+    }
   }
 
   async searchWithNegatives(
@@ -88,29 +186,41 @@ export class GooglePlacesProvider implements DiscoveryProvider {
     }
 
     const url = 'https://places.googleapis.com/v1/places:searchText';
-    const body: Record<string, unknown> = { textQuery: queryText };
+    const allPlaces: GooglePlace[] = [];
+    let pageToken: string | undefined;
+    const MAX_PAGES = 3;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask':
-          'places.id,places.displayName,places.formattedAddress,places.location,' +
-          'places.internationalPhoneNumber,places.websiteUri,' +
-          'places.primaryType,places.types,places.primaryTypeDisplayName',
-      },
-      body: JSON.stringify(body),
-    });
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const body: Record<string, unknown> = { textQuery: queryText, pageSize: 20 };
+      if (pageToken) body.pageToken = pageToken;
 
-    if (!response.ok) {
-      throw new Error(`Google Places API returned status ${response.status}`);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask':
+            'places.id,places.displayName,places.formattedAddress,places.location,' +
+            'places.internationalPhoneNumber,places.websiteUri,' +
+            'places.primaryType,places.types,places.primaryTypeDisplayName,' +
+            'nextPageToken',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Google Places API returned status ${response.status}`);
+      }
+
+      const data = await response.json();
+      allPlaces.push(...(data.places || []));
+
+      if (!data.nextPageToken) break;
+      pageToken = data.nextPageToken;
+      await new Promise(r => setTimeout(r, 300));
     }
 
-    const data = await response.json();
-    const rawPlaces: GooglePlace[] = data.places || [];
-
-    const filteredPlaces = rawPlaces.filter((place) => {
+    const filteredPlaces = allPlaces.filter((place) => {
       const name = (place.displayName?.text || '').toLowerCase();
       const address = (place.formattedAddress || '').toLowerCase();
       const type = (place.primaryType || '').toLowerCase();
