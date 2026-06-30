@@ -308,12 +308,13 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       const hasStrongSignals = categorySignals.some((s) => s.strength === 'strong');
 
       const nameLower = (p.displayName?.text || '').toLowerCase();
+      const fullQueryMatch = searchQueries.some(q => nameLower.includes(q.toLowerCase()));
       const queryWords = new Set(
         searchQueries.flatMap(q =>
-          q.toLowerCase().split(/\s+/).filter(w => w.length >= 4)
+          q.toLowerCase().split(/\s+/).filter(w => w.length >= 4 && !['inspection','service','company','contractor','repair','maintenance','construction','building','supply','solution'].includes(w))
         )
       );
-      const hasUsefulNameSignal = [...queryWords].some(w => nameLower.includes(w));
+      const hasUsefulNameSignal = fullQueryMatch || [...queryWords].filter(w => nameLower.includes(w)).length >= 2;
 
       const weakOnly =
         categorySignals.length > 0 &&
