@@ -30,7 +30,5 @@ export async function invalidateMarketCache(state: string, vertical: string): Pr
     `intelligence:${state.toLowerCase()}:${vertical.toLowerCase()}`,
     `scraper:${state.toLowerCase()}:${vertical.toLowerCase()}`,
   ];
-  for (const key of keys) {
-    await redis!.del(key);
-  }
+  await redis!.del(...keys);
 }

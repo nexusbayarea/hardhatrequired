@@ -28,7 +28,33 @@ export class ApolloAdapter {
     }
   }
 
-  async enrich(company: Partial<Company>): Promise<ApolloEnrichResult> {
+  async batchCheckCache(
+    companies: Partial<Company>[]
+  ): Promise<Map<string, ApolloEnrichResult | null>> {
+    const result = new Map<string, ApolloEnrichResult | null>();
+    if (!redisAvailable()) return result;
+
+    const entries: { domain: string; cacheKey: string; index: number }[] = [];
+    for (const c of companies) {
+      if (!c.website) continue;
+      const domain = this.normalizeDomain(c.website);
+      entries.push({ domain, cacheKey: `apollo:${domain}`, index: 0 });
+    }
+
+    if (entries.length === 0) return result;
+
+    const cachedValues = (await redis!.mget(...entries.map(e => e.cacheKey))) as (ApolloEnrichResult | null)[];
+    for (let i = 0; i < entries.length; i++) {
+      result.set(entries[i].domain, cachedValues?.[i] ?? null);
+    }
+
+    return result;
+  }
+
+  async enrich(
+    company: Partial<Company>,
+    cacheMap?: Map<string, ApolloEnrichResult | null>
+  ): Promise<ApolloEnrichResult> {
     const empty: ApolloEnrichResult = { companyFields: {}, contacts: [] };
     const apiKey = process.env.APOLLO_API_KEY;
     if (!apiKey || !company.website) {
@@ -39,7 +65,10 @@ export class ApolloAdapter {
       const cleanDomain = this.normalizeDomain(company.website);
       const cacheKey = `apollo:${cleanDomain}`;
 
-      if (redisAvailable()) {
+      if (cacheMap) {
+        const cached = cacheMap.get(cleanDomain);
+        if (cached) return cached;
+      } else if (redisAvailable()) {
         const cached = await redis!.get(cacheKey);
         if (cached) {
           return cached as ApolloEnrichResult;

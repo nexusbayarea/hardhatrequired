@@ -22,6 +22,16 @@ export async function getCachedFeed(
   return redis!.get(key);
 }
 
+export async function getCachedFeeds(
+  vertical: string,
+  state: string,
+  types: FeedType[],
+): Promise<(any | null)[]> {
+  if (!redisAvailable()) return types.map(() => null);
+  const keys = types.map(t => feedKey(vertical, state, t));
+  return (await redis!.mget(...keys)) as (any | null)[];
+}
+
 export async function setCachedFeed(
   vertical: string,
   state: string,
@@ -41,7 +51,5 @@ export async function invalidateFeed(
   const keys = (['bids', 'compliance', 'news'] as FeedType[]).map(t =>
     feedKey(vertical, state, t),
   );
-  for (const key of keys) {
-    await redis!.del(key);
-  }
+  await redis!.del(...keys);
 }

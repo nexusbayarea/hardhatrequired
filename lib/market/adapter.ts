@@ -79,10 +79,9 @@ export class IndexIntelligenceEngine {
     const finalizedCompanies: Company[] = [];
     const allContacts: Contact[] = [];
 
-    for (let i = 0; i < filteredPool.length; i++) {
-      const record = filteredPool[i];
-      const isPermit = record.source === 'regulatory_permit';
-
+    // Phase 1: Pre-filter + permit fast path
+    const toEnrich: { record: Partial<Company>; base: Partial<Company> }[] = [];
+    for (const record of filteredPool) {
       const base: Partial<Company> = {
         ...record,
         organizationId,
@@ -94,49 +93,41 @@ export class IndexIntelligenceEngine {
         updatedAt: now,
       };
 
-      if (isPermit) {
-        const distance =
-          record.latitude != null && record.longitude != null && zipCoords
-            ? Math.round(haversineDistance(zipCoords.lat, zipCoords.lng, record.latitude, record.longitude) * 10) / 10
-            : undefined;
-
+      if (record.source === 'regulatory_permit') {
+        const distance = record.latitude != null && record.longitude != null && zipCoords
+          ? Math.round(haversineDistance(zipCoords.lat, zipCoords.lng, record.latitude, record.longitude) * 10) / 10
+          : undefined;
         const text = buildAnalysisText(record);
         const result = calculateLeadScore(record, config, text, distance);
-
         const fbProfile = await getCompanyProfile(record.id || '', config.id);
         let fbAdj = 0;
         if (fbProfile && fbProfile.totalVotes >= 3) {
           fbAdj = getFeedbackAdjustment(fbProfile).adjustment;
-          if (getFeedbackAdjustment(fbProfile).action === 'blacklist') {
-            console.log(`[BLACKLIST] ${record.companyName} — regulatory permit blacklisted by feedback`);
-            continue;
-          }
+          if (getFeedbackAdjustment(fbProfile).action === 'blacklist') continue;
         }
-
-        base.enrichmentScore = Math.max(0, result.score + fbAdj);
-        base.priority = result.priority;
-        base.distanceMiles = distance;
-        base.matchedSignals = result.matchedSignals;
-        base.negativeHits = result.negativeHits;
-        base.relevanceReason = result.relevanceReason;
-        base.confidence = result.confidence;
-
-        if (result.score < 65 || result.priority === 'D') {
-          continue;
-        }
-
-        finalizedCompanies.push(base as Company);
+        const score = Math.max(0, result.score + fbAdj);
+        if (score < 65 || result.priority === 'D') continue;
+        finalizedCompanies.push({
+          ...record,
+          organizationId,
+          verticalId: config.id,
+          enrichmentScore: score,
+          priority: result.priority,
+          distanceMiles: distance,
+          matchedSignals: result.matchedSignals,
+          negativeHits: result.negativeHits,
+          relevanceReason: result.relevanceReason,
+          confidence: result.confidence,
+          status: 'NOT_CONTACTED',
+          createdAt: now,
+          updatedAt: now,
+        } as Company);
         continue;
       }
 
-      // Stage 1: Pre-filter before Apollo (saves API credits)
+      // Pre-filter before Apollo
       const precheckText = `${record.companyName || ''} ${record.notes || ''} ${record.address || ''}`;
-      const precheck = this.signalExtractor.extract(
-        precheckText,
-        config.signals,
-        config.equipmentKeywords,
-        record
-      );
+      const precheck = this.signalExtractor.extract(precheckText, config.signals, config.equipmentKeywords, record);
       if (!precheck.hasSignals) {
         console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (no signals)`);
         continue;
@@ -150,8 +141,17 @@ export class IndexIntelligenceEngine {
           continue;
         }
       }
+      toEnrich.push({ record, base });
+    }
 
-      const apolloResult = await this.apolloAdapter.enrich(base);
+    // Pipeline all Apollo cache checks in one round-trip
+    const apolloCache = await this.apolloAdapter.batchCheckCache(
+      toEnrich.map(e => e.base)
+    );
+
+    // Phase 2: Enrich + scrape + score (sequential per company to protect Apollo credits)
+    for (const { record, base } of toEnrich) {
+      const apolloResult = await this.apolloAdapter.enrich(base, apolloCache);
 
       // Merge Apollo fields — base (provider data) wins for contacts, Apollo augments
       const mergedBase: Partial<Company> = {
@@ -163,27 +163,26 @@ export class IndexIntelligenceEngine {
         apolloDescription: apolloResult.companyFields.apolloDescription || base.apolloDescription,
       };
 
-      // Stage 2a: Fast JSON-LD scrape before signal extraction (skips LLM if structured data found)
+      // Stage 2: Scrape website — FastJsonLd + full text in parallel
       if (mergedBase.website) {
-        const scraped = await this.fastScraper.extractBusinessData(mergedBase.website);
-        if (scraped) {
-          if (!mergedBase.phone && scraped.extractedPhone) mergedBase.phone = scraped.extractedPhone;
-          if (!mergedBase.email && scraped.extractedEmail) mergedBase.email = scraped.extractedEmail;
-          if (scraped.rawDescription) {
-            mergedBase.apolloDescription = [mergedBase.apolloDescription, scraped.rawDescription]
-              .filter(Boolean)
-              .join(' | ');
+        const [jsonLdResult, textResult] = await Promise.all([
+          this.fastScraper.extractBusinessData(mergedBase.website),
+          scrapeCompanyWebsite(mergedBase.website, config.equipmentKeywords || []),
+        ]);
+        if (jsonLdResult) {
+          if (!mergedBase.phone && jsonLdResult.extractedPhone) mergedBase.phone = jsonLdResult.extractedPhone;
+          if (!mergedBase.email && jsonLdResult.extractedEmail) mergedBase.email = jsonLdResult.extractedEmail;
+          if (jsonLdResult.rawDescription) {
+            mergedBase.apolloDescription = [mergedBase.apolloDescription, jsonLdResult.rawDescription]
+              .filter(Boolean).join(' | ');
           }
         }
-      }
-
-      // Stage 2b: Full web scrape for keyword matching, commercial detection, license extraction
-      if (mergedBase.website) {
-        const scrapeResult = await scrapeCompanyWebsite(mergedBase.website, config.equipmentKeywords || []);
-        mergedBase.scrapedIsCommercial = scrapeResult.isCommercial;
-        mergedBase.scrapedIsResidential = scrapeResult.isResidential;
-        mergedBase.scrapedKeywords = scrapeResult.matchedKeywords;
-        mergedBase.scrapedLicenseNumbers = scrapeResult.licenseNumbers;
+        if (textResult) {
+          mergedBase.scrapedIsCommercial = textResult.isCommercial;
+          mergedBase.scrapedIsResidential = textResult.isResidential;
+          mergedBase.scrapedKeywords = textResult.matchedKeywords;
+          mergedBase.scrapedLicenseNumbers = textResult.licenseNumbers;
+        }
       }
 
       // Stage 3: Rich signal extraction across all available data

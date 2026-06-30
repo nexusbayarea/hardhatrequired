@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCachedFeed, setCachedFeed } from '@/lib/intelligence/cache';
+import { getCachedFeeds, setCachedFeed } from '@/lib/intelligence/cache';
 import { VERTICAL_REGISTRY } from '@/lib/market/registry';
 
 interface Bid {
@@ -46,9 +46,7 @@ export async function POST(req: NextRequest) {
     const state = body.state || 'CA';
     const city = body.city || 'Hayward';
 
-    const cachedBids = await getCachedFeed(vertical, state, 'bids');
-    const cachedNews = await getCachedFeed(vertical, state, 'news');
-    const cachedCompliance = await getCachedFeed(vertical, state, 'compliance');
+    const [cachedBids, cachedNews, cachedCompliance] = await getCachedFeeds(vertical, state, ['bids', 'news', 'compliance']);
 
     if (cachedBids && cachedNews && cachedCompliance) {
       return NextResponse.json({
