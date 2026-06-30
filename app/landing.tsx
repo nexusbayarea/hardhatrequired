@@ -618,12 +618,9 @@ function LandingInner() {
               </span>
             </Link>
 
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
-              <ThemeToggle />
-              <span className="text-sm" style={{ color: 'var(--color-muted)' }}>
-                © 2026 Hard Hat Required. All rights reserved.
-              </span>
-            </div>
+            <span className="text-sm" style={{ color: 'var(--color-muted)' }}>
+              © 2026 Hard Hat Required. All rights reserved.
+            </span>
           </div>
         </div>
       </footer>

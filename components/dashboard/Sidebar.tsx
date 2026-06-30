@@ -4,7 +4,6 @@ import { HardHat, LayoutDashboard, Search, TrendingUp, Layers, Phone, BarChart3,
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import ThemeToggle from '@/components/shared/ThemeToggle';
 
 const navItems = [
   {
@@ -152,8 +151,11 @@ export default function Sidebar({ slim = false }: SidebarProps) {
             </div>
           </div>
         )}
-        <div className={`flex ${slim ? 'justify-center' : 'px-2'}`}>
-          <ThemeToggle />
+
+        <div className="px-4">
+          <span className="text-xs" style={{ color: 'var(--color-muted)' }}>
+            © 2026 Hard Hat Required. All rights reserved.
+          </span>
         </div>
       </div>
     </aside>
