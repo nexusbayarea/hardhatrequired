@@ -777,7 +777,8 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'grease removal system', 'duct cleaning kit'
     ],
     negativeKeywords: [
-      'residential kitchen hood filter replacement', 'home cleaning service', 'maid service'
+      'residential kitchen hood filter replacement', 'home cleaning service', 'maid service',
+      'chef', 'vegan', 'meal prep', 'food delivery', 'catering', 'private chef'
     ],
     signals: {
       primary: [

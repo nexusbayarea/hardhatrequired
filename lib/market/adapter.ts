@@ -167,7 +167,7 @@ export class IndexIntelligenceEngine {
       if (mergedBase.website) {
         const [jsonLdResult, textResult] = await Promise.all([
           this.fastScraper.extractBusinessData(mergedBase.website),
-          scrapeCompanyWebsite(mergedBase.website, config.equipmentKeywords || []),
+          scrapeCompanyWebsite(mergedBase.website, config.equipmentKeywords || [], config.negativeKeywords),
         ]);
         if (jsonLdResult) {
           if (!mergedBase.phone && jsonLdResult.extractedPhone) mergedBase.phone = jsonLdResult.extractedPhone;
@@ -180,6 +180,7 @@ export class IndexIntelligenceEngine {
         if (textResult) {
           mergedBase.scrapedIsCommercial = textResult.isCommercial;
           mergedBase.scrapedIsResidential = textResult.isResidential;
+          mergedBase.scrapedIsMismatch = textResult.isMismatch;
           mergedBase.scrapedKeywords = textResult.matchedKeywords;
           mergedBase.scrapedLicenseNumbers = textResult.licenseNumbers;
         }

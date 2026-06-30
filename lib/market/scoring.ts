@@ -154,6 +154,9 @@ export function calculateLeadScore(
     if (company.scrapedIsResidential) {
       webScrapeBonus -= 20;
     }
+    if (company.scrapedIsMismatch) {
+      webScrapeBonus -= 30;
+    }
     if (webScrapeBonus !== 0) {
       score += webScrapeBonus;
       breakdown.webScrapeBonus = webScrapeBonus;

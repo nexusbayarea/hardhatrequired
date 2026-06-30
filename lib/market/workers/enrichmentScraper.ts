@@ -4,18 +4,21 @@ export interface WebScrapeResult {
   matchedKeywords: string[];
   isCommercial: boolean;
   isResidential: boolean;
+  isMismatch: boolean;
   licenseNumbers: string[];
   rawText: string;
 }
 
 export async function scrapeCompanyWebsite(
   url: string,
-  verticalKeywords: string[]
+  verticalKeywords: string[],
+  negativeKeywords: string[] = []
 ): Promise<WebScrapeResult> {
   const result: WebScrapeResult = {
     matchedKeywords: [],
     isCommercial: false,
     isResidential: false,
+    isMismatch: false,
     licenseNumbers: [],
     rawText: '',
   };
@@ -52,6 +55,17 @@ export async function scrapeCompanyWebsite(
 
     if (/\b(homeowner|residential|home repair|house|apartment|condo|clogged toilet|kitchen sink|basement)\b/i.test(bodyText)) {
       result.isResidential = true;
+    }
+
+    if (
+      negativeKeywords.length > 0 &&
+      result.matchedKeywords.length === 0 &&
+      negativeKeywords.some((kw) => {
+        const regex = new RegExp(`\\b${kw.toLowerCase()}\\b`, 'i');
+        return regex.test(bodyText);
+      })
+    ) {
+      result.isMismatch = true;
     }
 
     const licenseRegex = /(?:lic|license|cert|licencia)\s*(?:#|no\.?:?)?\s*([0-9]{5,10})/gi;

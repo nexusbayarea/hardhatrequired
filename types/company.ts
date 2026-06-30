@@ -55,6 +55,7 @@ export interface Company {
   feedbackNegativeCount?: number;
   scrapedIsCommercial?: boolean;
   scrapedIsResidential?: boolean;
+  scrapedIsMismatch?: boolean;
   scrapedKeywords?: string[];
   scrapedLicenseNumbers?: string[];
   notes?: string;
