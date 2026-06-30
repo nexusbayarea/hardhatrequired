@@ -46,12 +46,6 @@ export function calculateLeadScore(
     .filter(Boolean)
     .join(' ');
 
-  const checkSignal = (term: string): boolean => {
-    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
-    return regex.test(fullText);
-  };
-
   const checkSignalInBase = (term: string): boolean => {
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(`\\b${escaped}\\b`, 'i');
@@ -72,32 +66,48 @@ export function calculateLeadScore(
     return regex.test(apolloText);
   };
 
+  let hasNameMatch = false;
+
   for (const sig of config.signals.primary) {
-    if (checkSignal(sig.term)) {
-      score += sig.weight;
+    const inBase = checkSignalInBase(sig.term);
+    const inCategory = checkSignalInCategory(sig.term);
+    const inApollo = checkSignalInApollo(sig.term);
+    const matched = inBase || inCategory || inApollo;
+
+    if (matched) {
+      const isMultiWord = sig.term.includes(' ');
+      const effectiveWeight = sig.weight + (isMultiWord ? 5 : 0);
+
+      score += effectiveWeight;
       matchedSignals.push(sig.term);
 
-      if (checkSignalInCategory(sig.term) && !checkSignalInBase(sig.term)) {
-        breakdown.categoryBonus += sig.weight;
-      } else if (checkSignalInApollo(sig.term) && !checkSignalInBase(sig.term)) {
-        breakdown.apolloBonus += sig.weight;
+      if (inBase) {
+        hasNameMatch = true;
+        breakdown.signalScore += effectiveWeight;
+      } else if (inCategory) {
+        breakdown.categoryBonus += effectiveWeight;
       } else {
-        breakdown.signalScore += sig.weight;
+        breakdown.apolloBonus += effectiveWeight;
       }
     }
   }
 
   for (const sig of config.signals.secondary) {
-    if (checkSignal(sig.term)) {
+    const inBase = checkSignalInBase(sig.term);
+    const inCategory = checkSignalInCategory(sig.term);
+    const inApollo = checkSignalInApollo(sig.term);
+    const matched = inBase || inCategory || inApollo;
+
+    if (matched) {
       score += sig.weight;
       matchedSignals.push(sig.term);
 
-      if (checkSignalInCategory(sig.term) && !checkSignalInBase(sig.term)) {
-        breakdown.categoryBonus += sig.weight;
-      } else if (checkSignalInApollo(sig.term) && !checkSignalInBase(sig.term)) {
-        breakdown.apolloBonus += sig.weight;
-      } else {
+      if (inBase) {
         breakdown.signalScore += sig.weight;
+      } else if (inCategory) {
+        breakdown.categoryBonus += sig.weight;
+      } else {
+        breakdown.apolloBonus += sig.weight;
       }
     }
   }
@@ -123,6 +133,11 @@ export function calculateLeadScore(
     if (company.website) profileScore += config.scoringWeights.hasWebsite;
     if (company.email)   profileScore += config.scoringWeights.hasContactEmail;
     if (company.address) profileScore += config.scoringWeights.hasPhysicalAddress;
+
+    if (!hasNameMatch) {
+      profileScore = Math.round(profileScore * 0.25);
+    }
+
     score += profileScore;
     breakdown.profileScore = profileScore;
 
