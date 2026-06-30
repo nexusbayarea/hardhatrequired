@@ -39,6 +39,7 @@ export async function GET() {
     googlePlaces: !!process.env.GOOGLE_PLACES_API_KEY,
     tomtom: !!process.env.TOM_TOM_API,
     deepseek: !!process.env.DEEPSEEK_API_KEY,
+    brave: !!process.env.BRAVE_API_KEY,
     supabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     supabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
     qstash: !!process.env.QSTASH_TOKEN,

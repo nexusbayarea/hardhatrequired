@@ -2,11 +2,13 @@ import { VerticalConfig } from '@/types/config';
 import { DiscoveryProvider } from './providers/base';
 import { RegulatoryProvider } from './providers/regulatory';
 import { GooglePlacesProvider } from './providers/google';
+import { WebSearchProvider } from './providers/web';
 import { TomTomProvider } from './providers/tomtom';
 import { OverpassProvider } from './providers/overpass';
 
 const regulatory = new RegulatoryProvider();
 const google = new GooglePlacesProvider();
+const web = new WebSearchProvider();
 const tomtom = new TomTomProvider();
 const overpass = new OverpassProvider();
 
@@ -15,11 +17,11 @@ export interface VerticalConfigWithProviders extends VerticalConfig {
 }
 
 export function createProviders(extra: DiscoveryProvider[] = []): DiscoveryProvider[] {
-  return [regulatory, google, ...extra];
+  return [regulatory, google, web, ...extra];
 }
 
 export function createSearchOnlyProviders(extra: DiscoveryProvider[] = []): DiscoveryProvider[] {
-  return [google, ...extra];
+  return [google, web, ...extra];
 }
 
 const NOW = new Date().toISOString();
@@ -38,15 +40,13 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     slug: 'slurry_concrete',
     industryName: 'Concrete Slurry Recycling & Disposal',
     searchQueries: [
-      'slurry disposal concrete recycling',
-      'concrete washout slurry',
-      'concrete slurry',
-      'concrete recycling center',
-      'construction waste removal recycling',
-      'slurry',
-      'concrete reclaiming',
-      'ready mix reclaiming',
-      'industrial waste concrete'
+      'concrete washout service',
+      'slurry disposal',
+      'vacuum truck service',
+      'industrial wastewater treatment',
+      'hydro excavation',
+      'environmental waste services',
+      'concrete recycling',
     ],
     targetNaicsCodes: ['562211', '238110', '562112'],
     equipmentKeywords: [
@@ -54,33 +54,26 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'vacuum truck', 'concrete recycling plant', 'slurry press'
     ],
     negativeKeywords: [
-      'landscaping', 'gardening', 'lawn', 'tree service', 'florist',
-      'residential', 'cleaning', 'municipal dump', 'residential landfill',
-      'household waste', 'DIY concrete mix', 'city recycle station',
-      'garbage collection', 'junk removal', 'paving'
+      'residential', 'driveway', 'handyman', 'home repair',
+      'home kitchen', 'landscaping', 'home improvement',
     ],
     signals: {
       primary: [
-        { term: 'slurry', weight: 25 },
-        { term: 'concrete', weight: 25 },
-        { term: 'concrete washout', weight: 25 },
-        { term: 'concrete slurry', weight: 25 },
-        { term: 'wash water', weight: 25 },
-        { term: 'slurry recycling', weight: 25 },
+        { term: 'slurry', weight: 40 },
+        { term: 'concrete washout', weight: 40 },
+        { term: 'washout', weight: 30 },
+        { term: 'wastewater', weight: 25 },
       ],
       secondary: [
-        { term: 'dewatering', weight: 10 },
-        { term: 'filter press', weight: 10 },
-        { term: 'roll off', weight: 10 },
-        { term: 'vacuum truck', weight: 10 },
-        { term: 'pump', weight: 10 },
-        { term: 'OSHA', weight: 10 },
-        { term: 'EPA', weight: 10 },
+        { term: 'vacuum truck', weight: 20 },
+        { term: 'hydro excavation', weight: 20 },
+        { term: 'recycling', weight: 15 },
+        { term: 'filtration', weight: 15 },
       ],
       negative: [
-        { term: 'driveway', weight: -30 },
-        { term: 'residential', weight: -30 },
-        { term: 'home repair', weight: -30 },
+        { term: 'residential', weight: -50 },
+        { term: 'driveway', weight: -40 },
+        { term: 'handyman', weight: -60 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
