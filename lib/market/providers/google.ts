@@ -3,35 +3,109 @@ import { DiscoveryProvider, DiscoveryParams } from './base';
 import { haversineDistance } from '@/lib/geo';
 import { VerticalConfig } from '@/types/config';
 
-export const GOOGLE_TYPE_TO_VERTICAL_SIGNALS: Record<string, string[]> = {
-  waste_management_service:     ['waste management', 'waste removal', 'industrial waste'],
-  recycling_center:             ['recycling', 'material recovery', 'waste recycling'],
-  hazardous_waste_disposal:     ['hazardous waste', 'hazmat disposal', 'environmental remediation'],
-  environmental_consultant:     ['environmental', 'compliance', 'SWPPP', 'stormwater'],
-  sewage_disposal_service:      ['wastewater', 'sewer service', 'pumping'],
-  septic_system_service:        ['pumping', 'wastewater', 'tank service'],
-  concrete_contractor:          ['concrete contractor', 'concrete', 'commercial concrete'],
-  construction_company:         ['construction', 'demolition', 'contractor'],
-  demolition_contractor:        ['demolition', 'concrete removal', 'construction waste'],
-  ready_mix_concrete_supplier:  ['ready mix', 'concrete', 'batch plant'],
-  excavating_contractor:        ['excavation', 'hydrovac', 'digging'],
-  fire_protection_service:      ['fire protection', 'fire sprinkler', 'fire extinguisher', 'NFPA'],
-  hvac_contractor:              ['HVAC', 'air balancing', 'test and balance'],
-  plumber:                      ['backflow', 'plumbing', 'water service'],
-  mechanical_contractor:        ['mechanical', 'HVAC', 'fire protection'],
-  elevator_service:             ['elevator inspection', 'lift certification', 'elevator testing'],
-  restaurant_supply_store:      ['restaurant service', 'kitchen equipment'],
-  industrial_equipment_supplier: ['industrial equipment', 'commercial kitchen'],
-  scrap_metal_dealer:           ['scrap metal', 'metal recycling', 'ferrous scrap'],
-  metal_processing:             ['metal processing', 'scrap yard', 'metal recycling'],
-  junk_removal_service:         ['scrap metal', 'waste removal', 'metal recycling'],
-  marine_contractor:            ['marine construction', 'dock building', 'seawall'],
-  dock_builder:                 ['dock building', 'marine construction', 'bulkhead'],
-  medical_clinic:               ['medical waste', 'biohazard disposal'],
-  laboratory:                   ['regulated medical waste', 'biohazard disposal'],
-  roofing_contractor:           ['commercial roofing', 'flat roof', 'roof membrane'],
-  fuel_supplier:                ['fuel tank', 'UST', 'tank testing'],
-  gas_station:                  ['fuel tank', 'UST'],
+export interface CategorySignal {
+  term: string;
+  weight: number;
+  strength: 'strong' | 'weak';
+}
+
+export const GOOGLE_TYPE_TO_VERTICAL_SIGNALS: Record<string, CategorySignal[]> = {
+  waste_management_service: [
+    { term: 'waste management', weight: 20, strength: 'strong' },
+    { term: 'industrial waste', weight: 20, strength: 'strong' },
+  ],
+  recycling_center: [
+    { term: 'recycling', weight: 15, strength: 'strong' },
+    { term: 'material recovery', weight: 12, strength: 'strong' },
+  ],
+  hazardous_waste_disposal: [
+    { term: 'hazardous waste', weight: 25, strength: 'strong' },
+    { term: 'environmental remediation', weight: 20, strength: 'strong' },
+  ],
+  environmental_consultant: [
+    { term: 'environmental', weight: 12, strength: 'strong' },
+    { term: 'compliance', weight: 10, strength: 'weak' },
+    { term: 'SWPPP', weight: 15, strength: 'strong' },
+  ],
+  sewage_disposal_service: [
+    { term: 'wastewater', weight: 18, strength: 'strong' },
+    { term: 'pumping', weight: 15, strength: 'strong' },
+  ],
+  septic_system_service: [
+    { term: 'pumping', weight: 12, strength: 'strong' },
+    { term: 'tank service', weight: 10, strength: 'weak' },
+  ],
+  concrete_contractor: [
+    { term: 'concrete', weight: 15, strength: 'strong' },
+    { term: 'concrete contractor', weight: 15, strength: 'strong' },
+  ],
+  construction_company: [
+    { term: 'construction', weight: 4, strength: 'weak' },
+    { term: 'contractor', weight: 3, strength: 'weak' },
+  ],
+  demolition_contractor: [
+    { term: 'demolition', weight: 8, strength: 'weak' },
+    { term: 'concrete removal', weight: 10, strength: 'weak' },
+    { term: 'construction waste', weight: 6, strength: 'weak' },
+  ],
+  ready_mix_concrete_supplier: [
+    { term: 'ready mix', weight: 18, strength: 'strong' },
+    { term: 'concrete', weight: 15, strength: 'strong' },
+  ],
+  excavating_contractor: [
+    { term: 'excavation', weight: 15, strength: 'strong' },
+    { term: 'hydrovac', weight: 20, strength: 'strong' },
+  ],
+  fire_protection_service: [
+    { term: 'fire sprinkler', weight: 20, strength: 'strong' },
+    { term: 'fire protection', weight: 18, strength: 'strong' },
+    { term: 'fire extinguisher', weight: 18, strength: 'strong' },
+  ],
+  hvac_contractor: [
+    { term: 'HVAC', weight: 20, strength: 'strong' },
+    { term: 'air balancing', weight: 20, strength: 'strong' },
+  ],
+  plumber: [
+    { term: 'backflow', weight: 8, strength: 'weak' },
+    { term: 'plumbing', weight: 5, strength: 'weak' },
+  ],
+  mechanical_contractor: [
+    { term: 'mechanical', weight: 4, strength: 'weak' },
+    { term: 'HVAC', weight: 12, strength: 'weak' },
+  ],
+  elevator_service: [
+    { term: 'elevator inspection', weight: 20, strength: 'strong' },
+    { term: 'elevator testing', weight: 20, strength: 'strong' },
+  ],
+  scrap_metal_dealer: [
+    { term: 'scrap metal', weight: 20, strength: 'strong' },
+    { term: 'metal recycling', weight: 18, strength: 'strong' },
+  ],
+  metal_processing: [
+    { term: 'metal processing', weight: 15, strength: 'strong' },
+    { term: 'scrap yard', weight: 15, strength: 'strong' },
+  ],
+  marine_contractor: [
+    { term: 'marine construction', weight: 20, strength: 'strong' },
+    { term: 'dock building', weight: 18, strength: 'strong' },
+  ],
+  dock_builder: [
+    { term: 'dock building', weight: 18, strength: 'strong' },
+    { term: 'bulkhead', weight: 15, strength: 'strong' },
+  ],
+  roofing_contractor: [
+    { term: 'commercial roofing', weight: 20, strength: 'strong' },
+    { term: 'roof membrane', weight: 15, strength: 'strong' },
+  ],
+  fuel_supplier: [
+    { term: 'fuel tank', weight: 18, strength: 'strong' },
+    { term: 'UST', weight: 20, strength: 'strong' },
+    { term: 'tank testing', weight: 18, strength: 'strong' },
+  ],
+  gas_station: [
+    { term: 'fuel tank', weight: 5, strength: 'weak' },
+    { term: 'UST', weight: 5, strength: 'weak' },
+  ],
 };
 
 export class GooglePlacesProvider implements DiscoveryProvider {
@@ -46,19 +120,17 @@ export class GooglePlacesProvider implements DiscoveryProvider {
 
     const searchQueries = params.searchQueries?.length
       ? params.searchQueries
-      : [
-          'concrete slurry recycling',
-          'concrete washout',
-          'slurry disposal',
-          'ready mix reclaiming',
-          'concrete reclaiming',
-        ];
+      : [];
 
     for (const query of searchQueries) {
       const textQuery = `${query} ${params.zip}`;
       try {
         const results = await this.searchWithNegatives(
-          textQuery, [], params.lat, params.lng, params.verticalConfig
+          textQuery,
+          params.verticalConfig?.negativeKeywords || [],
+          params.lat,
+          params.lng,
+          params.verticalConfig
         );
         for (const r of results) {
           const key = (r.companyName || '').toLowerCase().trim();
@@ -68,7 +140,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           }
         }
       } catch (err) {
-        console.error(`[GooglePlacesProvider] Query '${textQuery}' failed:`, err);
+        console.error(`[GooglePlacesProvider] Query failed:`, err);
       }
     }
 
@@ -125,7 +197,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           'X-Goog-FieldMask':
             'places.id,places.displayName,places.formattedAddress,places.location,' +
             'places.internationalPhoneNumber,places.websiteUri,' +
-            'places.primaryType,places.types,places.primaryTypeDisplayName',
+            'places.primaryType,places.types,places.rating,places.userRatingCount',
         },
         body: JSON.stringify(body),
       });
@@ -135,39 +207,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       const data = await response.json();
       const rawPlaces: GooglePlace[] = data.places || [];
 
-      return rawPlaces.map((p) => {
-        const placeLat = p.location?.latitude;
-        const placeLng = p.location?.longitude;
-        const distanceMiles =
-          lat != null && lng != null && placeLat != null && placeLng != null
-            ? Math.round(haversineDistance(lat, lng, placeLat, placeLng) * 10) / 10
-            : undefined;
-
-        const allTypes: string[] = (p.types || []).filter(
-          (t) => t !== 'establishment' && t !== 'point_of_interest'
-        );
-        if (p.primaryType) allTypes.unshift(p.primaryType);
-
-        const categorySignals = extractCategorySignals(allTypes, verticalConfig);
-
-        const now = new Date().toISOString();
-        return {
-          id: p.id,
-          companyName: p.displayName?.text || 'Unindexed Business',
-          address: p.formattedAddress,
-          phone: p.internationalPhoneNumber,
-          website: p.websiteUri,
-          notes: `nearby: ${(p.primaryType || '').replace(/_/g, ' ')}` || undefined,
-          googleCategorySignals: categorySignals.length > 0 ? categorySignals : undefined,
-          latitude: placeLat,
-          longitude: placeLng,
-          distanceMiles,
-          source: this.name,
-          status: 'NOT_CONTACTED' as const,
-          createdAt: now,
-          updatedAt: now,
-        };
-      });
+      return this.mapResults(rawPlaces, lat, lng, verticalConfig);
     } catch {
       return [];
     }
@@ -202,7 +242,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           'X-Goog-FieldMask':
             'places.id,places.displayName,places.formattedAddress,places.location,' +
             'places.internationalPhoneNumber,places.websiteUri,' +
-            'places.primaryType,places.types,places.primaryTypeDisplayName,' +
+            'places.primaryType,places.types,places.rating,places.userRatingCount,' +
             'nextPageToken',
         },
         body: JSON.stringify(body),
@@ -230,9 +270,42 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       });
     });
 
+    return this.mapResults(filteredPlaces, zipLat, zipLng, verticalConfig);
+  }
+
+  private mapResults(
+    places: GooglePlace[],
+    zipLat?: number,
+    zipLng?: number,
+    verticalConfig?: VerticalConfig
+  ): Partial<Company>[] {
+    const searchQueries = verticalConfig?.searchQueries || [];
     const now = new Date().toISOString();
 
-    return filteredPlaces.map((p) => {
+    const mapped: Partial<Company>[] = [];
+
+    for (const p of places) {
+      const allTypes = [
+        ...(p.primaryType ? [p.primaryType] : []),
+        ...(p.types || []).filter(
+          (t) => t !== 'establishment' && t !== 'point_of_interest'
+        ),
+      ];
+
+      const categorySignals = extractCategorySignals(allTypes, verticalConfig);
+
+      const hasStrongSignals = categorySignals.some((s) => s.strength === 'strong');
+      const hasUsefulNameSignal = searchQueries.some((term) =>
+        (p.displayName?.text || '').toLowerCase().includes(term.toLowerCase())
+      );
+
+      const weakOnly =
+        categorySignals.length > 0 &&
+        categorySignals.every((s) => s.strength === 'weak');
+
+      if (!hasStrongSignals && !hasUsefulNameSignal) continue;
+      if (weakOnly && !hasUsefulNameSignal) continue;
+
       const lat = p.location?.latitude;
       const lng = p.location?.longitude;
       const distanceMiles =
@@ -240,27 +313,17 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           ? Math.round(haversineDistance(zipLat, zipLng, lat, lng) * 10) / 10
           : undefined;
 
-      const allTypes: string[] = (p.types || []).filter(
-        (t) => t !== 'establishment' && t !== 'point_of_interest'
-      );
-      if (p.primaryType) allTypes.unshift(p.primaryType);
-
-      const categorySignals = extractCategorySignals(allTypes, verticalConfig);
-
-      const googleType = (p.primaryType || '').replace(/_/g, ' ');
-      const googleTypes = allTypes.map((t) => t.replace(/_/g, ' '));
-      const typeContext = [...new Set([googleType, ...googleTypes])]
-        .filter(Boolean)
-        .join(', ');
-
-      return {
+      mapped.push({
         id: p.id,
-        companyName: p.displayName?.text || 'Unindexed Business',
+        companyName: p.displayName?.text || 'Unknown',
         address: p.formattedAddress,
         phone: p.internationalPhoneNumber,
         website: p.websiteUri,
-        notes: typeContext || undefined,
-        googleCategorySignals: categorySignals.length > 0 ? categorySignals : undefined,
+        googlePrimaryType: p.primaryType,
+        googleTypes: p.types || [],
+        googleCategorySignals: categorySignals.map((s) => s.term),
+        googleRating: p.rating,
+        googleReviewCount: p.userRatingCount,
         latitude: lat,
         longitude: lng,
         distanceMiles,
@@ -268,39 +331,36 @@ export class GooglePlacesProvider implements DiscoveryProvider {
         status: 'NOT_CONTACTED' as const,
         createdAt: now,
         updatedAt: now,
-      };
-    });
+      });
+    }
+
+    return mapped;
   }
 }
 
 function extractCategorySignals(
   googleTypes: string[],
   verticalConfig?: VerticalConfig
-): string[] {
-  const mapped: string[] = [];
+): CategorySignal[] {
+  const mapped: CategorySignal[] = [];
   for (const type of googleTypes) {
-    const terms = GOOGLE_TYPE_TO_VERTICAL_SIGNALS[type];
-    if (terms) mapped.push(...terms);
+    const signals = GOOGLE_TYPE_TO_VERTICAL_SIGNALS[type];
+    if (signals) mapped.push(...signals);
   }
-  if (!verticalConfig || mapped.length === 0) {
-    return [...new Set(mapped)];
-  }
-  const verticalTerms = new Set<string>([
+  if (!verticalConfig) return mapped;
+
+  const verticalTerms = new Set([
     ...verticalConfig.signals.primary.map((s) => s.term.toLowerCase()),
     ...verticalConfig.signals.secondary.map((s) => s.term.toLowerCase()),
     ...verticalConfig.equipmentKeywords.map((k) => k.toLowerCase()),
   ]);
-  const relevant = mapped.filter((term) => {
-    const words = term.toLowerCase().split(/\s+/);
-    return words.some((word) => {
-      if (word.length < 4) return false;
-      return (
-        verticalTerms.has(term.toLowerCase()) ||
-        [...verticalTerms].some((vt) => vt.includes(word) || word.includes(vt.split(/\s+/)[0]))
-      );
-    });
+
+  return mapped.filter((signal) => {
+    const words = signal.term.toLowerCase().split(/\s+/);
+    return words.some((word) =>
+      [...verticalTerms].some((vt) => vt.includes(word) || word.includes(vt))
+    );
   });
-  return [...new Set(relevant)];
 }
 
 interface GooglePlace {
@@ -311,8 +371,9 @@ interface GooglePlace {
   internationalPhoneNumber?: string;
   websiteUri?: string;
   primaryType?: string;
-  primaryTypeDisplayName?: { text?: string };
   types?: string[];
+  rating?: number;
+  userRatingCount?: number;
 }
 
 export class GooglePlacesAdapter extends GooglePlacesProvider {}

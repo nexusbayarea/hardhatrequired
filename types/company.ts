@@ -38,6 +38,10 @@ export interface Company {
   distanceMiles?: number;
   hasRegulatoryPermit?: boolean;
   googleCategorySignals?: string[];
+  googlePrimaryType?: string;
+  googleTypes?: string[];
+  googleRating?: number;
+  googleReviewCount?: number;
   apolloDescription?: string;
   enrichmentScore: number;
   priority: PriorityGroup;

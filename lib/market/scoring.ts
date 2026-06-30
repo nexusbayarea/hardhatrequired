@@ -131,6 +131,13 @@ export function calculateLeadScore(
       breakdown.regulatoryBonus = 15;
     }
 
+    if (company.googleReviewCount && company.googleReviewCount > 15) {
+      score += 8;
+    }
+    if (company.googleRating && company.googleRating >= 4.2) {
+      score += 5;
+    }
+
     const dist = distanceMiles ?? company.distanceMiles;
     if (dist !== undefined) {
       let distanceScore = 0;
