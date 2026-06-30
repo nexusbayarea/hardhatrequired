@@ -135,9 +135,18 @@ export class IndexIntelligenceEngine {
         config.equipmentKeywords,
         record
       );
-      if (!precheck.hasSignals || precheck.confidence === 'low') {
-        console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (hasSignals=${precheck.hasSignals} confidence=${precheck.confidence})`);
+      if (!precheck.hasSignals) {
+        console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (no signals)`);
         continue;
+      }
+      if (precheck.confidence === 'low') {
+        const hasPrimaryMatch = precheck.matchedSignals.some(s =>
+          config.signals.primary.some(p => p.term === s)
+        );
+        if (!hasPrimaryMatch) {
+          console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (low confidence, no primary match)`);
+          continue;
+        }
       }
 
       const apolloResult = await this.apolloAdapter.enrich(base);
