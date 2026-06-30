@@ -782,16 +782,18 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     ],
     signals: {
       primary: [
-        { term: 'hood', weight: 25 },
-        { term: 'kitchen', weight: 25 },
-        { term: 'kitchen exhaust', weight: 25 },
-        { term: 'hood cleaning', weight: 25 },
+        { term: 'hood', weight: 30 },
+        { term: 'kitchen', weight: 30 },
+        { term: 'kitchen exhaust', weight: 30 },
+        { term: 'hood cleaning', weight: 35 },
         { term: 'grease removal', weight: 25 },
       ],
       secondary: [
         { term: 'NFPA 96', weight: 10 },
         { term: 'restaurant', weight: 10 },
         { term: 'duct cleaning', weight: 10 },
+        { term: 'pressure washer', weight: 10 },
+        { term: 'exhaust cleaning', weight: 10 },
       ],
       negative: [
         { term: 'residential cleaning', weight: -30 },
