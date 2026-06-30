@@ -2,7 +2,6 @@ import { Company, Contact, SearchFilters } from '@/types/company';
 import { VerticalConfig } from '@/types/config';
 import { VerticalConfigWithProviders, isIrrelevant } from './registry';
 import { ApolloAdapter } from './providers/apollo';
-import { KeywordSignalExtractor } from './signals';
 import { calculateLeadScore, buildAnalysisText } from './scoring';
 import { geocodeZip, haversineDistance } from '@/lib/geo';
 import { getCompanyProfile, getBlacklistedVerticalCompanies } from '@/lib/feedback/storage';
@@ -11,7 +10,6 @@ import { FastJsonLdScraper } from '@/lib/market/scrapers/fastScraper';
 
 export class IndexIntelligenceEngine {
   private apolloAdapter = new ApolloAdapter();
-  private signalExtractor = new KeywordSignalExtractor();
   private fastScraper = new FastJsonLdScraper();
 
   async executeMarketDiscovery(
@@ -115,7 +113,7 @@ export class IndexIntelligenceEngine {
         base.priority = result.priority;
         base.distanceMiles = distance;
 
-        if (base.enrichmentScore < 50 || result.priority === 'D' || result.negativeHits.length >= 2) {
+        if (result.priority === 'D' || result.score < 55 || result.confidence < 40 || result.negativeHits.length >= 2) {
           continue;
         }
 
@@ -123,10 +121,11 @@ export class IndexIntelligenceEngine {
         continue;
       }
 
-      // Stage 1: Fast pre-filter before Apollo (saves API credits)
+      // Stage 1: Pre-filter before Apollo (saves API credits)
       const precheckText = buildAnalysisText(record);
-      const precheck = this.signalExtractor.extract(precheckText, config.signals, config.equipmentKeywords);
-      if (precheck.negativeHits.length >= 2) {
+      const precheck = calculateLeadScore(record, config, precheckText, record.distanceMiles);
+      if (precheck.priority === 'D' && precheck.confidence < 30) {
+        console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (D/${precheck.confidence})`);
         continue;
       }
 
@@ -152,40 +151,25 @@ export class IndexIntelligenceEngine {
         }
       }
 
-      // Stage 2: Rich signal extraction across all available data
-      const analysisText = buildAnalysisText(mergedBase);
-      const signalResult = this.signalExtractor.extract(
-        analysisText,
-        config.signals,
-        config.equipmentKeywords,
-        mergedBase
-      );
-
-      const mergedCompany: Partial<Company> = {
-        ...mergedBase,
-        capabilitySummary: signalResult.capabilitySummary,
-      };
+      const mergedCompany: Partial<Company> = { ...mergedBase };
 
       const companyContacts: Partial<Contact>[] = apolloResult.contacts.map(c => ({
         ...c,
         companyId: mergedCompany.id!
       }));
 
-      const distance = mergedCompany.distanceMiles;
       const scoringText = buildAnalysisText(mergedCompany);
-      const result = calculateLeadScore(mergedCompany, config, scoringText, distance);
+      const result = calculateLeadScore(mergedCompany, config, scoringText, mergedCompany.distanceMiles);
       mergedCompany.enrichmentScore = result.score;
       mergedCompany.priority = result.priority;
 
       // Stage 3: User Feedback Layer — adjust score based on historical feedback
       const feedbackProfile = await getCompanyProfile(mergedCompany.id || '', config.id);
-      let feedbackAdjustment = 0;
       let feedbackAction = 'none';
       if (feedbackProfile && feedbackProfile.totalVotes >= 3) {
         const adj = getFeedbackAdjustment(feedbackProfile);
-        feedbackAdjustment = adj.adjustment;
         feedbackAction = adj.action;
-        mergedCompany.enrichmentScore = Math.max(0, result.score + feedbackAdjustment);
+        mergedCompany.enrichmentScore = Math.max(0, result.score + adj.adjustment);
         if (feedbackAction === 'blacklist') {
           console.log(`[BLACKLIST] ${mergedCompany.companyName} — score=${mergedCompany.enrichmentScore} (${feedbackAction})`);
           continue;
@@ -193,12 +177,12 @@ export class IndexIntelligenceEngine {
       }
 
       // Stage 4: Hard filter garbage after scoring + feedback
-      if (mergedCompany.enrichmentScore < 50 || mergedCompany.priority === 'D' || result.negativeHits.length >= 2) {
-        console.log(`[FILTERED] ${mergedCompany.companyName} — score=${mergedCompany.enrichmentScore} priority=${mergedCompany.priority} negatives=${result.negativeHits.join(',')} feedback=${feedbackAction}`);
+      if (result.priority === 'D' || result.score < 55 || result.confidence < 40 || result.negativeHits.length >= 2) {
+        console.log(`[FILTERED] ${mergedCompany.companyName} — score=${result.score} confidence=${result.confidence} priority=${result.priority} negatives=${result.negativeHits.join(',')} reason=${result.relevanceReason} feedback=${feedbackAction}`);
         continue;
       }
 
-      console.log(`[SCORE] ${mergedCompany.companyName} — score=${mergedCompany.enrichmentScore} priority=${mergedCompany.priority} matched=${result.matchedSignals.join(',')} feedback=${feedbackAction}`);
+      console.log(`[SCORE] ${mergedCompany.companyName} — score=${result.score} confidence=${result.confidence} priority=${result.priority} matched=${result.matchedSignals.join(',')} reason=${result.relevanceReason} feedback=${feedbackAction}`);
 
       const contactId = `contact-${mergedCompany.id}`;
       finalizedCompanies.push(mergedCompany as Company);
