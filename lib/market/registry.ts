@@ -103,14 +103,15 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     negativeKeywords: [
       'plumber repair', 'residential plumbing', 'home kitchen cleaning',
       'sewer line repair', 'faucet installation', 'clogged toilet',
-      'residential', 'cleaning service', 'handyman'
+      'residential', 'cleaning service', 'handyman',
+      'cooking oil', 'oil change', 'fryer repair'
     ],
     signals: {
       primary: [
+        { term: 'grease trap', weight: 30 },
+        { term: 'grease interceptor', weight: 30 },
         { term: 'grease', weight: 25 },
-        { term: 'grease trap', weight: 25 },
-        { term: 'grease interceptor', weight: 25 },
-        { term: 'FOG', weight: 25 },
+        { term: 'FOG', weight: 30 },
       ],
       secondary: [
         { term: 'pumping', weight: 10 },
@@ -118,6 +119,8 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'hydro jetting', weight: 10 },
         { term: 'vacuum truck', weight: 10 },
         { term: 'restaurant service', weight: 10 },
+        { term: 'yellow grease', weight: 10 },
+        { term: 'rendering', weight: 10 },
         { term: 'OSHA', weight: 10 },
       ],
       negative: [
@@ -126,7 +129,6 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'landscape', weight: -50 },
         { term: 'restoration', weight: -50 },
         { term: 'home kitchen', weight: -30 },
-        { term: 'cooking oil', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -152,7 +154,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     negativeKeywords: [
       'home inspection', 'paint store', 'hardware store', 'residential painter',
       'mold inspection DIY', 'interior design', 'cleaning service',
-      'carpet cleaning', 'property management'
+      'carpet cleaning', 'property management', 'mold removal', 'water damage restoration'
     ],
     signals: {
       primary: [
@@ -202,14 +204,15 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     negativeKeywords: [
       'landscaping design', 'backyard trenching', 'sprinkler installation',
       'hand digging', 'plumbing repair DIY', 'pool excavation',
-      'residential', 'gardening'
+      'residential', 'gardening', 'backhoe', 'general contractor',
+      'foundation repair', 'septic installation'
     ],
     signals: {
       primary: [
+        { term: 'hydro excavation', weight: 30 },
+        { term: 'hydrovac', weight: 30 },
+        { term: 'vacuum excavation', weight: 30 },
         { term: 'excavation', weight: 25 },
-        { term: 'hydro excavation', weight: 25 },
-        { term: 'vacuum excavation', weight: 25 },
-        { term: 'hydrovac', weight: 25 },
         { term: 'non-destructive digging', weight: 25 },
       ],
       secondary: [
@@ -217,6 +220,8 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'daylighting', weight: 10 },
         { term: 'slurry excavation', weight: 10 },
         { term: 'vactor', weight: 10 },
+        { term: 'hydrovac truck', weight: 10 },
+        { term: 'vacuum truck', weight: 10 },
         { term: 'OSHA', weight: 10 },
         { term: 'EPA', weight: 10 },
       ],
@@ -224,6 +229,8 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'landscaping', weight: -30 },
         { term: 'backyard trenching', weight: -30 },
         { term: 'sprinkler installation', weight: -30 },
+        { term: 'foundation repair', weight: -30 },
+        { term: 'septic', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -249,24 +256,30 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     negativeKeywords: [
       'residential shingle repair', 'gutter cleaning', 'handyman services',
       'chimney sweep', 'DIY shingle replacement', 'skylight installation home',
-      'home inspector', 'real estate'
+      'home inspector', 'real estate', 'siding', 'window replacement',
+      'deck building', 'fence installation'
     ],
     signals: {
       primary: [
-        { term: 'commercial roofing', weight: 25 },
-        { term: 'flat roof', weight: 25 },
-        { term: 'TPO roofing', weight: 25 },
-        { term: 'industrial roofing', weight: 25 },
+        { term: 'commercial roofing', weight: 30 },
+        { term: 'flat roof', weight: 30 },
+        { term: 'TPO roofing', weight: 30 },
+        { term: 'industrial roofing', weight: 30 },
       ],
       secondary: [
         { term: 'roof membrane', weight: 10 },
         { term: 'built-up roofing', weight: 10 },
         { term: 'EPDM roofing', weight: 10 },
+        { term: 'cool roof', weight: 10 },
+        { term: 'single-ply', weight: 10 },
+        { term: 'roof replacement', weight: 10 },
       ],
       negative: [
         { term: 'residential shingle', weight: -30 },
         { term: 'gutter cleaning', weight: -30 },
         { term: 'handyman', weight: -30 },
+        { term: 'siding', weight: -30 },
+        { term: 'window replacement', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -293,24 +306,30 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     negativeKeywords: [
       'pharmacy retail', 'dental clinic general', 'home health aid',
       'veterinarian hospital general', 'local doctor office',
-      'medical supply store', 'hospital'
+      'medical supply store', 'hospital', 'janitorial', 'general waste',
+      'trash pickup', 'dumpster rental', 'junk removal'
     ],
     signals: {
       primary: [
-        { term: 'medical waste', weight: 25 },
-        { term: 'biohazard disposal', weight: 25 },
-        { term: 'sharps disposal', weight: 25 },
+        { term: 'medical waste', weight: 30 },
+        { term: 'biohazard disposal', weight: 30 },
+        { term: 'sharps disposal', weight: 30 },
         { term: 'regulated medical waste', weight: 25 },
       ],
       secondary: [
         { term: 'clinical waste', weight: 10 },
         { term: 'infectious waste', weight: 10 },
         { term: 'pathological waste', weight: 10 },
+        { term: 'autoclave', weight: 10 },
+        { term: 'biohazard', weight: 10 },
+        { term: 'sharps container', weight: 10 },
       ],
       negative: [
         { term: 'pharmacy', weight: -30 },
         { term: 'dental clinic', weight: -30 },
         { term: 'home health aid', weight: -30 },
+        { term: 'janitorial', weight: -30 },
+        { term: 'dumpster', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -336,15 +355,16 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     negativeKeywords: [
       'used car dealership', 'auto salvage retail', 'mechanic shop',
       'pawn shop', 'residential junk collection', 'antique store',
-      'appliance repair', 'electronics repair'
+      'appliance repair', 'electronics repair', 'plastic recycling',
+      'paper recycling', 'e-waste', 'bottle recycling', 'cardboard'
     ],
     signals: {
       primary: [
-        { term: 'recycling', weight: 25 },
-        { term: 'scrap metal', weight: 25 },
-        { term: 'metal recycling', weight: 25 },
-        { term: 'ferrous scrap', weight: 25 },
+        { term: 'scrap metal', weight: 30 },
+        { term: 'metal recycling', weight: 30 },
+        { term: 'ferrous scrap', weight: 30 },
         { term: 'non-ferrous scrap', weight: 25 },
+        { term: 'recycling', weight: 20 },
       ],
       secondary: [
         { term: 'metal', weight: 10 },
@@ -352,11 +372,14 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'metal processing', weight: 10 },
         { term: 'scrap yard', weight: 10 },
         { term: 'metal shredding', weight: 10 },
+        { term: 'metal baler', weight: 10 },
       ],
       negative: [
         { term: 'used car', weight: -30 },
         { term: 'auto salvage', weight: -30 },
         { term: 'mechanic shop', weight: -30 },
+        { term: 'plastic', weight: -30 },
+        { term: 'paper recycling', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -382,27 +405,32 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     negativeKeywords: [
       'boat rental', 'jet ski rental', 'residential dock repair',
       'yacht club sales', 'scuba diving school', 'marina slips',
-      'fishing charter', 'boat storage'
+      'fishing charter', 'boat storage', 'boat repair', 'fishing guide',
+      'marine engine', 'boat dealer'
     ],
     signals: {
       primary: [
-        { term: 'marine', weight: 25 },
-        { term: 'marine construction', weight: 25 },
-        { term: 'seawall', weight: 25 },
-        { term: 'bulkhead', weight: 25 },
-        { term: 'dock building', weight: 25 },
+        { term: 'marine construction', weight: 30 },
+        { term: 'seawall', weight: 30 },
+        { term: 'bulkhead', weight: 30 },
+        { term: 'dock building', weight: 30 },
+        { term: 'marine', weight: 20 },
       ],
       secondary: [
         { term: 'commercial dredging', weight: 10 },
         { term: 'pile driving', weight: 10 },
         { term: 'marine infrastructure', weight: 10 },
         { term: 'dock', weight: 10 },
-        { term: 'construction', weight: 5 },
+        { term: 'dredge', weight: 10 },
+        { term: 'sheet piling', weight: 10 },
+        { term: 'marine salvage', weight: 10 },
       ],
       negative: [
         { term: 'boat rental', weight: -30 },
         { term: 'jet ski rental', weight: -30 },
         { term: 'residential dock', weight: -30 },
+        { term: 'boat repair', weight: -30 },
+        { term: 'fishing', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -428,17 +456,18 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     ],
     negativeKeywords: [
       'residential driveway', 'home repair', 'handyman',
-      'concrete bags retail', 'decorative concrete', 'stamped concrete patio'
+      'concrete bags retail', 'decorative concrete', 'stamped concrete patio',
+      'general contractor', 'framing', 'drywall', 'painting', 'siding'
     ],
     signals: {
       primary: [
-        { term: 'concrete contractor', weight: 25 },
-        { term: 'concrete pumping', weight: 25 },
-        { term: 'ready mix', weight: 25 },
-        { term: 'concrete foundation', weight: 25 },
+        { term: 'concrete contractor', weight: 30 },
+        { term: 'concrete pumping', weight: 30 },
+        { term: 'ready mix', weight: 30 },
+        { term: 'concrete foundation', weight: 30 },
+        { term: 'concrete recycling', weight: 30 },
+        { term: 'concrete crushing', weight: 30 },
         { term: 'commercial concrete', weight: 25 },
-        { term: 'concrete recycling', weight: 25 },
-        { term: 'concrete crushing', weight: 25 },
       ],
       secondary: [
         { term: 'concrete pump', weight: 10 },
@@ -446,6 +475,8 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'concrete batch plant', weight: 10 },
         { term: 'recycling', weight: 10 },
         { term: 'crushed concrete', weight: 10 },
+        { term: 'concrete saw', weight: 10 },
+        { term: 'power trowel', weight: 10 },
       ],
       negative: [
         { term: 'residential driveway', weight: -30 },
@@ -453,6 +484,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'stamped concrete patio', weight: -30 },
         { term: 'municipal recycling', weight: -30 },
         { term: 'bottle recycling', weight: -30 },
+        { term: 'general contractor', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -476,14 +508,15 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'erosion control blanket', 'silt fence'
     ],
     negativeKeywords: [
-      'rain gutter cleaning', 'residential drainage', 'home waterproofing'
+      'rain gutter cleaning', 'residential drainage', 'home waterproofing',
+      'irrigation', 'plumbing', 'landscaping', 'lawn care', 'sprinkler'
     ],
     signals: {
       primary: [
-        { term: 'SWPPP', weight: 25 },
-        { term: 'stormwater', weight: 25 },
-        { term: 'compliance', weight: 25 },
-        { term: 'erosion control', weight: 25 },
+        { term: 'SWPPP', weight: 30 },
+        { term: 'stormwater', weight: 30 },
+        { term: 'erosion control', weight: 30 },
+        { term: 'compliance', weight: 20 },
       ],
       secondary: [
         { term: 'BMP', weight: 10 },
@@ -492,9 +525,12 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'environmental', weight: 10 },
         { term: 'EPA', weight: 10 },
         { term: 'OSHA', weight: 10 },
+        { term: 'stormwater pollution', weight: 10 },
       ],
       negative: [
         { term: 'gutter cleaning', weight: -30 },
+        { term: 'irrigation', weight: -30 },
+        { term: 'lawn care', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -518,25 +554,32 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'wastewater pump', 'pH neutralization system'
     ],
     negativeKeywords: [
-      'residential septic repair', 'pool cleaning', 'home plumbing'
+      'residential septic repair', 'pool cleaning', 'home plumbing',
+      'laboratory testing', 'water delivery', 'bottled water',
+      'water softener', 'reverse osmosis home'
     ],
     signals: {
       primary: [
+        { term: 'industrial wastewater', weight: 30 },
+        { term: 'wastewater treatment', weight: 30 },
         { term: 'wastewater', weight: 25 },
-        { term: 'industrial wastewater', weight: 25 },
-        { term: 'wastewater treatment', weight: 25 },
-        { term: 'pretreatment', weight: 25 },
+        { term: 'pretreatment', weight: 30 },
       ],
       secondary: [
         { term: 'filtration', weight: 10 },
         { term: 'clarifier', weight: 10 },
         { term: 'discharge permit', weight: 10 },
+        { term: 'filter press', weight: 10 },
+        { term: 'chemical treatment', weight: 10 },
+        { term: 'pH neutralization', weight: 10 },
         { term: 'EPA', weight: 10 },
         { term: 'OSHA', weight: 10 },
         { term: 'NPDES', weight: 10 },
       ],
       negative: [
         { term: 'home septic', weight: -30 },
+        { term: 'pool cleaning', weight: -30 },
+        { term: 'water delivery', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -560,19 +603,24 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'soil vapor probe', 'groundwater monitor'
     ],
     negativeKeywords: [
-      'propane grill tank refill', 'home fuel tank', 'tank toys'
+      'propane grill tank refill', 'home fuel tank', 'tank toys',
+      'plumber', 'plumbing', 'auto repair', 'garage', 'storage',
+      'home inspection', 'landscape'
     ],
     signals: {
       primary: [
-        { term: 'tank testing', weight: 25 },
-        { term: 'leak detection', weight: 25 },
-        { term: 'UST', weight: 25 },
+        { term: 'tank testing', weight: 30 },
+        { term: 'leak detection', weight: 30 },
+        { term: 'UST', weight: 30 },
         { term: 'tank', weight: 25 },
       ],
       secondary: [
         { term: 'fuel tank', weight: 10 },
         { term: 'tank monitoring', weight: 10 },
         { term: 'compliance', weight: 10 },
+        { term: 'leak detector', weight: 10 },
+        { term: 'tightness test', weight: 10 },
+        { term: 'groundwater monitor', weight: 10 },
         { term: 'OSHA', weight: 10 },
         { term: 'EPA', weight: 10 },
       ],
@@ -617,22 +665,27 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'elevator leveling tool', 'car top inspection station'
     ],
     negativeKeywords: [
-      'home stair lift', 'wheelchair lift', 'DIY repair'
+      'home stair lift', 'wheelchair lift', 'DIY repair',
+      'escalator repair', 'conveyor', 'elevator sales', 'elevator installation'
     ],
     signals: {
       primary: [
+        { term: 'elevator inspection', weight: 30 },
+        { term: 'elevator testing', weight: 30 },
+        { term: 'lift certification', weight: 30 },
         { term: 'elevator', weight: 25 },
-        { term: 'elevator inspection', weight: 25 },
-        { term: 'lift certification', weight: 25 },
-        { term: 'elevator testing', weight: 25 },
       ],
       secondary: [
         { term: 'ASME', weight: 10 },
         { term: 'safety inspection', weight: 10 },
         { term: 'building compliance', weight: 10 },
+        { term: 'load test', weight: 10 },
+        { term: 'elevator certification', weight: 10 },
       ],
       negative: [
         { term: 'home stair lift', weight: -30 },
+        { term: 'escalator', weight: -30 },
+        { term: 'elevator sales', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -655,28 +708,34 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'balancing damper', 'air velocity meter'
     ],
     negativeKeywords: [
-      'home AC repair', 'window unit', 'portable AC'
+      'home AC repair', 'window unit', 'portable AC',
+      'furnace repair', 'refrigeration', 'appliance repair',
+      'thermostat replacement', 'mini split installation'
     ],
     signals: {
       primary: [
-        { term: 'HVAC', weight: 25 },
-        { term: 'air balance', weight: 25 },
-        { term: 'test and balance', weight: 25 },
-        { term: 'air balancing', weight: 25 },
-        { term: 'HVAC balancing', weight: 25 },
+        { term: 'air balance', weight: 30 },
+        { term: 'air balancing', weight: 30 },
+        { term: 'HVAC balancing', weight: 30 },
+        { term: 'test and balance', weight: 30 },
         { term: 'commercial HVAC', weight: 25 },
+        { term: 'HVAC', weight: 20 },
       ],
       secondary: [
         { term: 'heating', weight: 10 },
         { term: 'air conditioning', weight: 10 },
-        { term: 'air service', weight: 10 },
         { term: 'CFM', weight: 10 },
         { term: 'airflow testing', weight: 10 },
         { term: 'TAB contractor', weight: 10 },
+        { term: 'flow hood', weight: 10 },
+        { term: 'anemometer', weight: 10 },
+        { term: 'manometer', weight: 10 },
       ],
       negative: [
         { term: 'window AC', weight: -30 },
         { term: 'residential', weight: -40 },
+        { term: 'furnace repair', weight: -30 },
+        { term: 'refrigeration', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -699,22 +758,29 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'flow test kit', 'fire alarm panel'
     ],
     negativeKeywords: [
-      'garden irrigation repair', 'residential lawn sprinkler system', 'plumbing drain unclogging'
+      'garden irrigation repair', 'residential lawn sprinkler system', 'plumbing drain unclogging',
+      'sprinkler system installation', 'landscape irrigation', 'fire alarm',
+      'fire extinguisher', 'security system'
     ],
     signals: {
       primary: [
-        { term: 'fire sprinkler', weight: 25 },
-        { term: 'hydrostatic test', weight: 25 },
-        { term: 'sprinkler inspection', weight: 25 },
+        { term: 'fire sprinkler', weight: 30 },
+        { term: 'sprinkler inspection', weight: 30 },
+        { term: 'hydrostatic test', weight: 30 },
       ],
       secondary: [
         { term: 'NFPA 25', weight: 10 },
         { term: 'fire protection', weight: 10 },
         { term: 'alarm testing', weight: 10 },
+        { term: 'flow test', weight: 10 },
+        { term: 'backflow preventer', weight: 10 },
+        { term: 'hydrostatic pump', weight: 10 },
       ],
       negative: [
         { term: 'lawn sprinkler', weight: -30 },
         { term: 'irrigation', weight: -30 },
+        { term: 'fire alarm', weight: -30 },
+        { term: 'landscape', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -738,22 +804,30 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'CO2 fill manifold', 'pressure gauge'
     ],
     negativeKeywords: [
-      'buy smoke detector home', 'extinguisher mount bracket amazon', 'fire protection engineering degree'
+      'buy smoke detector home', 'extinguisher mount bracket amazon', 'fire protection engineering degree',
+      'fireplace', 'firewood', 'fire pit', 'fire alarm installation',
+      'fire sprinkler', 'smoke detector', 'security system'
     ],
     signals: {
       primary: [
-        { term: 'fire', weight: 25 },
-        { term: 'fire extinguisher', weight: 25 },
-        { term: 'recharge', weight: 25 },
-        { term: 'hydrotesting', weight: 25 },
+        { term: 'fire extinguisher', weight: 30 },
+        { term: 'recharge', weight: 30 },
+        { term: 'hydrotesting', weight: 30 },
+        { term: 'fire', weight: 15 },
       ],
       secondary: [
         { term: 'NFPA 10', weight: 10 },
         { term: 'inspection tag', weight: 10 },
         { term: 'safety inspection', weight: 10 },
+        { term: 'dry chemical', weight: 10 },
+        { term: 'CO2 refill', weight: 10 },
+        { term: 'extinguisher service', weight: 10 },
       ],
       negative: [
         { term: 'home extinguisher', weight: -30 },
+        { term: 'fireplace', weight: -30 },
+        { term: 'firewood', weight: -30 },
+        { term: 'smoke detector', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -820,22 +894,29 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'RPZ tester', 'double check valve tester'
     ],
     negativeKeywords: [
-      'residential water filtration pitcher', 'swimming pool backwash valve', 'sewer line replacement'
+      'residential water filtration pitcher', 'swimming pool backwash valve', 'sewer line replacement',
+      'water heater repair', 'water softener installation', 'plumbing',
+      'drain cleaning', 'sewer line', 'faucet repair', 'toilet repair'
     ],
     signals: {
       primary: [
-        { term: 'backflow', weight: 25 },
-        { term: 'RPZ', weight: 25 },
-        { term: 'cross connection', weight: 25 },
+        { term: 'backflow', weight: 30 },
+        { term: 'RPZ', weight: 30 },
+        { term: 'cross connection', weight: 30 },
       ],
       secondary: [
         { term: 'water testing', weight: 10 },
         { term: 'certified tester', weight: 10 },
         { term: 'assembly testing', weight: 10 },
+        { term: 'backflow preventer', weight: 10 },
+        { term: 'double check valve', weight: 10 },
+        { term: 'pressure gauge', weight: 10 },
       ],
       negative: [
         { term: 'pool', weight: -30 },
         { term: 'home filter', weight: -30 },
+        { term: 'water heater', weight: -30 },
+        { term: 'plumbing', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
@@ -859,24 +940,31 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'fuel polishing system', 'battery load tester'
     ],
     negativeKeywords: [
-      'portable generator camping sales', 'rv generator repair', 'home solar backup installation'
+      'portable generator camping sales', 'rv generator repair', 'home solar backup installation',
+      'solar installation', 'battery backup', 'inverter', 'UPS system',
+      'home standby generator', 'generator sales'
     ],
     signals: {
       primary: [
-        { term: 'generator', weight: 25 },
-        { term: 'generator testing', weight: 25 },
-        { term: 'load bank', weight: 25 },
-        { term: 'emergency generator', weight: 25 },
+        { term: 'generator testing', weight: 30 },
+        { term: 'load bank', weight: 30 },
+        { term: 'emergency generator', weight: 30 },
+        { term: 'generator', weight: 20 },
       ],
       secondary: [
         { term: 'NFPA 110', weight: 10 },
         { term: 'backup power', weight: 10 },
         { term: 'diesel generator', weight: 10 },
+        { term: 'transfer switch', weight: 10 },
+        { term: 'fuel polishing', weight: 10 },
+        { term: 'load bank test', weight: 10 },
         { term: 'OSHA', weight: 10 },
       ],
       negative: [
         { term: 'camping generator', weight: -30 },
         { term: 'portable generator', weight: -30 },
+        { term: 'solar', weight: -30 },
+        { term: 'battery backup', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
