@@ -53,7 +53,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Main content — padded for bottom nav */}
-        <main className="flex-1 overflow-x-hidden pb-28">
+        <main className="flex-1 overflow-x-hidden pb-20">
           <div className="p-4">{children}</div>
         </main>
 
