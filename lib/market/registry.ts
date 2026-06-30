@@ -629,6 +629,8 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     ],
     signals: {
       primary: [
+        { term: 'HVAC', weight: 25 },
+        { term: 'air balance', weight: 25 },
         { term: 'test and balance', weight: 25 },
         { term: 'air balancing', weight: 25 },
         { term: 'HVAC balancing', weight: 25 },
