@@ -143,8 +143,8 @@ export function calculateLeadScore(
   }
 
   // Feedback Learning Bonus
-  const positiveFeedback = (company as any).feedbackPositiveCount || 0;
-  const negativeFeedback = (company as any).feedbackNegativeCount || 0;
+  const positiveFeedback = company.feedbackPositiveCount || 0;
+  const negativeFeedback = company.feedbackNegativeCount || 0;
   const feedbackBonus = Math.min(25, positiveFeedback * 3) - Math.min(40, negativeFeedback * 5);
   score += feedbackBonus;
   breakdown.historicalFeedbackBonus = feedbackBonus;

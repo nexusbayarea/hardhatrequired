@@ -43,6 +43,12 @@ export interface Company {
   priority: PriorityGroup;
   status: CRMStatus;
   capabilitySummary?: string;
+  matchedSignals?: string[];
+  negativeHits?: string[];
+  relevanceReason?: string;
+  confidence?: number;
+  feedbackPositiveCount?: number;
+  feedbackNegativeCount?: number;
   notes?: string;
   source?: string;
   createdAt: string;

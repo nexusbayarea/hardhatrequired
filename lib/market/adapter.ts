@@ -114,6 +114,10 @@ export class IndexIntelligenceEngine {
         base.enrichmentScore = Math.max(0, result.score + fbAdj);
         base.priority = result.priority;
         base.distanceMiles = distance;
+        base.matchedSignals = result.matchedSignals;
+        base.negativeHits = result.negativeHits;
+        base.relevanceReason = result.relevanceReason;
+        base.confidence = result.confidence;
 
         if (result.score < 65 || result.priority === 'D') {
           continue;
@@ -181,6 +185,10 @@ export class IndexIntelligenceEngine {
       const result = calculateLeadScore(mergedCompany, config, scoringText, mergedCompany.distanceMiles);
       mergedCompany.enrichmentScore = result.score;
       mergedCompany.priority = result.priority;
+      mergedCompany.matchedSignals = result.matchedSignals;
+      mergedCompany.negativeHits = result.negativeHits;
+      mergedCompany.relevanceReason = result.relevanceReason;
+      mergedCompany.confidence = result.confidence;
 
       // Stage 4: User Feedback Layer — adjust score based on historical feedback
       const feedbackProfile = await getCompanyProfile(mergedCompany.id || '', config.id);
