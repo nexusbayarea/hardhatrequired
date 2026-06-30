@@ -7,42 +7,108 @@ type Language = 'en' | 'es';
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, vars?: Record<string, string | number>) => string;
   loading: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 const esDictionary: Record<string, string> = {
+  // ─── App-wide ───
+  'hard hat required': 'Hard Hat Required',
+  'english': 'English',
+  'español': 'Español',
+
+  // ─── Dashboard chrome (sidebar, topbar, bottom nav) ───
+  'overview': 'Resumen',
+  'search': 'Búsqueda',
+  'markets': 'Mercados',
+  'campaigns': 'Campañas',
+  'outreach': 'Divulgación',
+  'reports': 'Informes',
+  'billing': 'Facturación',
+  'settings': 'Configuración',
+  'admin': 'Admin',
+  'main': 'PRINCIPAL',
+  'sales': 'VENTAS',
+  'admin section': 'ADMIN',
+  'growth plan': 'Plan de Crecimiento',
+  'credits': 'Créditos',
+  'dashboard': 'Panel de Control',
+  'construction market intelligence': 'Inteligencia de Mercado para la Construcción',
+
+  // ─── Search console ───
+  'market search': 'Búsqueda de Mercado',
+  'define your target market parameters': 'Defina los parámetros de su mercado objetivo',
+  'index': 'Índice',
+  '(select)': '(Seleccionar)',
+  'radius': 'Radio',
+  'zip code': 'Código Postal',
+  'enter zip code': 'Ingrese el Código Postal',
+  'scanning your market...': 'Escaneando su mercado...',
+  'set parameters above and run discovery': 'Establezca parámetros arriba y ejecute la búsqueda',
+  'grading:': 'Calificación:',
+  ' = good to go': ' = Listo',
+  ' = check website or call to verify': ' = Verifique sitio web o llame',
+  ' = call to verify': ' = Llame para verificar',
+  'run discovery': 'Ejecutar Búsqueda',
+  'enter a zip code to begin search.': 'Ingrese un código postal para comenzar la búsqueda.',
+  'select an index to search.': 'Seleccione un Índice para buscar.',
+  'searching...': 'Buscando...',
+
+  // ─── Results ───
+  'results': 'Resultados',
+  'companies found': 'empresas encontradas',
+  'run a search above': 'Ejecute una búsqueda arriba',
+  'no results yet': 'Aún no hay resultados',
+  'set your parameters above and run a discovery search': 'Establezca sus parámetros arriba y ejecute una búsqueda',
+  'discovering companies...': 'Descubriendo empresas...',
+  'searching, enriching contacts, detecting signals': 'Buscando, enriqueciendo contactos, detectando señales',
+
+  // ─── Results table ───
+  'company': 'Empresa',
+  'grade': 'Grado',
+  'distance': 'Distancia',
+  'score': 'Puntaje',
+  'signals': 'Señales',
+  'accurate?': '¿Preciso?',
+  'contact': 'Contacto',
+  'lead score': 'Puntaje de Cliente Potencial',
+  'mi': 'millas',
+
+  // ─── Results cards (mobile) ───
+  'call': 'Llamar',
+  'details': 'Detalles',
+  'accurate': 'Preciso',
+  'partial': 'Parcial',
+  'bad': 'Incorrecto',
+  'mi away': 'millas de distancia',
+
+  // ─── Metrics ───
+  'companies indexed': 'Empresas Indexadas',
+  'campaigns active': 'Campañas Activas',
+  'monthly searches': 'Búsquedas Mensuales',
+  'pipeline value': 'Valor del Pipeline',
+  'priority a': 'prioridad A',
+  'calls today': 'llamadas hoy',
+  'avg score': 'puntaje promedio',
+  'enrichments': 'enriquecimientos',
+
+  // ─── Landing page ───
   'daily intelligence': 'Inteligencia Diaria',
   'active bids': 'Licitaciones Activas',
   'compliance': 'Cumplimiento Normativo',
-  'market intelligence': 'Generación de Clientes Potenciales',
   'lead generation': 'Generación de Clientes Potenciales',
+  'market intelligence': 'Inteligencia de Mercado',
   'industry index': 'Índice de la Industria',
   'win more contracts': 'Gane Más Contratos',
   'contractor intelligence': 'Inteligencia de Contratistas',
   'osha violation risk': 'Riesgo de Infracción de OSHA',
-  'hard hat required': 'Hard Hat Required',
   'search radius': 'Radio de Búsqueda',
-  'run discovery': 'Ejecutar Búsqueda',
-  'enter zip code': 'Ingrese el Código Postal',
-  'select index type': 'Seleccionar Tipo de Índice',
   'source': 'Fuente',
-  'score': 'Puntaje',
-  'grade': 'Grado',
-  'phone': 'Teléfono',
-  'email': 'Correo Electrónico',
-  'website': 'Sitio Web',
-  'distance': 'Distancia',
   'pipeline': 'Tubería de Ventas',
-  'campaigns': 'Campañas',
-  'reports': 'Informes',
-  'settings': 'Configuración',
   'login': 'Iniciar Sesión',
   'get access': 'Obtener Acceso',
-  'english': 'English',
-  'español': 'Español',
   'bids': 'Licitaciones',
   'news': 'Noticias',
   'compliance alerts': 'Alertas de Cumplimiento',
@@ -55,7 +121,6 @@ const esDictionary: Record<string, string> = {
   'expiring state licenses': 'Licencias Estatales por Expirar',
   'municipal vendor search engine': 'Motor de Búsqueda de Proveedores Municipales',
   'high intent demand alerts': 'Alertas de Demanda de Alta Intención',
-  'construction market intelligence': 'Inteligencia de Mercado para la Construcción',
   'find every job': 'Encuentre Cada Trabajo',
   'win every bid': 'Gane Cada Licitación',
   'ai-powered market intelligence built for the field.': 'Inteligencia de mercado impulsada por IA, construida para el campo.',
@@ -67,9 +132,79 @@ const esDictionary: Record<string, string> = {
   'live lead scoring': 'Puntuación de Clientes Potenciales en Vivo',
   'open dashboard': 'Abrir Panel de Control',
   'book a demo': 'Solicitar una Demostración',
-  'login': 'Iniciar Sesión',
-  'get access': 'Obtener Acceso',
+  'scroll': 'Desplazar',
+  'how it works': 'Cómo Funciona',
+  'three steps.': 'Tres Pasos.',
+  'zero guesswork.': 'Cero Conjeturas.',
+  'search your market': 'Busque Su Mercado',
+  'score every lead': 'Califique Cada Cliente Potencial',
+  'close the job': 'Cierre el Trabajo',
+  'core engines': 'Motores Principales',
+  'four engines.': 'Cuatro Motores.',
+  'one platform.': 'Una Plataforma.',
+  'industry verticals': 'Verticales de la Industria',
+  'built for your industry.': 'Construido para Su Industria.',
+  'live': 'En Vivo',
+  'beta': 'Beta',
+  'get started today': 'Comience Hoy',
+  'your market.': 'Su Mercado.',
+  'mapped in minutes.': 'Mapeado en Minutos.',
+
+  // ─── Vertical names for search dropdown ───
+  'asbestos_abatement': 'Asbesto y Eliminación de Plomo',
+  'backflow_testing': 'Prueba de Prevención de Flujo Inverso',
+  'grease_trap': 'Bombeo de Trampas de Grasa Comerciales',
+  'kitchen_exhaust': 'Desengrase de Campanas de Cocina Comerciales',
+  'concrete': 'Servicios de Concreto',
+  'elevator_inspection': 'Inspección y Certificación de Elevadores',
+  'generator_testing': 'Prueba de Banco de Carga de Generadores de Emergencia',
+  'fire_extinguisher': 'Inspección y Recarga de Extintores',
+  'fire_sprinkler': 'Prueba de Presión de Rociadores Contra Incendios',
+  'marine_construction': 'Infraestructura Marina y Muelles Pesados',
+  'hvac_balance': 'Prueba y Balanceo de HVAC',
+  'hydro_excavation': 'Hidroexcavación y Excavación No Destructiva',
+  'commercial_roofing': 'Techado Plano Industrial y Comercial',
+  'scrap_metal': 'Procesamiento de Chatarra Industrial',
+  'industrial_wastewater': 'Tratamiento de Aguas Residuales Industriales',
+  'medical_waste': 'Eliminación de Residuos Médicos',
+  'slurry_concrete': 'Slurry / Lechada',
+  'stormwater_compliance': 'Cumplimiento de SWPPP / Aguas Pluviales',
+  'tank_testing': 'Prueba de Tanques Subterráneos',
+
+  // ─── Step bodies (landing) ───
+  'enter a zip code. pick a vertical. we scan every company within your radius — contractors, subs, suppliers.':
+    'Ingrese un código postal. Elija una vertical. Escaneamos cada empresa en su radio — contratistas, subcontratistas, proveedores.',
+  'our ai ranks companies by revenue signals, fleet size, and buying intent. you see who\'s ready to spend.':
+    'Nuestra IA clasifica empresas por señales de ingresos, tamaño de flota e intención de compra. Usted ve quién está listo para gastar.',
+  'one-tap calling, auto-enriched contacts, and ai-drafted bid proposals. done before the next pour.':
+    'Llamadas con un solo toque, contactos enriquecidos automáticamente y propuestas de licitación redactadas por IA. Listo antes del próximo vertido.',
+
+  // ─── Engine titles (landing) ───
+  'discovery engine': 'Motor de Descubrimiento',
+  'enrichment engine': 'Motor de Enriquecimiento',
+  'scoring engine': 'Motor de Calificación',
+  'campaign engine': 'Motor de Campañas',
+
+  // ─── Engine descriptions (landing) ───
+  'search 8+ verticals with geo-intelligence and industry signals. find companies your competitors don\'t know exist.':
+    'Busque en más de 8 verticales con geointeligencia y señales de la industria. Encuentre empresas que sus competidores ni saben que existen.',
+  'auto-populate verified contacts, phones, emails, and decision-maker data for every company found.':
+    'Complete automáticamente contactos verificados, teléfonos, correos electrónicos y datos de tomadores de decisiones para cada empresa encontrada.',
+  'priority rankings based on revenue, fleet, permit activity, and buying signals. know who to call first.':
+    'Clasificaciones prioritarias basadas en ingresos, flota, actividad de permisos y señales de compra. Sepa a quién llamar primero.',
+  'deploy targeted outreach and track every touchpoint from first call to signed contract.':
+    'Despliegue divulgación dirigida y rastree cada punto de contacto desde la primera llamada hasta el contrato firmado.',
+  'every function you need to prospect, enrich, score, and close — unified in a single field-hardened interface built for construction teams.':
+    'Cada función que necesita para prospectar, enriquecer, calificar y cerrar — unificada en una sola interfaz robusta construida para equipos de construcción.',
+
+  // ─── CTA body ───
+  'book a 20-minute demo. we\'ll map your market live and show you exactly where the revenue is — before your competitors find it.':
+    'Agende una demostración de 20 minutos. Mapearemos su mercado en vivo y le mostraremos exactamente dónde están los ingresos — antes de que sus competidores los encuentren.',
 };
+
+function interpolate(text: string, vars: Record<string, string | number>): string {
+  return text.replace(/\{(\w+)\}/g, (_, key) => String(vars[key] ?? `{${key}}`));
+}
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>('en');
@@ -85,9 +220,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLoading(false);
   };
 
-  const t = (text: string): string => {
-    if (language === 'en') return text;
-    return esDictionary[text.trim().toLowerCase()] || text;
+  const t = (text: string, vars?: Record<string, string | number>): string => {
+    const key = text.trim().toLowerCase();
+    const translated = language === 'en' ? text : (esDictionary[key] || text);
+    return vars ? interpolate(translated, vars) : translated;
   };
 
   return (

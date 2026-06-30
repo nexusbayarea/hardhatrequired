@@ -1,6 +1,7 @@
 'use client';
 
 import { Bell } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 import LanguageToggle from '@/components/shared/LanguageToggle';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 
@@ -9,6 +10,7 @@ interface TopbarProps {
 }
 
 export default function Topbar({ mobile = false }: TopbarProps) {
+  const { t } = useLanguage();
 
   /* ── Mobile: compact actions only (no search bar) ── */
   if (mobile) {
@@ -60,10 +62,10 @@ export default function Topbar({ mobile = false }: TopbarProps) {
             color: 'var(--color-text)',
           }}
         >
-          DASHBOARD
+          {t('dashboard').toUpperCase()}
         </h1>
         <p className="text-sm font-medium mt-0.5" style={{ color: 'var(--color-muted)' }}>
-          Construction market intelligence
+          {t('construction market intelligence')}
         </p>
       </div>
 

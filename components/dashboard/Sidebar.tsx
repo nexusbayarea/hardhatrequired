@@ -3,31 +3,32 @@
 import { HardHat, LayoutDashboard, Search, TrendingUp, Layers, Phone, BarChart3, CreditCard, Settings, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLanguage } from '@/context/LanguageContext';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 
 const navItems = [
   {
-    section: 'MAIN',
+    section: 'main',
     items: [
-      { icon: LayoutDashboard, label: 'Overview',  href: '/dashboard' },
-      { icon: Search,          label: 'Search',    href: '/dashboard/search' },
-      { icon: TrendingUp,      label: 'Markets',   href: '/dashboard/markets' },
+      { icon: LayoutDashboard, label: 'overview',  href: '/dashboard' },
+      { icon: Search,          label: 'search',    href: '/dashboard/search' },
+      { icon: TrendingUp,      label: 'markets',   href: '/dashboard/markets' },
     ],
   },
   {
-    section: 'SALES',
+    section: 'sales',
     items: [
-      { icon: Layers,   label: 'Campaigns', href: '/dashboard/campaigns' },
-      { icon: Phone,    label: 'Outreach',  href: '/login' },
-      { icon: BarChart3,label: 'Reports',   href: '/dashboard/reports' },
+      { icon: Layers,   label: 'campaigns', href: '/dashboard/campaigns' },
+      { icon: Phone,    label: 'outreach',  href: '/login' },
+      { icon: BarChart3,label: 'reports',   href: '/dashboard/reports' },
     ],
   },
   {
-    section: 'ADMIN',
+    section: 'admin section',
     items: [
-      { icon: CreditCard, label: 'Billing',  href: '/dashboard/billing' },
-      { icon: Settings,   label: 'Settings', href: '/dashboard/settings' },
-      { icon: Shield,     label: 'Admin',    href: '/dashboard/admin' },
+      { icon: CreditCard, label: 'billing',  href: '/dashboard/billing' },
+      { icon: Settings,   label: 'settings', href: '/dashboard/settings' },
+      { icon: Shield,     label: 'admin',    href: '/dashboard/admin' },
     ],
   },
 ];
@@ -38,6 +39,7 @@ interface SidebarProps {
 
 export default function Sidebar({ slim = false }: SidebarProps) {
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   return (
     <aside
@@ -84,7 +86,7 @@ export default function Sidebar({ slim = false }: SidebarProps) {
                 className="px-4 mb-2 text-[10px] font-black uppercase tracking-widest"
                 style={{ color: 'var(--color-muted)' }}
               >
-                {group.section}
+                {t(group.section)}
               </div>
             )}
             <div className="space-y-0.5">
@@ -115,7 +117,7 @@ export default function Sidebar({ slim = false }: SidebarProps) {
                           color: active ? 'var(--color-red)' : undefined,
                         }}
                       >
-                        {item.label}
+                        {t(item.label)}
                       </span>
                     )}
                   </Link>
@@ -140,13 +142,13 @@ export default function Sidebar({ slim = false }: SidebarProps) {
               className="text-xs font-black uppercase tracking-wider mb-1"
               style={{ color: 'var(--color-muted)' }}
             >
-              Growth Plan
+              {t('growth plan')}
             </div>
             <div
               className="font-bold"
               style={{ fontSize: '1.0625rem', color: 'var(--color-text)' }}
             >
-              Credits
+              {t('credits')}
             </div>
           </div>
         )}

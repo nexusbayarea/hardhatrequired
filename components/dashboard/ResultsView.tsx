@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search, ChevronDown, ChevronRight, Phone, Globe, MapPin } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 import ResultsTable from './ResultsTable';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
@@ -15,6 +16,7 @@ interface ResultsViewProps {
 
 /* ── Mobile card view — optimised for glove use ── */
 function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeedback?: (company: SearchResult, voteType: VoteType) => void }) {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, VoteType>>({});
 
@@ -53,7 +55,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                       className="text-sm font-medium mt-1"
                       style={{ color: 'var(--color-muted)' }}
                     >
-                      {r.distanceMiles.toFixed(1)} mi away
+                      {r.distanceMiles.toFixed(1)} {t('mi away')}
                     </div>
                   )}
                 </div>
@@ -90,7 +92,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                   }}
                 >
                   <Phone className="w-5 h-5" />
-                  Call
+                  {t('call')}
                 </a>
                 <button
                   onClick={() => setExpanded(isExpanded ? null : r.id)}
@@ -103,7 +105,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                   }}
                 >
                   {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-                  Details
+                  {t('details')}
                 </button>
               </div>
 
@@ -145,7 +147,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                         cursor: 'pointer',
                       }}
                     >
-                      {v === 'accurate' ? 'Accurate' : v === 'partial' ? 'Partial' : 'Bad'}
+                      {v === 'accurate' ? t('accurate') : v === 'partial' ? t('partial') : t('bad')}
                     </button>
                   );
                 })}
@@ -188,12 +190,12 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                 )}
                 {r.capabilitySummary && (
                   <div>
-                    <div
-                      className="text-xs font-black uppercase tracking-widest mb-2"
-                      style={{ color: 'var(--color-muted)' }}
-                    >
-                      Signals
-                    </div>
+                      <div
+                        className="text-xs font-black uppercase tracking-widest mb-2"
+                        style={{ color: 'var(--color-muted)' }}
+                      >
+                        {t('signals')}
+                      </div>
                     <p className="text-base leading-relaxed" style={{ color: 'var(--color-muted)' }}>
                       {r.capabilitySummary}
                     </p>
@@ -210,6 +212,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
 
 /* ── Main export: table on desktop, cards on mobile ── */
 export default function ResultsView({ results, loading, vertical, onFeedback }: ResultsViewProps) {
+  const { t } = useLanguage();
   /* Empty / loading states */
   const EmptyState = ({ msg }: { msg: string }) => (
     <div
@@ -221,7 +224,7 @@ export default function ResultsView({ results, loading, vertical, onFeedback }: 
         className="font-bold mb-2"
         style={{ fontSize: '1.125rem', color: 'var(--color-text)' }}
       >
-        No results yet
+        {t('no results yet')}
       </div>
       <div className="text-base" style={{ color: 'var(--color-muted)' }}>{msg}</div>
     </div>
@@ -264,7 +267,7 @@ export default function ResultsView({ results, loading, vertical, onFeedback }: 
         {loading ? (
           <LoadingCards />
         ) : !results || results.length === 0 ? (
-          <EmptyState msg="Set your parameters above and run a discovery search" />
+          <EmptyState msg={t('set your parameters above and run a discovery search')} />
         ) : (
           <ResultsCards results={results} onFeedback={onFeedback} />
         )}

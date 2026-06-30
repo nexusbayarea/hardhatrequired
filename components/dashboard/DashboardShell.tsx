@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import MetricsRow from './MetricsRow';
 import SearchConsole from './SearchConsole';
 import ResultsView from './ResultsView';
@@ -8,6 +9,7 @@ import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
 
 export default function DashboardShell() {
+  const { t } = useLanguage();
   const [searchData, setSearchData] = useState<{ companies: SearchResult[]; count: number } | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const [activeVertical, setActiveVertical] = useState('');
@@ -60,17 +62,17 @@ export default function DashboardShell() {
               color: 'var(--color-red)',
             }}
           >
-            Results
+            {t('results')}
           </h2>
           <div
             className="text-sm font-semibold"
             style={{ color: 'var(--color-muted)' }}
           >
             {searchLoading
-              ? 'Searching...'
+              ? t('searching...')
               : searchData
-              ? `${searchData.count} companies found`
-              : 'Run a search above'}
+              ? `${searchData.count} ${t('companies found')}`
+              : t('run a search above')}
           </div>
         </div>
         <ResultsView

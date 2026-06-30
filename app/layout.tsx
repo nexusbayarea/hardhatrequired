@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
+import HtmlLangSetter from "@/components/shared/HtmlLangSetter";
 
 export const metadata: Metadata = {
   title: "Index Intelligence Engine — Field-Grade Market Intelligence",
@@ -15,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -28,7 +29,10 @@ export default function RootLayout({
         />
       </head>
       <body className="overflow-x-hidden">
-        <ClientLayout>{children}</ClientLayout>
+        <ClientLayout>
+          <HtmlLangSetter />
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );

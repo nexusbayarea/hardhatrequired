@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search, MapPin, Crosshair, Loader2 } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 import type { SearchResult } from '@/types/search';
 
 interface SearchConsoleProps {
@@ -30,16 +31,17 @@ export default function SearchConsole({
   const setZip = onZipChange ?? setInternalZip;
 
   const [radius, setRadius] = useState('');
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async () => {
     if (!zip.trim()) {
-      setError('Enter a ZIP code to begin search.');
+      setError(t('enter a zip code to begin search.'));
       return;
     }
     if (!vertical) {
-      setError('Select an Index to search.');
+      setError(t('select an index to search.'));
       return;
     }
 
@@ -96,10 +98,10 @@ export default function SearchConsole({
               letterSpacing: '0.04em',
             }}
           >
-            Market Search
+            {t('market search')}
           </div>
           <div className="text-sm font-medium mt-0.5" style={{ color: 'var(--color-muted)' }}>
-            Define your target market parameters
+            {t('define your target market parameters')}
           </div>
         </div>
       </div>
@@ -109,50 +111,50 @@ export default function SearchConsole({
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-6">
           {/* Vertical */}
           <div>
-            <label className="field-label">
-              <Crosshair className="w-4 h-4" />
-              Index
-            </label>
-            <select
-              value={vertical}
-              onChange={e => setVertical(e.target.value)}
-              className="field-input"
-            >
-              <option value="" disabled>(Select)</option>
-              <option value="asbestos_abatement">Asbestos & Lead Abatement</option>
-              <option value="backflow_testing">Backflow Prevention Testing</option>
-              <option value="grease_trap">Commercial Grease Trap Pumping</option>
-              <option value="kitchen_exhaust">Commercial Kitchen Hood Degreasing</option>
-              <option value="concrete">Concrete Services</option>
-              <option value="elevator_inspection">Elevator Inspection & Certification</option>
-              <option value="generator_testing">Emergency Generator Load Bank Testing</option>
-              <option value="fire_extinguisher">Fire Extinguisher Inspection & Filling</option>
-              <option value="fire_sprinkler">Fire Sprinkler Pressure Testing</option>
-              <option value="marine_construction">Heavy Marine & Dock Infrastructure</option>
-              <option value="hvac_balance">HVAC Test & Balance</option>
-              <option value="hydro_excavation">Hydro-Excavation & Non-Destructive Digging</option>
-              <option value="commercial_roofing">Industrial & Commercial Flat Roofing</option>
-              <option value="scrap_metal">Industrial Scrap Metal Processing</option>
-              <option value="industrial_wastewater">Industrial Wastewater Treatment</option>
-              <option value="medical_waste">Medical Waste Disposal</option>
-              <option value="slurry_concrete">Slurry</option>
-              <option value="stormwater_compliance">Stormwater Compliance / SWPPP</option>
-              <option value="tank_testing">Underground Tank Testing</option>
+              <label className="field-label">
+                <Crosshair className="w-4 h-4" />
+                {t('index')}
+              </label>
+              <select
+                value={vertical}
+                onChange={e => setVertical(e.target.value)}
+                className="field-input"
+              >
+                <option value="" disabled>{t('(select)')}</option>
+              <option value="asbestos_abatement">{t('asbestos_abatement')}</option>
+              <option value="backflow_testing">{t('backflow_testing')}</option>
+              <option value="grease_trap">{t('grease_trap')}</option>
+              <option value="kitchen_exhaust">{t('kitchen_exhaust')}</option>
+              <option value="concrete">{t('concrete')}</option>
+              <option value="elevator_inspection">{t('elevator_inspection')}</option>
+              <option value="generator_testing">{t('generator_testing')}</option>
+              <option value="fire_extinguisher">{t('fire_extinguisher')}</option>
+              <option value="fire_sprinkler">{t('fire_sprinkler')}</option>
+              <option value="marine_construction">{t('marine_construction')}</option>
+              <option value="hvac_balance">{t('hvac_balance')}</option>
+              <option value="hydro_excavation">{t('hydro_excavation')}</option>
+              <option value="commercial_roofing">{t('commercial_roofing')}</option>
+              <option value="scrap_metal">{t('scrap_metal')}</option>
+              <option value="industrial_wastewater">{t('industrial_wastewater')}</option>
+              <option value="medical_waste">{t('medical_waste')}</option>
+              <option value="slurry_concrete">{t('slurry_concrete')}</option>
+              <option value="stormwater_compliance">{t('stormwater_compliance')}</option>
+              <option value="tank_testing">{t('tank_testing')}</option>
             </select>
           </div>
 
           {/* Radius */}
           <div>
             <label className="field-label">
-              <MapPin className="w-4 h-4" />
-              Radius
-            </label>
-            <select
-              value={radius}
-              onChange={e => setRadius(e.target.value)}
-              className="field-input"
-            >
-              <option value="" disabled>(Select)</option>
+                <MapPin className="w-4 h-4" />
+                {t('radius')}
+              </label>
+              <select
+                value={radius}
+                onChange={e => setRadius(e.target.value)}
+                className="field-input"
+              >
+                <option value="" disabled>{t('(select)')}</option>
               <option value="10">10 miles</option>
               <option value="20">20 miles</option>
               <option value="50">50 miles</option>
@@ -163,18 +165,18 @@ export default function SearchConsole({
           {/* ZIP */}
           <div>
             <label className="field-label">
-              <MapPin className="w-4 h-4" />
-              ZIP Code
-            </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={zip}
-              onChange={e => setZip(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              placeholder="Enter ZIP code"
-              className="field-input"
+                <MapPin className="w-4 h-4" />
+                {t('zip code')}
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={zip}
+                onChange={e => setZip(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                placeholder={t('enter zip code')}
+                className="field-input"
             />
           </div>
 
@@ -201,13 +203,13 @@ export default function SearchConsole({
               className="text-sm font-semibold"
               style={{ color: 'var(--color-muted)' }}
             >
-              {loading ? 'Scanning your market...' : 'Set parameters above and run discovery'}
+              {loading ? t('scanning your market...') : t('set parameters above and run discovery')}
             </div>
             {!loading && (
               <div className="text-xs" style={{ color: 'var(--color-muted)' }}>
-                Grading: <span style={{ color: 'var(--color-red)' }}>A</span> = Good to go{' '}
-                <span style={{ color: 'var(--color-red)' }}>B</span> = Check website or call to verify{' '}
-                <span style={{ color: 'var(--color-red)' }}>C</span> = Call to verify
+                {t('grading:')} <span style={{ color: 'var(--color-red)' }}>A</span>{t(' = good to go')}{' '}
+                <span style={{ color: 'var(--color-red)' }}>B</span>{t(' = check website or call to verify')}{' '}
+                <span style={{ color: 'var(--color-red)' }}>C</span>{t(' = call to verify')}
               </div>
             )}
           </div>
@@ -223,9 +225,9 @@ export default function SearchConsole({
             }}
           >
             {loading ? (
-              <><Loader2 className="w-5 h-5 animate-spin" /> Searching...</>
+              <><Loader2 className="w-5 h-5 animate-spin" /> {t('searching...')}</>
             ) : (
-              <><Search className="w-5 h-5" /> Run Discovery</>
+              <><Search className="w-5 h-5" /> {t('run discovery')}</>
             )}
           </button>
         </div>

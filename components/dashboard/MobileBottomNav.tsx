@@ -2,17 +2,19 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLanguage } from '@/context/LanguageContext';
 import { LayoutDashboard, Search, TrendingUp, Layers, Settings } from 'lucide-react';
 
 const items = [
-  { icon: LayoutDashboard, label: 'Overview', href: '/dashboard' },
-  { icon: Search,          label: 'Search',   href: '/dashboard/search' },
-  { icon: TrendingUp,      label: 'Markets',  href: '/dashboard/markets' },
-  { icon: Layers,          label: 'Campaigns',href: '/dashboard/campaigns' },
-  { icon: Settings,        label: 'Settings', href: '/dashboard/settings' },
+  { icon: LayoutDashboard, label: 'overview', href: '/dashboard' },
+  { icon: Search,          label: 'search',   href: '/dashboard/search' },
+  { icon: TrendingUp,      label: 'markets',  href: '/dashboard/markets' },
+  { icon: Layers,          label: 'campaigns',href: '/dashboard/campaigns' },
+  { icon: Settings,        label: 'settings', href: '/dashboard/settings' },
 ];
 
 export default function MobileBottomNav() {
+  const { t } = useLanguage();
   const pathname = usePathname();
 
   return (
@@ -32,7 +34,7 @@ export default function MobileBottomNav() {
               style={{ color: active ? 'var(--color-red)' : 'var(--color-muted)' }}
             />
             <span style={{ color: active ? 'var(--color-red)' : 'var(--color-muted)' }}>
-              {label}
+              {t(label)}
             </span>
           </Link>
         );

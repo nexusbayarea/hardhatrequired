@@ -24,20 +24,20 @@ const steps = [
   {
     n: '01',
     icon: MapPin,
-    title: 'Search Your Market',
-    body: 'Enter a ZIP code. Pick a vertical. We scan every company within your radius — contractors, subs, suppliers.',
+    titleKey: 'search your market',
+    bodyKey: 'enter a zip code. pick a vertical. we scan every company within your radius — contractors, subs, suppliers.',
   },
   {
     n: '02',
     icon: Target,
-    title: 'Score Every Lead',
-    body: 'Our AI ranks companies by revenue signals, fleet size, and buying intent. You see who\'s ready to spend.',
+    titleKey: 'score every lead',
+    bodyKey: 'our ai ranks companies by revenue signals, fleet size, and buying intent. you see who\'s ready to spend.',
   },
   {
     n: '03',
     icon: Phone,
-    title: 'Close the Job',
-    body: 'One-tap calling, auto-enriched contacts, and AI-drafted bid proposals. Done before the next pour.',
+    titleKey: 'close the job',
+    bodyKey: 'one-tap calling, auto-enriched contacts, and ai-drafted bid proposals. done before the next pour.',
   },
 ];
 
@@ -45,23 +45,23 @@ const steps = [
 const engines = [
   {
     icon: Search,
-    title: 'Discovery Engine',
-    desc: 'Search 8+ verticals with geo-intelligence and industry signals. Find companies your competitors don\'t know exist.',
+    titleKey: 'discovery engine',
+    descKey: 'search 8+ verticals with geo-intelligence and industry signals. find companies your competitors don\'t know exist.',
   },
   {
     icon: Database,
-    title: 'Enrichment Engine',
-    desc: 'Auto-populate verified contacts, phones, emails, and decision-maker data for every company found.',
+    titleKey: 'enrichment engine',
+    descKey: 'auto-populate verified contacts, phones, emails, and decision-maker data for every company found.',
   },
   {
     icon: Target,
-    title: 'Scoring Engine',
-    desc: 'Priority rankings based on revenue, fleet, permit activity, and buying signals. Know who to call first.',
+    titleKey: 'scoring engine',
+    descKey: 'priority rankings based on revenue, fleet, permit activity, and buying signals. know who to call first.',
   },
   {
     icon: TrendingUp,
-    title: 'Campaign Engine',
-    desc: 'Deploy targeted outreach and track every touchpoint from first call to signed contract.',
+    titleKey: 'campaign engine',
+    descKey: 'deploy targeted outreach and track every touchpoint from first call to signed contract.',
   },
 ];
 
@@ -319,7 +319,7 @@ function LandingInner() {
                 className="btn-primary"
                 style={{ fontSize: 'clamp(1rem, 2vw, 1.125rem)', height: '64px', padding: '0 40px' }}
               >
-                Open Dashboard <ArrowRight className="w-5 h-5" />
+                {t('Open Dashboard')} <ArrowRight className="w-5 h-5" />
               </Link>
               <a
                 href="mailto:demo@indexintelligence.io"
@@ -335,7 +335,7 @@ function LandingInner() {
         {/* Scroll cue */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
           <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>
-            Scroll
+            {t('scroll')}
           </span>
           <div
             className="w-px h-12"
@@ -362,10 +362,10 @@ function LandingInner() {
       <section id="how-it-works" className="py-24 md:py-36">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
           <div className="mb-16 md:mb-24">
-            <p className="section-label mb-4">How It Works</p>
+            <p className="section-label mb-4">{t('how it works')}</p>
             <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
-              Three Steps.<br />
-              <span style={{ color: 'var(--color-muted)' }}>Zero Guesswork.</span>
+              {t('three steps.')}<br />
+              <span style={{ color: 'var(--color-muted)' }}>{t('zero guesswork.')}</span>
             </h2>
           </div>
 
@@ -404,10 +404,10 @@ function LandingInner() {
                     color: 'var(--color-text)',
                   }}
                 >
-                  {step.title}
+                  {t(step.titleKey)}
                 </h3>
                 <p style={{ fontSize: '1.0625rem', lineHeight: 1.6, color: 'var(--color-muted)', fontWeight: 500 }}>
-                  {step.body}
+                  {t(step.bodyKey)}
                 </p>
               </div>
             ))}
@@ -425,14 +425,13 @@ function LandingInner() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
             {/* Left: copy */}
             <div className="lg:sticky lg:top-28">
-              <p className="section-label mb-4">Core Engines</p>
+              <p className="section-label mb-4">{t('core engines')}</p>
               <h2 className="text-section mb-6" style={{ color: 'var(--color-text)' }}>
-                Four Engines.<br />
-                <span style={{ color: 'var(--color-muted)' }}>One Platform.</span>
+                {t('four engines.')}<br />
+                <span style={{ color: 'var(--color-muted)' }}>{t('one platform.')}</span>
               </h2>
               <p style={{ fontSize: '1.125rem', color: 'var(--color-muted)', lineHeight: 1.7, fontWeight: 500, maxWidth: '480px' }}>
-                Every function you need to prospect, enrich, score, and close — unified in a single
-                field-hardened interface built for construction teams.
+                  {t('every function you need to prospect, enrich, score, and close — unified in a single field-hardened interface built for construction teams.')}
               </p>
               <div className="mt-10">
                 <Link href="/dashboard" className="btn-primary" style={{ width: '100%', maxWidth: '320px' }}>
@@ -443,9 +442,9 @@ function LandingInner() {
 
             {/* Right: engine cards */}
             <div className="space-y-4">
-              {engines.map((e, i) => (
+                {engines.map((e, i) => (
                 <div
-                  key={e.title}
+                  key={e.titleKey}
                   className="group p-7 rounded-xl transition-all duration-200"
                   style={{
                     background: 'var(--color-surface)',
@@ -474,10 +473,10 @@ function LandingInner() {
                         className="font-bold mb-2"
                         style={{ fontSize: '1.25rem', fontFamily: "'Space Grotesk', sans-serif", color: 'var(--color-text)' }}
                       >
-                        {e.title}
+                        {t(e.titleKey)}
                       </h3>
                       <p style={{ fontSize: '1rem', color: 'var(--color-muted)', lineHeight: 1.65, fontWeight: 500 }}>
-                        {e.desc}
+                        {t(e.descKey)}
                       </p>
                     </div>
                   </div>
@@ -494,9 +493,9 @@ function LandingInner() {
       <section id="verticals" className="py-24 md:py-36">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
           <div className="mb-16">
-            <p className="section-label mb-4">Industry Verticals</p>
+            <p className="section-label mb-4">{t('industry verticals')}</p>
             <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
-              Built for Your Industry.
+              {t('built for your industry.')}
             </h2>
           </div>
 
@@ -565,17 +564,16 @@ function LandingInner() {
         />
         <div className="max-w-[1400px] mx-auto px-5 md:px-8 relative z-10">
           <div className="max-w-3xl">
-            <p className="section-label mb-4">Get Started Today</p>
+            <p className="section-label mb-4">{t('get started today')}</p>
             <h2 className="text-section mb-8" style={{ color: 'var(--color-text)' }}>
-              Your Market.<br />
-              <span style={{ color: 'var(--color-red)' }}>Mapped in Minutes.</span>
+              {t('your market.')}<br />
+              <span style={{ color: 'var(--color-red)' }}>{t('mapped in minutes.')}</span>
             </h2>
             <p
               className="mb-12 max-w-xl"
               style={{ fontSize: 'clamp(1.125rem, 2.5vw, 1.375rem)', color: 'var(--color-muted)', lineHeight: 1.6, fontWeight: 500 }}
             >
-              Book a 20-minute demo. We'll map your market live and show you
-              exactly where the revenue is — before your competitors find it.
+              {t('book a 20-minute demo. we\'ll map your market live and show you exactly where the revenue is — before your competitors find it.')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <a
@@ -583,14 +581,14 @@ function LandingInner() {
                 className="btn-primary"
                 style={{ height: '68px', fontSize: '1.125rem', width: '100%', maxWidth: '320px' }}
               >
-                Book a Demo <ArrowRight className="w-5 h-5" />
+                {t('Book a Demo')} <ArrowRight className="w-5 h-5" />
               </a>
               <Link
                 href="/dashboard"
                 className="btn-secondary"
                 style={{ height: '68px', fontSize: '1.125rem', width: '100%', maxWidth: '280px' }}
               >
-                Open Dashboard
+                {t('Open Dashboard')}
               </Link>
             </div>
           </div>
