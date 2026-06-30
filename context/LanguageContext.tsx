@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 
 type Language = 'en' | 'es';
 
@@ -8,6 +8,7 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string, vars?: Record<string, string | number>) => string;
+  translateText: (text: string) => Promise<string>;
   loading: boolean;
 }
 
@@ -209,6 +210,8 @@ function interpolate(text: string, vars: Record<string, string | number>): strin
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>('en');
   const [loading, setLoading] = useState(false);
+  const [runtimeCache, setRuntimeCache] = useState<Record<string, string>>({});
+  const missedKeys = useRef<Set<string>>(new Set());
 
   const setLanguage = async (targetLang: Language) => {
     if (targetLang === 'en') {
@@ -221,13 +224,65 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const t = (text: string, vars?: Record<string, string | number>): string => {
+    if (language === 'en') {
+      return vars ? interpolate(text, vars) : text;
+    }
     const key = text.trim().toLowerCase();
-    const translated = language === 'en' ? text : (esDictionary[key] || text);
-    return vars ? interpolate(translated, vars) : translated;
+    const dictTranslation = esDictionary[key];
+    if (dictTranslation) {
+      return vars ? interpolate(dictTranslation, vars) : dictTranslation;
+    }
+    const cachedTranslation = runtimeCache[key];
+    if (cachedTranslation) {
+      return vars ? interpolate(cachedTranslation, vars) : cachedTranslation;
+    }
+    missedKeys.current.add(key);
+    return vars ? interpolate(text, vars) : text;
   };
 
+  const translateText = useCallback(async (text: string): Promise<string> => {
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, target: 'es' }),
+      });
+      const data = await res.json();
+      if (data.success && data.translatedText) {
+        const key = text.trim().toLowerCase();
+        setRuntimeCache(prev => ({ ...prev, [key]: data.translatedText }));
+        return data.translatedText;
+      }
+    } catch {}
+    return text;
+  }, []);
+
+  useEffect(() => {
+    if (language === 'es' && missedKeys.current.size > 0) {
+      const keys = Array.from(missedKeys.current);
+      missedKeys.current.clear();
+      fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: keys, target: 'es' }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.translatedText) {
+            const batch: Record<string, string> = {};
+            const translations = Array.isArray(data.translatedText) ? data.translatedText : [data.translatedText];
+            keys.forEach((key, i) => {
+              batch[key] = translations[i] || key;
+            });
+            setRuntimeCache(prev => ({ ...prev, ...batch }));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [language]);
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, loading }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, translateText, loading }}>
       {children}
     </LanguageContext.Provider>
   );
