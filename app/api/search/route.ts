@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { waitUntil } from '@vercel/functions';
 import { IndexIntelligenceEngine } from '@/lib/market/adapter';
 import { getVerticalConfigByDomain } from '@/lib/market/registry';
 import { withTimeout } from '@/lib/timeouts';
 import { writeAudit } from '@/lib/telemetry/index';
+import { enqueueBatch, scrapeDirect, qstashAvailable } from '@/lib/market/workers/enrichQueue';
 import type { SearchResult } from '@/types/search';
 
 export async function POST(req: NextRequest) {
@@ -51,7 +53,7 @@ export async function POST(req: NextRequest) {
       capabilitySummary: c.capabilitySummary ?? null,
     }));
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       tenant: verticalConfig.id,
       industry: verticalConfig.industryName,
@@ -59,6 +61,26 @@ export async function POST(req: NextRequest) {
       companies: normalized,
       contacts,
     });
+
+    waitUntil(
+      (async () => {
+        const canQStash = qstashAvailable();
+        const enqueued = canQStash
+          ? await enqueueBatch(companies, verticalConfig.id, body.zip)
+          : 0;
+
+        if (!canQStash) {
+          const withWebsites = companies.filter(c => c.website).slice(0, 10);
+          await Promise.allSettled(
+            withWebsites.map(c =>
+              scrapeDirect(c.id, c.website!, verticalConfig.id, body.zip)
+            )
+          );
+        }
+      })()
+    );
+
+    return response;
   } catch (err: any) {
     console.error("Core Engine Error:", err);
     return NextResponse.json({

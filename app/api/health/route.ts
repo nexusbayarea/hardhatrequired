@@ -40,6 +40,8 @@ export async function GET() {
     deepseek: !!process.env.DEEPSEEK_API_KEY,
     supabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     supabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    qstash: !!process.env.QSTASH_TOKEN,
+    upstashRedis: !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN,
   };
 
   const allOk = checks.database && checks.auth;
