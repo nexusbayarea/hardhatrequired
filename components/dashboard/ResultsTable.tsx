@@ -123,18 +123,14 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                           style={{
                             background: currentVote === 'accurate'
                               ? 'color-mix(in srgb, var(--color-green) 12%, transparent)'
-                              : currentVote === 'partial'
-                              ? 'color-mix(in srgb, var(--color-yellow) 12%, transparent)'
                               : 'color-mix(in srgb, var(--color-red) 12%, transparent)',
                             color: currentVote === 'accurate'
                               ? 'var(--color-green)'
-                              : currentVote === 'partial'
-                              ? 'var(--color-yellow)'
                               : 'var(--color-red)',
                           }}
                         >
-                          {currentVote === 'accurate' ? <ThumbsUp className="w-3 h-3" /> : currentVote === 'partial' ? <Minus className="w-3 h-3" /> : <ThumbsDown className="w-3 h-3" />}
-                          {currentVote === 'accurate' ? t('accurate') : currentVote === 'partial' ? t('partial') : t('bad')}
+                          {currentVote === 'accurate' ? <ThumbsUp className="w-3 h-3" /> : <ThumbsDown className="w-3 h-3" />}
+                          {currentVote === 'accurate' ? t('accurate') : t('bad')}
                         </span>
                       ) : (
                         <div className="flex gap-1">
@@ -143,12 +139,6 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                             className="p-1.5 rounded-lg text-xs transition-all hover:scale-105 hover:bg-green/10 hover:text-green text-muted"
                           >
                             <ThumbsUp className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleVote(company, 'partial'); }}
-                            className="p-1.5 rounded-lg text-xs transition-all hover:scale-105 hover:bg-yellow/10 hover:text-yellow text-muted"
-                          >
-                            <Minus className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); handleVote(company, 'bad'); }}

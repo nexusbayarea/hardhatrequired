@@ -81,7 +81,6 @@ const esDictionary: Record<string, string> = {
   'call': 'Llamar',
   'details': 'Detalles',
   'accurate': 'Preciso',
-  'partial': 'Parcial',
   'bad': 'Incorrecto',
   'mi away': 'millas de distancia',
 

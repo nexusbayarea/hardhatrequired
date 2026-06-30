@@ -16,9 +16,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!['accurate', 'partial', 'bad'].includes(voteType)) {
+    if (!['accurate', 'bad'].includes(voteType)) {
       return NextResponse.json(
-        { success: false, error: 'voteType must be accurate, partial, or bad' },
+        { success: false, error: 'voteType must be accurate or bad' },
         { status: 400 }
       );
     }
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
   } catch (err: any) {
     console.error('Feedback GET Error:', err);
     return NextResponse.json(
-      { success: true, total: 0, accurate: 0, partial: 0, bad: 0, rate: 0 },
+      { success: true, total: 0, accurate: 0, bad: 0, rate: 0 },
       { status: 200 }
     );
   }

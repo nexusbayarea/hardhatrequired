@@ -111,7 +111,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
 
               {/* Mobile feedback buttons */}
               <div className="flex gap-3 mt-3">
-                {(['accurate', 'partial', 'bad'] as const).map((v) => {
+                {(['accurate', 'bad'] as const).map((v) => {
                   const isVoted = voted[r.id] === v;
                   return (
                     <button
@@ -125,15 +125,11 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                         background: isVoted
                           ? v === 'accurate'
                             ? 'color-mix(in srgb, var(--color-green) 12%, transparent)'
-                            : v === 'partial'
-                            ? 'color-mix(in srgb, var(--color-yellow) 12%, transparent)'
                             : 'color-mix(in srgb, var(--color-red) 12%, transparent)'
                           : 'var(--color-surface2)',
                         color: isVoted
                           ? v === 'accurate'
                             ? 'var(--color-green)'
-                            : v === 'partial'
-                            ? 'var(--color-yellow)'
                             : 'var(--color-red)'
                           : 'var(--color-muted)',
                         fontSize: '0.75rem',
@@ -147,7 +143,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                         cursor: 'pointer',
                       }}
                     >
-                      {v === 'accurate' ? t('accurate') : v === 'partial' ? t('partial') : t('bad')}
+                      {v === 'accurate' ? t('accurate') : t('bad')}
                     </button>
                   );
                 })}

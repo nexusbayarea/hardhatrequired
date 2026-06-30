@@ -182,7 +182,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     scoringWeights: SHARED_SCORING_WEIGHTS,
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
+    providers: createProviders([tomtom, overpass]),
   },
 
   hydro_excavation: {
@@ -418,12 +418,13 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     searchQueries: [
       'concrete contractor commercial', 'concrete pumping service',
       'ready mix concrete delivery', 'industrial concrete work',
-      'concrete foundation contractor'
+      'concrete foundation contractor', 'concrete recycling',
+      'concrete crushing service'
     ],
-    targetNaicsCodes: ['238110', '327320'],
+    targetNaicsCodes: ['238110', '327320', '423320'],
     equipmentKeywords: [
       'concrete pump', 'concrete mixer', 'concrete batch plant',
-      'concrete saw', 'power trowel', 'concrete form'
+      'concrete saw', 'power trowel', 'concrete form', 'concrete crusher'
     ],
     negativeKeywords: [
       'residential driveway', 'home repair', 'handyman',
@@ -436,22 +437,28 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'ready mix', weight: 25 },
         { term: 'concrete foundation', weight: 25 },
         { term: 'commercial concrete', weight: 25 },
+        { term: 'concrete recycling', weight: 25 },
+        { term: 'concrete crushing', weight: 25 },
       ],
       secondary: [
         { term: 'concrete pump', weight: 10 },
         { term: 'concrete mixer', weight: 10 },
         { term: 'concrete batch plant', weight: 10 },
+        { term: 'recycling', weight: 10 },
+        { term: 'crushed concrete', weight: 10 },
       ],
       negative: [
         { term: 'residential driveway', weight: -30 },
         { term: 'decorative concrete', weight: -30 },
         { term: 'stamped concrete patio', weight: -30 },
+        { term: 'municipal recycling', weight: -30 },
+        { term: 'bottle recycling', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
+    providers: createProviders([tomtom, overpass]),
   },
 
   stormwater_compliance: {
@@ -535,7 +542,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     scoringWeights: SHARED_SCORING_WEIGHTS,
     baseScoringWeights: { distanceWeight: 15, contactEnrichmentWeight: 10, assetSignalWeight: 20 },
     createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
+    providers: createProviders([tomtom, overpass]),
   },
 
   tank_testing: {
@@ -594,7 +601,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     scoringWeights: SHARED_SCORING_WEIGHTS,
     baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
     createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
+    providers: createProviders([tomtom, overpass]),
   },
 
   elevator_inspection: {
@@ -631,7 +638,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     scoringWeights: SHARED_SCORING_WEIGHTS,
     baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
     createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
+    providers: createProviders([tomtom, overpass]),
   },
 
   hvac_balance: {
@@ -872,7 +879,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     scoringWeights: SHARED_SCORING_WEIGHTS,
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
+    providers: createProviders([tomtom, overpass]),
   }
 };
 

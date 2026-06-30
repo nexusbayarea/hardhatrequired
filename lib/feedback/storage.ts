@@ -91,7 +91,6 @@ export async function upsertCompanyProfile(
     const updatedHistory = [...(profile.voteHistory || []), newVote];
     const totalVotes = profile.totalVotes + 1;
     const accurateVotes = profile.accurateVotes + (voteType === 'accurate' ? 1 : 0);
-    const partialVotes = profile.partialVotes + (voteType === 'partial' ? 1 : 0);
     const badVotes = profile.badVotes + (voteType === 'bad' ? 1 : 0);
     const score = computeFeedbackScore(updatedHistory);
     const confidence = computeConfidence(totalVotes, updatedHistory);
@@ -103,7 +102,6 @@ export async function upsertCompanyProfile(
         feedback_confidence: confidence,
         total_votes: totalVotes,
         accurate_votes: accurateVotes,
-        partial_votes: partialVotes,
         bad_votes: badVotes,
         vote_history: JSON.stringify(updatedHistory),
         last_vote_at: now,
@@ -121,7 +119,6 @@ export async function upsertCompanyProfile(
       feedbackConfidence: confidence,
       totalVotes,
       accurateVotes,
-      partialVotes,
       badVotes,
       voteHistory: updatedHistory,
       lastVoteAt: now,
@@ -140,7 +137,6 @@ export async function upsertCompanyProfile(
     feedback_confidence: confidence,
     total_votes: 1,
     accurate_votes: voteType === 'accurate' ? 1 : 0,
-    partial_votes: voteType === 'partial' ? 1 : 0,
     bad_votes: voteType === 'bad' ? 1 : 0,
     vote_history: JSON.stringify(history),
     last_vote_at: now,
@@ -156,7 +152,6 @@ export async function upsertCompanyProfile(
     feedbackConfidence: confidence,
     totalVotes: 1,
     accurateVotes: voteType === 'accurate' ? 1 : 0,
-    partialVotes: voteType === 'partial' ? 1 : 0,
     badVotes: voteType === 'bad' ? 1 : 0,
     voteHistory: history,
     lastVoteAt: now,
@@ -167,13 +162,12 @@ export async function upsertCompanyProfile(
 export async function getVerticalStats(vertical?: string): Promise<{
   total: number;
   accurate: number;
-  partial: number;
   bad: number;
   rate: number;
 }> {
   const client = getClient();
   if (!client) {
-    return { total: 0, accurate: 0, partial: 0, bad: 0, rate: 0 };
+    return { total: 0, accurate: 0, bad: 0, rate: 0 };
   }
 
   let query = client.from('feedback_votes').select('vote_type');
@@ -183,18 +177,16 @@ export async function getVerticalStats(vertical?: string): Promise<{
 
   const { data, error } = await query;
   if (error || !data) {
-    return { total: 0, accurate: 0, partial: 0, bad: 0, rate: 0 };
+    return { total: 0, accurate: 0, bad: 0, rate: 0 };
   }
 
   const total = data.length;
   const accurate = data.filter((r: any) => r.vote_type === 'accurate').length;
-  const partial = data.filter((r: any) => r.vote_type === 'partial').length;
   const bad = data.filter((r: any) => r.vote_type === 'bad').length;
 
   return {
     total,
     accurate,
-    partial,
     bad,
     rate: total > 0 ? Math.round((accurate / total) * 100) : 0,
   };
@@ -268,7 +260,6 @@ function mapRowToProfile(row: any): CompanyFeedbackProfile {
     feedbackConfidence: row.feedback_confidence,
     totalVotes: row.total_votes,
     accurateVotes: row.accurate_votes,
-    partialVotes: row.partial_votes,
     badVotes: row.bad_votes,
     voteHistory: (typeof row.vote_history === 'string'
       ? JSON.parse(row.vote_history)

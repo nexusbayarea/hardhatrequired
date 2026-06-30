@@ -1,4 +1,4 @@
-export type VoteType = 'accurate' | 'partial' | 'bad';
+export type VoteType = 'accurate' | 'bad';
 
 export type ConfidenceLevel = 'low' | 'medium' | 'high' | 'very_high';
 
@@ -25,7 +25,6 @@ export interface CompanyFeedbackProfile {
   feedbackConfidence: number;
   totalVotes: number;
   accurateVotes: number;
-  partialVotes: number;
   badVotes: number;
   voteHistory: FeedbackVoteSummary[];
   lastVoteAt: string;
@@ -49,7 +48,7 @@ export const FEEDBACK_WEIGHTS = {
   defaultVerticalTrust: 0.5,
   defaultConsensusWeight: 1.0,
   timeDecayHalfLifeDays: 30,
-  voteValue: { accurate: 1, partial: 0, bad: -1 } as const,
+  voteValue: { accurate: 1, bad: -1 } as const,
   confidenceThresholds: {
     low: { minVotes: 0, maxConfidence: 0.3, adjustment: 0, action: 'none' as const },
     medium: { minVotes: 3, maxConfidence: 0.6, adjustment: -10, action: 'downrank' as const },
