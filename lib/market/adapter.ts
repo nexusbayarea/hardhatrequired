@@ -2,6 +2,7 @@ import { Company, Contact, SearchFilters } from '@/types/company';
 import { VerticalConfig } from '@/types/config';
 import { VerticalConfigWithProviders, isIrrelevant } from './registry';
 import { ApolloAdapter } from './providers/apollo';
+import { KeywordSignalExtractor } from './signals';
 import { calculateLeadScore, buildAnalysisText } from './scoring';
 import { geocodeZip, haversineDistance } from '@/lib/geo';
 import { getCompanyProfile, getBlacklistedVerticalCompanies } from '@/lib/feedback/storage';
@@ -10,6 +11,7 @@ import { FastJsonLdScraper } from '@/lib/market/scrapers/fastScraper';
 
 export class IndexIntelligenceEngine {
   private apolloAdapter = new ApolloAdapter();
+  private signalExtractor = new KeywordSignalExtractor();
   private fastScraper = new FastJsonLdScraper();
 
   async executeMarketDiscovery(
@@ -113,7 +115,7 @@ export class IndexIntelligenceEngine {
         base.priority = result.priority;
         base.distanceMiles = distance;
 
-        if (result.priority === 'D' || result.score < 55 || result.confidence < 40 || result.negativeHits.length >= 2) {
+        if (result.score < 65 || result.priority === 'D') {
           continue;
         }
 
@@ -122,10 +124,15 @@ export class IndexIntelligenceEngine {
       }
 
       // Stage 1: Pre-filter before Apollo (saves API credits)
-      const precheckText = buildAnalysisText(record);
-      const precheck = calculateLeadScore(record, config, precheckText, record.distanceMiles);
-      if (precheck.priority === 'D' && precheck.confidence < 30) {
-        console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (D/${precheck.confidence})`);
+      const precheckText = `${record.companyName || ''} ${record.notes || ''} ${record.address || ''}`;
+      const precheck = this.signalExtractor.extract(
+        precheckText,
+        config.signals,
+        config.equipmentKeywords,
+        record
+      );
+      if (!precheck.hasSignals || precheck.confidence === 'low') {
+        console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (hasSignals=${precheck.hasSignals} confidence=${precheck.confidence})`);
         continue;
       }
 
@@ -151,7 +158,19 @@ export class IndexIntelligenceEngine {
         }
       }
 
-      const mergedCompany: Partial<Company> = { ...mergedBase };
+      // Stage 3: Rich signal extraction across all available data
+      const signalText = buildAnalysisText(mergedBase);
+      const signalResult = this.signalExtractor.extract(
+        signalText,
+        config.signals,
+        config.equipmentKeywords,
+        mergedBase
+      );
+
+      const mergedCompany: Partial<Company> = {
+        ...mergedBase,
+        capabilitySummary: signalResult.capabilitySummary,
+      };
 
       const companyContacts: Partial<Contact>[] = apolloResult.contacts.map(c => ({
         ...c,
@@ -163,7 +182,7 @@ export class IndexIntelligenceEngine {
       mergedCompany.enrichmentScore = result.score;
       mergedCompany.priority = result.priority;
 
-      // Stage 3: User Feedback Layer — adjust score based on historical feedback
+      // Stage 4: User Feedback Layer — adjust score based on historical feedback
       const feedbackProfile = await getCompanyProfile(mergedCompany.id || '', config.id);
       let feedbackAction = 'none';
       if (feedbackProfile && feedbackProfile.totalVotes >= 3) {
@@ -176,8 +195,8 @@ export class IndexIntelligenceEngine {
         }
       }
 
-      // Stage 4: Hard filter garbage after scoring + feedback
-      if (result.priority === 'D' || result.score < 55 || result.confidence < 40 || result.negativeHits.length >= 2) {
+      // Stage 5: Hard filter garbage after scoring + feedback
+      if (result.score < 65 || result.priority === 'D') {
         console.log(`[FILTERED] ${mergedCompany.companyName} — score=${result.score} confidence=${result.confidence} priority=${result.priority} negatives=${result.negativeHits.join(',')} reason=${result.relevanceReason} feedback=${feedbackAction}`);
         continue;
       }
