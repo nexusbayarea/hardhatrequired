@@ -22,9 +22,12 @@ export class RegulatoryProvider implements DiscoveryProvider {
     const vertical = params.vertical || 'slurry_concrete';
 
     const cached = await getCachedScraperResult(state, vertical);
-    if (cached) {
-      console.log(`[RegulatoryProvider] Cache hit for ${state}:${vertical}`);
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      console.log(`[RegulatoryProvider] Cache hit for ${state}:${vertical} (${cached.length} records)`);
       return cached;
+    }
+    if (cached) {
+      console.log(`[RegulatoryProvider] Cache busted — empty/corrupt result for ${state}:${vertical}`);
     }
 
     const scraper = this.scrapers.get(state);

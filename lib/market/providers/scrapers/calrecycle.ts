@@ -30,7 +30,7 @@ export class CalRecycleScraper implements StateScraper {
             timeout: 15000,
           });
 
-          const rows = await page.$$('.swis-table-row');
+            const rows = await page.$$('.swis-table-row');
           const records: Partial<Company>[] = [];
 
           for (const row of rows) {
@@ -56,6 +56,12 @@ export class CalRecycleScraper implements StateScraper {
           }
 
           await browser.close();
+
+          if (records.length === 0) {
+            console.warn('[CalRecycleScraper] Live scrape returned 0 records, falling back to seed data');
+            return this.fallback(params, start);
+          }
+
           return { success: true, records, latencyMs: Date.now() - start };
         } finally {
           await browser.close().catch(() => {});
