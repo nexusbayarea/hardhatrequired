@@ -41,12 +41,11 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     industryName: 'Concrete Slurry Recycling & Disposal',
     searchQueries: [
       'concrete washout service',
-      'slurry disposal',
-      'vacuum truck service',
-      'industrial wastewater treatment',
-      'hydro excavation',
-      'environmental waste services',
-      'concrete recycling',
+      'slurry disposal concrete recycling',
+      'concrete recycling center',
+      'construction waste removal recycling',
+      'slurry',
+      'industrial waste concrete',
     ],
     targetNaicsCodes: ['562211', '238110', '562112'],
     equipmentKeywords: [
@@ -60,6 +59,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     signals: {
       primary: [
         { term: 'slurry', weight: 40 },
+        { term: 'concrete', weight: 25 },
         { term: 'concrete washout', weight: 40 },
         { term: 'washout', weight: 30 },
         { term: 'wastewater', weight: 25 },
