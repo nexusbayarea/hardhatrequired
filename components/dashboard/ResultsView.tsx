@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, ChevronDown, ChevronRight, Phone, Globe, MapPin } from 'lucide-react';
+import { Search, ChevronDown, ChevronRight, Phone, Globe, MapPin, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import ResultsTable from './ResultsTable';
 import type { SearchResult } from '@/types/search';
@@ -132,18 +132,13 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                             ? 'var(--color-green)'
                             : 'var(--color-red)'
                           : 'var(--color-muted)',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '6px',
                         cursor: 'pointer',
                       }}
                     >
-                      {v === 'accurate' ? t('accurate') : t('bad')}
+                      {v === 'accurate' ? <ThumbsUp className="w-5 h-5" /> : <ThumbsDown className="w-5 h-5" />}
                     </button>
                   );
                 })}
