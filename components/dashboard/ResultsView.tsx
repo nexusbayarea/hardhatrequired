@@ -26,7 +26,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
   };
 
   return (
-    <div className="space-y-3 pb-24">
+    <div className="space-y-3">
       {results.map((r) => {
         const isExpanded = expanded === r.id;
         const gradeColor =
@@ -202,6 +202,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
           </div>
         );
       })}
+      <div className="h-32 md:hidden" />
     </div>
   );
 }
