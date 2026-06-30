@@ -9,16 +9,37 @@ import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
 
 export default function DashboardShell() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [searchData, setSearchData] = useState<{ companies: SearchResult[]; count: number } | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const [activeVertical, setActiveVertical] = useState('');
 
-  const handleResults = useCallback((data: { companies: SearchResult[]; count: number }) => {
-    const filtered = data.companies.filter(c => c.grade !== 'D');
-    setSearchData({ companies: filtered, count: filtered.length });
+  const handleResults = useCallback(async (data: { companies: SearchResult[]; count: number }) => {
+    let companies = data.companies.filter(c => c.grade !== 'D');
+
+    if (language === 'es' && companies.length > 0) {
+      const summaries = companies.map(c => c.capabilitySummary || '');
+
+      try {
+        const res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: summaries, target: 'es' }),
+        });
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.translatedText)) {
+          companies = companies.map((c, i) => ({
+            ...c,
+            capabilitySummary: data.translatedText[i] || c.capabilitySummary,
+          }));
+        }
+      } catch {}
+    }
+
+    setSearchData({ companies, count: companies.length });
     setSearchLoading(false);
-  }, []);
+  }, [language]);
 
   const handleSearchStart = useCallback(() => {
     setSearchLoading(true);
