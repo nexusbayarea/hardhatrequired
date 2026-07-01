@@ -29,7 +29,7 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
     onFeedback?.(r, voteType);
   };
 
-  const groups = groupResults(results);
+  const groups = groupResults(results, activePane);
   const isDisposal = activePane === 'disposal';
 
   return (

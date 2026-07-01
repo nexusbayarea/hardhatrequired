@@ -93,7 +93,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
             </tr>
           </thead>
           <tbody>
-            {groupResults(companies).map((group) => (
+            {groupResults(companies, activePane).map((group) => (
               <Fragment key={group.fitType}>
                 <tr
                   className="border-b border-t-2 border-border"

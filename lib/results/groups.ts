@@ -7,18 +7,21 @@ export interface FitTypeGroup {
   results: SearchResult[];
 }
 
-const SECTION_CONFIG: { fitType: FitType | 'OTHER'; label: string; icon: string; order: number }[] = [
-  { fitType: 'DIRECT_OPERATOR', label: 'Labor Contractors', icon: '🔧', order: 0 },
-  { fitType: 'INDIRECT_VENDOR', label: 'Support Services', icon: '🚛', order: 1 },
-  { fitType: 'DISPOSAL_NODE', label: 'Disposal Facilities', icon: '♻️', order: 2 },
+export type SectionPane = 'labor' | 'disposal';
+
+const SECTION_CONFIG: { fitType: FitType | 'OTHER'; label: string; icon: string; order: number; pane?: SectionPane }[] = [
+  { fitType: 'DIRECT_OPERATOR', label: 'Labor Contractors', icon: '🔧', order: 0, pane: 'labor' },
+  { fitType: 'INDIRECT_VENDOR', label: 'Support Services', icon: '🚛', order: 1, pane: 'labor' },
+  { fitType: 'DISPOSAL_NODE', label: 'Disposal Facilities', icon: '♻️', order: 2, pane: 'disposal' },
   { fitType: 'REGULATORY_NODE', label: 'Permitted Facilities', icon: '📋', order: 3 },
   { fitType: 'OTHER', label: 'Other', icon: '📌', order: 4 },
 ];
 
-export function groupResults(results: SearchResult[]): FitTypeGroup[] {
+export function groupResults(results: SearchResult[], pane?: SectionPane): FitTypeGroup[] {
   const groups = new Map<FitType | 'OTHER', FitTypeGroup>();
 
   for (const config of SECTION_CONFIG) {
+    if (pane && config.pane && config.pane !== pane) continue;
     groups.set(config.fitType, { ...config, results: [] });
   }
 
@@ -27,7 +30,7 @@ export function groupResults(results: SearchResult[]): FitTypeGroup[] {
     const group = groups.get(key);
     if (group) {
       group.results.push(r);
-    } else {
+    } else if (!pane) {
       groups.get('OTHER')!.results.push(r);
     }
   }
