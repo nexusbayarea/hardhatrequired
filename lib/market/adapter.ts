@@ -33,6 +33,14 @@ export class IndexIntelligenceEngine {
     const tenant = createTenantProfile(tenantId, organizationId || '', [config.id]);
     this.scoreEngine.registerTenant(tenant);
 
+    console.log('[DISCOVERY_START]', {
+      zip: filters.zip,
+      radius: filters.radius,
+      vertical: config.id,
+      providers: providers.map(p => p.name),
+      zipCoords,
+    });
+
     const providerFailures: string[] = [];
     const providerResults = await Promise.all(
       providers.map(provider =>
@@ -52,25 +60,48 @@ export class IndexIntelligenceEngine {
       )
     );
 
+    providerResults.forEach((results, idx) => {
+      console.log('[PROVIDER_RESULT]', {
+        provider: providers[idx].name,
+        count: results.length,
+      });
+    });
+
+    const rawTotal = providerResults.flat().length;
     const candidatePool: Partial<Company>[] = [];
-    const seenNames = new Set<string>();
+    const seenKeys = new Set<string>();
 
     for (const results of providerResults) {
       for (const company of results) {
-        const normalizedName = company.companyName?.toLowerCase().trim();
-        if (normalizedName && !seenNames.has(normalizedName)) {
-          seenNames.add(normalizedName);
+        const dedupKey = `${company.companyName || ''}|${company.address || ''}`
+          .toLowerCase()
+          .trim();
+        if (dedupKey && !seenKeys.has(dedupKey)) {
+          seenKeys.add(dedupKey);
           candidatePool.push(company);
         }
       }
     }
 
+    console.log('[CANDIDATE_POOL]', {
+      raw: rawTotal,
+      deduped: candidatePool.length,
+    });
+
     const negativeKeywords = config.negativeKeywords || [];
     const blacklistedIds = await getBlacklistedVerticalCompanies(config.id);
 
+    let irrelevantDrops = 0;
+    let blacklistDrops = 0;
+    let radiusDrops = 0;
+
     const filteredPool = candidatePool.filter(c => {
-      if (isIrrelevant(c, negativeKeywords)) return false;
+      if (isIrrelevant(c, negativeKeywords)) {
+        irrelevantDrops++;
+        return false;
+      }
       if (c.id && blacklistedIds.includes(c.id)) {
+        blacklistDrops++;
         console.log(`[BLACKLIST] ${c.companyName} — excluded by feedback profile`);
         return false;
       }
@@ -79,12 +110,23 @@ export class IndexIntelligenceEngine {
           ? Math.round(haversineDistance(zipCoords.lat, zipCoords.lng, c.latitude, c.longitude) * 10) / 10
           : undefined
       );
-      if (d != null && d > radiusFilter) return false;
+      if (d != null && d > radiusFilter) {
+        radiusDrops++;
+        return false;
+      }
       return true;
+    });
+
+    console.log('[FILTER_REASONS]', { irrelevantDrops, blacklistDrops, radiusDrops });
+    console.log('[FILTERED_POOL]', {
+      candidatePool: candidatePool.length,
+      filteredPool: filteredPool.length,
+      dropped: candidatePool.length - filteredPool.length,
     });
 
     const finalizedCompanies: Company[] = [];
     const allContacts: Contact[] = [];
+    const scoreBuckets = { A: 0, B: 0, C: 0, D: 0 };
 
     // Phase 1: Pre-filter + permit fast path
     const toEnrich: { record: Partial<Company>; base: Partial<Company> }[] = [];
@@ -214,6 +256,18 @@ export class IndexIntelligenceEngine {
 
       const { result: scoreResult, feedbackAction } = scored;
 
+      console.log('[SCORE_RESULT]', {
+        company: mergedCompany.companyName,
+        score: scoreResult.score,
+        grade: scoreResult.grade,
+        confidence: scoreResult.confidence,
+        signals: scoreResult.matchedSignals,
+        negatives: scoreResult.negativeHits,
+        feedbackAction,
+      });
+
+      scoreBuckets[scoreResult.grade]++;
+
       if (feedbackAction === 'blacklist') {
         console.log(`[BLACKLIST] ${mergedCompany.companyName} — score=${scoreResult.score} (${feedbackAction})`);
         continue;
@@ -228,11 +282,8 @@ export class IndexIntelligenceEngine {
 
       // Stage 5: Hard filter garbage after scoring
       if (scoreResult.score < 65 || scoreResult.grade === 'D') {
-        console.log(`[FILTERED] ${mergedCompany.companyName} — score=${scoreResult.score} confidence=${scoreResult.confidence} grade=${scoreResult.grade} negatives=${scoreResult.negativeHits.join(',')} reason=${scoreResult.relevanceReason} feedback=${feedbackAction}`);
         continue;
       }
-
-      console.log(`[SCORE] ${mergedCompany.companyName} — score=${scoreResult.score} confidence=${scoreResult.confidence} grade=${scoreResult.grade} matched=${scoreResult.matchedSignals.join(',')} reason=${scoreResult.relevanceReason} feedback=${feedbackAction}`);
 
       const contactId = `contact-${mergedCompany.id}`;
       finalizedCompanies.push(mergedCompany as Company);
@@ -266,6 +317,13 @@ export class IndexIntelligenceEngine {
         console.log(`[ENTERPRISE] ${ec.companyName} — injected at 130/A (enterprise overlay)`);
       }
     }
+
+    console.log('[SCORE_DISTRIBUTION]', scoreBuckets);
+    console.log('[FINAL_RESULTS]', {
+      companies: finalizedCompanies.length,
+      contacts: allContacts.length,
+      providerFailures,
+    });
 
     const gradeOrder: Record<string, number> = { A: 0, B: 1, C: 2, D: 3 };
     finalizedCompanies.sort((a, b) => {
