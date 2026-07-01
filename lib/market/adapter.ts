@@ -207,7 +207,7 @@ export class IndexIntelligenceEngine {
     const ENRICH_LIMIT = 20;
     const toRich = toEnrich.slice(0, ENRICH_LIMIT);
     const toBasic = toEnrich.slice(ENRICH_LIMIT);
-    const PER_COMPANY_TIMEOUT = 18000;
+    const PER_COMPANY_TIMEOUT = 30000;
     for (const { record, base } of toRich) {
       const enriched = await withTimeout(
         (async () => {
