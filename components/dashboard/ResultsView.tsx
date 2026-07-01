@@ -156,7 +156,7 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                         className="flex-1 flex items-center justify-center gap-2 rounded-xl font-bold text-base text-white transition-all"
                         style={{
                           height: '56px',
-                          background: isDisposal ? '#3b82f6' : 'var(--color-red)',
+                          background: isDisposal ? 'var(--color-green)' : 'var(--color-red)',
                           border: 'none',
                           cursor: 'pointer',
                         }}

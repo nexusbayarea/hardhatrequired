@@ -109,9 +109,9 @@ export default function DashboardShell() {
                   color: tab.disabled
                     ? 'var(--color-border)'
                     : isActive
-                      ? tab.id === 'disposal' ? '#3b82f6' : 'var(--color-red)'
+                      ? tab.id === 'disposal' ? 'var(--color-green)' : 'var(--color-red)'
                       : 'var(--color-muted)',
-                  borderBottom: isActive ? `2px solid ${tab.id === 'disposal' ? '#3b82f6' : 'var(--color-red)'}` : '2px solid transparent',
+                  borderBottom: isActive ? `2px solid ${tab.id === 'disposal' ? 'var(--color-green)' : 'var(--color-red)'}` : '2px solid transparent',
                   cursor: tab.disabled ? 'not-allowed' : 'pointer',
                 }}
               >
@@ -153,10 +153,10 @@ export default function DashboardShell() {
           <span className="font-bold" style={{ color: 'var(--color-red)' }}>C</span>
           = {t('call to verify')}
         </span>
-        <span className="inline-flex items-center gap-1.5 ml-2 text-xs" style={{ color: 'var(--color-muted)' }}>
-          <span className="inline-block w-2 h-2 rounded-full" style={{ background: 'var(--color-green)' }} /> Operator
+          <span className="inline-flex items-center gap-1.5 ml-2 text-xs" style={{ color: 'var(--color-muted)' }}>
+          <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#3b82f6' }} /> Operator
           <span className="inline-block w-2 h-2 rounded-full ml-2" style={{ background: 'var(--color-yellow)' }} /> Vendor
-          <span className="inline-block w-2 h-2 rounded-full ml-2" style={{ background: '#3b82f6' }} /> Disposal
+          <span className="inline-block w-2 h-2 rounded-full ml-2" style={{ background: 'var(--color-green)' }} /> Disposal
           <span className="inline-block w-2 h-2 rounded-full ml-2" style={{ background: '#a855f7' }} /> Permitted
         </span>
       </div>

@@ -42,9 +42,9 @@ export function groupResults(results: SearchResult[]): FitTypeGroup[] {
 }
 
 export const FIT_COLORS: Record<string, { bg: string; text: string }> = {
-  DIRECT_OPERATOR: { bg: 'color-mix(in srgb, var(--color-green) 14%, transparent)', text: 'var(--color-green)' },
+  DIRECT_OPERATOR: { bg: 'color-mix(in srgb, #3b82f6 14%, transparent)', text: '#3b82f6' },
   INDIRECT_VENDOR: { bg: 'color-mix(in srgb, var(--color-yellow) 14%, transparent)', text: 'var(--color-yellow)' },
-  DISPOSAL_NODE: { bg: 'color-mix(in srgb, #3b82f6 14%, transparent)', text: '#3b82f6' },
+  DISPOSAL_NODE: { bg: 'color-mix(in srgb, var(--color-green) 14%, transparent)', text: 'var(--color-green)' },
   REGULATORY_NODE: { bg: 'color-mix(in srgb, #a855f7 14%, transparent)', text: '#a855f7' },
 };
 

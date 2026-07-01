@@ -111,14 +111,14 @@ export default function SearchConsole({
           className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{
             background: activePane === 'disposal'
-              ? 'color-mix(in srgb, #3b82f6 12%, var(--color-surface))'
+              ? 'color-mix(in srgb, var(--color-green) 12%, var(--color-surface))'
               : 'color-mix(in srgb, var(--color-red) 12%, var(--color-surface))',
             border: activePane === 'disposal'
-              ? '1px solid color-mix(in srgb, #3b82f6 25%, var(--color-border))'
+              ? '1px solid color-mix(in srgb, var(--color-green) 25%, var(--color-border))'
               : '1px solid color-mix(in srgb, var(--color-red) 25%, var(--color-border))',
           }}
         >
-          <Search className="w-6 h-6" style={{ color: activePane === 'disposal' ? '#3b82f6' : 'var(--color-red)' }} />
+          <Search className="w-6 h-6" style={{ color: activePane === 'disposal' ? 'var(--color-green)' : 'var(--color-red)' }} />
         </div>
         <div>
           <div
