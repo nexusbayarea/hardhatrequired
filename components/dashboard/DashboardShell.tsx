@@ -97,6 +97,8 @@ export default function DashboardShell() {
           onSearchStart={lh.handleSearchStart}
           vertical={left.vertical}
           onVerticalChange={lh.setVertical}
+          headerLabel="LABOR"
+          mode="labor"
         />
         <SearchConsole
           onResults={rh.handleResults}
@@ -104,6 +106,8 @@ export default function DashboardShell() {
           onSearchStart={rh.handleSearchStart}
           vertical={right.vertical}
           onVerticalChange={rh.setVertical}
+          headerLabel="Disposal"
+          mode="disposal"
         />
       </div>
 

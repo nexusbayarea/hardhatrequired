@@ -50,7 +50,9 @@ export class IndexIntelligenceEngine {
           lat: zipCoords?.lat,
           lng: zipCoords?.lng,
           radius: filters.radius,
-          searchQueries: config.searchQueries,
+          searchQueries: filters.mode === 'disposal'
+            ? (config.disposalQueries ?? config.searchQueries)
+            : config.searchQueries,
           verticalConfig: config,
         }).catch(err => {
           console.error(`[${provider.name}] search failed:`, err);

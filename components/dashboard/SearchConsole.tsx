@@ -14,6 +14,8 @@ interface SearchConsoleProps {
   onVerticalChange?: (v: string) => void;
   zip?: string;
   onZipChange?: (z: string) => void;
+  headerLabel?: string;
+  mode?: 'labor' | 'disposal';
 }
 
 export default function SearchConsole({
@@ -24,6 +26,8 @@ export default function SearchConsole({
   onVerticalChange,
   zip: controlledZip,
   onZipChange,
+  headerLabel,
+  mode,
 }: SearchConsoleProps) {
   const [internalVertical, setInternalVertical] = useState('');
   const [internalZip, setInternalZip] = useState('');
@@ -60,6 +64,7 @@ export default function SearchConsole({
           zip: zip.trim(),
           radius: parseInt(radius),
           vertical,
+          mode,
         }),
       });
       const data = await res.json();
@@ -104,7 +109,7 @@ export default function SearchConsole({
               letterSpacing: '0.04em',
             }}
           >
-            {t('market search')}
+            {headerLabel ?? t('market search')}
           </div>
           <div className="text-sm font-medium mt-0.5" style={{ color: 'var(--color-muted)' }}>
             {t('define your target market parameters')}

@@ -118,4 +118,5 @@ export interface OutreachLog {
 export interface SearchFilters {
   zip: string;
   radius: number;
+  mode?: 'labor' | 'disposal';
 }

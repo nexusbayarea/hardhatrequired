@@ -37,6 +37,7 @@ export interface VerticalConfig {
   equipmentKeywords: string[];
   negativeKeywords: string[];
   searchQueries: string[];
+  disposalQueries?: string[];
   verticalSignals?: string[];
   signals: SignalLayers;
   scoringWeights: ContactScoringWeights;
