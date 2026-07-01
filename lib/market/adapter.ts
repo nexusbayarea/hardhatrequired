@@ -203,7 +203,7 @@ export class IndexIntelligenceEngine {
 
     // Phase 2: Enrich + scrape + score (sequential per company to protect Apollo credits)
     // Cap enrichment to prevent 60s timeout — further companies get basic scoring
-    const ENRICH_LIMIT = 30;
+    const ENRICH_LIMIT = 20;
     const toRich = toEnrich.slice(0, ENRICH_LIMIT);
     const toBasic = toEnrich.slice(ENRICH_LIMIT);
     for (const { record, base } of toRich) {

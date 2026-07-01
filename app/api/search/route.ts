@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
     const engine = new IndexIntelligenceEngine();
     const result = await withTimeout(
       engine.executeMarketDiscovery(body, verticalConfig),
-       120000,
-      () => { throw new Error('Search pipeline timeout after 120 seconds'); }
+       180000,
+      () => { throw new Error('Search pipeline timeout after 180 seconds'); }
     );
     const { companies, contacts, providerFailures } = result;
 
