@@ -62,6 +62,9 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     negativeKeywords: [
       'residential', 'driveway', 'handyman', 'home repair',
       'home kitchen', 'landscaping', 'home improvement',
+      'tire', 'truck parking', 'auto repair', 'truck stop',
+      'parking lot', 'storage unit', 'car wash', 'trucking',
+      'logistics', 'warehouse',
     ],
     signals: {
       primary: [

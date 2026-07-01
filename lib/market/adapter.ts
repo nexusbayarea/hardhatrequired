@@ -393,20 +393,32 @@ export class IndexIntelligenceEngine {
 
 export class IndexIntelligenceOrchestrator extends IndexIntelligenceEngine {}
 
+const GENERIC_WORDS = new Set([
+  'service', 'services', 'facility', 'facilities', 'disposal', 'plant', 'plants',
+  'treatment', 'recycling', 'recycler', 'recyclers', 'company', 'companies',
+  'contractor', 'contractors', 'removal', 'transport', 'management', 'industrial',
+  'commercial', 'waste', 'hazardous', 'center', 'centre', 'system', 'systems',
+  'solution', 'solutions', 'supply', 'supplies', 'supplier', 'suppliers',
+  'equipment', 'product', 'products', 'material', 'materials', 'processing',
+  'broker', 'brokers', 'consulting', 'consultant', 'consultants',
+  'parking', 'tire', 'tires', 'auto', 'automotive', 'repair', 'truck',
+  'trucking', 'hauling', 'storage',
+]);
+
 function buildDisposalSignals(config: VerticalConfig): SignalLayers {
-  const stopWords = new Set(['for', 'and', 'the', 'or', 'of', 'in', 'to', 'a', 'is']);
   const seen = new Set<string>();
   const primary: { term: string; weight: number }[] = [];
   for (const q of (config.disposalQueries || [])) {
-    const words = q.toLowerCase().split(/\s+/).filter(w => w.length >= 3 && !stopWords.has(w));
+    const words = q.toLowerCase().split(/\s+/)
+      .filter(w => w.length >= 4 && !GENERIC_WORDS.has(w));
     for (const w of words) {
       if (!seen.has(w)) {
         seen.add(w);
-        primary.push({ term: w, weight: 15 });
+        primary.push({ term: w, weight: 20 });
       }
     }
   }
-  return { primary, secondary: [], negative: config.signals.negative || [] };
+  return { primary, secondary: [], negative: config.signals?.negative || [] };
 }
 
 function buildDisposalScoreConfig(config: VerticalConfig): VerticalConfig {
