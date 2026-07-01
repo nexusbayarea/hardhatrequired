@@ -364,7 +364,7 @@ export class IndexIntelligenceEngine {
           status: 'NOT_CONTACTED',
           matchedSignals: ['enterprise_overlay'],
           confidence: 100,
-          fitType: 'DIRECT_OPERATOR',
+          fitType: isDisposalMode ? 'DISPOSAL_NODE' : 'DIRECT_OPERATOR',
           relevanceReason: `Enterprise market leader — ${ec.notes || 'injected via overlay'}`,
           createdAt: now,
           updatedAt: now,
@@ -403,6 +403,7 @@ const GENERIC_WORDS = new Set([
   'broker', 'brokers', 'consulting', 'consultant', 'consultants',
   'parking', 'tire', 'tires', 'auto', 'automotive', 'repair', 'truck',
   'trucking', 'hauling', 'storage',
+  'excavation', 'construction',
 ]);
 
 function buildDisposalSignals(config: VerticalConfig): SignalLayers {
