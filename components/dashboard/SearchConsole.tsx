@@ -51,10 +51,12 @@ export default function SearchConsole({
 
   const isActive = activePane === 'labor' || activePane === 'disposal';
 
-  const verticalOptions = Object.values(verticalMatrix).map(v => ({
-    value: v.id,
-    label: activePane === 'disposal' ? v.disposalLabel : v.laborLabel,
-  }));
+  const verticalOptions = Object.values(verticalMatrix)
+    .map(v => ({
+      value: v.id,
+      label: activePane === 'disposal' ? v.disposalLabel : v.laborLabel,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   const meta = PANE_META[activePane];
 
