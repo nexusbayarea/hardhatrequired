@@ -9,6 +9,24 @@ export interface WebScrapeResult {
   rawText: string;
 }
 
+async function fetchPageText(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) HardHatRequiredBot/1.0',
+      },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) return null;
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    $('script, style, nav, footer, header').remove();
+    return $('body').text();
+  } catch {
+    return null;
+  }
+}
+
 export async function scrapeCompanyWebsite(
   url: string,
   verticalKeywords: string[],
@@ -25,35 +43,38 @@ export async function scrapeCompanyWebsite(
 
   try {
     const targetUrl = url.startsWith('http') ? url : `https://${url}`;
+    const parsed = new URL(targetUrl);
+    const origin = parsed.origin;
 
-    const response = await fetch(targetUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) HardHatRequiredBot/1.0',
-      },
-      signal: AbortSignal.timeout(5000),
-    });
+    const pages = [
+      targetUrl,
+      `${origin}/services`,
+      `${origin}/about`,
+      `${origin}/services/`,
+      `${origin}/about/`,
+    ];
 
-    if (!response.ok) return result;
-    const html = await response.text();
+    const pageTexts: string[] = [];
+    for (const pageUrl of pages) {
+      const text = await fetchPageText(pageUrl);
+      if (text) pageTexts.push(text);
+    }
 
-    const $ = cheerio.load(html);
-    $('script, style, nav, footer, header').remove();
-
-    const bodyText = $('body').text().toLowerCase();
-    result.rawText = bodyText.slice(0, 5000);
+    const combinedText = pageTexts.join('\n').toLowerCase();
+    result.rawText = combinedText.slice(0, 10000);
 
     for (const keyword of verticalKeywords) {
       const regex = new RegExp(`\\b${keyword.toLowerCase()}\\b`, 'g');
-      if (regex.test(bodyText)) {
+      if (regex.test(combinedText)) {
         result.matchedKeywords.push(keyword);
       }
     }
 
-    if (/\b(commercial|industrial|enterprise|municipal|facility manager|contractor|warehouse|factory|plant)\b/i.test(bodyText)) {
+    if (/\b(commercial|industrial|enterprise|municipal|facility manager|contractor|warehouse|factory|plant)\b/i.test(combinedText)) {
       result.isCommercial = true;
     }
 
-    if (/\b(homeowner|residential|home repair|house|apartment|condo|clogged toilet|kitchen sink|basement)\b/i.test(bodyText)) {
+    if (/\b(homeowner|residential|home repair|house|apartment|condo|clogged toilet|kitchen sink|basement)\b/i.test(combinedText)) {
       result.isResidential = true;
     }
 
@@ -62,7 +83,7 @@ export async function scrapeCompanyWebsite(
       result.matchedKeywords.length === 0 &&
       negativeKeywords.some((kw) => {
         const regex = new RegExp(`\\b${kw.toLowerCase()}\\b`, 'i');
-        return regex.test(bodyText);
+        return regex.test(combinedText);
       })
     ) {
       result.isMismatch = true;
@@ -70,7 +91,7 @@ export async function scrapeCompanyWebsite(
 
     const licenseRegex = /(?:lic|license|cert|licencia)\s*(?:#|no\.?:?)?\s*([0-9]{5,10})/gi;
     let match;
-    while ((match = licenseRegex.exec(bodyText)) !== null) {
+    while ((match = licenseRegex.exec(combinedText)) !== null) {
       result.licenseNumbers.push(match[1]);
     }
 

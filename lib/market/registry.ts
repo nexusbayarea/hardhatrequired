@@ -40,18 +40,23 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     slug: 'slurry_concrete',
     industryName: 'Concrete Slurry Recycling & Disposal',
     searchQueries: [
+      'concrete cutting',
+      'core drilling',
+      'saw cutting service',
+      'demolition contractor',
+      'vacuum truck service',
+      'hydro excavation',
+      'concrete recycling',
+      'washout disposal',
       'concrete washout service',
-      'slurry disposal concrete recycling',
-      'concrete slurry disposal',
-      'slurry',
-      'vacuum truck slurry',
-      'concrete washout removal',
-      'concrete washout recycling',
+      'slurry disposal',
     ],
-    targetNaicsCodes: ['562211', '238110', '562112'],
+    targetNaicsCodes: ['562211', '238110', '562112', '238910', '238990', '562119'],
     equipmentKeywords: [
       'filter press', 'dewatering box', 'centrifuge', 'slurry tanker',
-      'vacuum truck', 'concrete recycling plant', 'slurry press'
+      'vacuum truck', 'concrete recycling plant', 'slurry press',
+      'concrete saw', 'core drill', 'wall saw', 'slab saw',
+      'hydro vac', 'concrete grinder', 'reclaimer'
     ],
     negativeKeywords: [
       'residential', 'driveway', 'handyman', 'home repair',
@@ -61,13 +66,17 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       primary: [
         { term: 'slurry', weight: 50 },
         { term: 'concrete washout', weight: 45 },
+        { term: 'concrete cutting', weight: 35 },
         { term: 'washout', weight: 35 },
         { term: 'vacuum truck', weight: 30 },
-        { term: 'wastewater', weight: 30 },
+        { term: 'core drilling', weight: 30 },
+        { term: 'saw cutting', weight: 30 },
+        { term: 'wastewater', weight: 25 },
       ],
       secondary: [
-        { term: 'concrete', weight: 10 },
+        { term: 'concrete', weight: 15 },
         { term: 'hydro excavation', weight: 15 },
+        { term: 'demolition', weight: 15 },
         { term: 'recycling', weight: 12 },
         { term: 'filtration', weight: 12 },
         { term: 'environmental', weight: 10 },
@@ -76,65 +85,13 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
         { term: 'residential', weight: -50 },
         { term: 'driveway', weight: -40 },
         { term: 'handyman', weight: -60 },
-        { term: 'demolition', weight: -50 },
-        { term: 'construction', weight: -30 },
       ],
     },
     scoringWeights: SHARED_SCORING_WEIGHTS,
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
     providers: createProviders([tomtom, overpass]),
-  },
-
-  grease_trap: {
-    id: 'grease_trap',
-    slug: 'grease_trap',
-    industryName: 'Commercial Grease Trap Pumping & Recycling',
-    searchQueries: [
-      'septic tank pumping', 'drain cleaning service',
-      'waste removal service', 'grease trap cleaning',
-      'restaurant grease disposal'
-    ],
-    targetNaicsCodes: ['562219', '562111', '562998'],
-    equipmentKeywords: [
-      'grease interceptor', 'vacuum tanker', 'hydro-jetting',
-      'grease rendering', 'degreasing unit', 'yellow grease collection'
-    ],
-    negativeKeywords: [
-      'plumber repair', 'residential plumbing', 'home kitchen cleaning',
-      'sewer line repair', 'faucet installation', 'clogged toilet',
-      'residential', 'cleaning service', 'handyman',
-      'cooking oil', 'oil change', 'fryer repair'
-    ],
-    signals: {
-      primary: [
-        { term: 'grease trap', weight: 30 },
-        { term: 'grease interceptor', weight: 30 },
-        { term: 'grease', weight: 25 },
-        { term: 'FOG', weight: 30 },
-      ],
-      secondary: [
-        { term: 'pumping', weight: 10 },
-        { term: 'wastewater', weight: 10 },
-        { term: 'hydro jetting', weight: 10 },
-        { term: 'vacuum truck', weight: 10 },
-        { term: 'restaurant service', weight: 10 },
-        { term: 'yellow grease', weight: 10 },
-        { term: 'rendering', weight: 10 },
-        { term: 'OSHA', weight: 10 },
-      ],
-      negative: [
-        { term: 'concrete', weight: -60 },
-        { term: 'recycling', weight: -60 },
-        { term: 'landscape', weight: -50 },
-        { term: 'restoration', weight: -50 },
-        { term: 'home kitchen', weight: -30 },
-      ],
-    },
-    scoringWeights: SHARED_SCORING_WEIGHTS,
-    baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
-    createdAt: NOW,
-    providers: createProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Concrete cutting, core drilling, saw cutting, concrete grinding, demolition', disposal: 'Slurry dewatering/recycling, washout collection, filtration, filter press operations' },
   },
 
   asbestos_abatement: {
@@ -185,6 +142,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
     providers: createProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Asbestos remediation, lead paint abatement, hazmat containment, air monitoring', disposal: 'Regulated asbestos waste transport, permitted hazmat landfill disposal' },
   },
 
   hydro_excavation: {
@@ -237,55 +195,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
     providers: createSearchOnlyProviders([tomtom, overpass]),
-  },
-
-  commercial_roofing: {
-    id: 'commercial_roofing',
-    slug: 'commercial_roofing',
-    industryName: 'Industrial & Commercial Flat Roofing',
-    searchQueries: [
-      'commercial roofing contractor', 'flat roof installation',
-      'industrial roofing services', 'TPO roofing contractor',
-      'roof membrane replacement'
-    ],
-    targetNaicsCodes: ['238160'],
-    equipmentKeywords: [
-      'TPO membrane', 'EPDM roofing', 'single-ply system',
-      'thermal roof inspection', 'built-up roofing', 'cool roof coating'
-    ],
-    negativeKeywords: [
-      'residential shingle repair', 'gutter cleaning', 'handyman services',
-      'chimney sweep', 'DIY shingle replacement', 'skylight installation home',
-      'home inspector', 'real estate', 'siding', 'window replacement',
-      'deck building', 'fence installation'
-    ],
-    signals: {
-      primary: [
-        { term: 'commercial roofing', weight: 30 },
-        { term: 'flat roof', weight: 30 },
-        { term: 'TPO roofing', weight: 30 },
-        { term: 'industrial roofing', weight: 30 },
-      ],
-      secondary: [
-        { term: 'roof membrane', weight: 10 },
-        { term: 'built-up roofing', weight: 10 },
-        { term: 'EPDM roofing', weight: 10 },
-        { term: 'cool roof', weight: 10 },
-        { term: 'single-ply', weight: 10 },
-        { term: 'roof replacement', weight: 10 },
-      ],
-      negative: [
-        { term: 'residential shingle', weight: -30 },
-        { term: 'gutter cleaning', weight: -30 },
-        { term: 'handyman', weight: -30 },
-        { term: 'siding', weight: -30 },
-        { term: 'window replacement', weight: -30 },
-      ],
-    },
-    scoringWeights: SHARED_SCORING_WEIGHTS,
-    baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
-    createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Hydro excavation, potholing, daylighting, utility exposure, non-destructive digging', disposal: 'Spoils disposal, slurry containment, water management' },
   },
 
   medical_waste: {
@@ -336,56 +246,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
     providers: createSearchOnlyProviders([tomtom, overpass]),
-  },
-
-  scrap_metal: {
-    id: 'scrap_metal',
-    slug: 'scrap_metal',
-    industryName: 'Industrial Scrap Metal Processing',
-    searchQueries: [
-      'scrap metal recycling facility', 'ferrous metal recycling',
-      'non-ferrous scrap processing', 'industrial metal recycling',
-      'scrap yard processing'
-    ],
-    targetNaicsCodes: ['423930', '562920'],
-    equipmentKeywords: [
-      'alligator shear', 'metal shredder', 'scrap baler',
-      'non-ferrous separator', 'scrap crane magnet', 'roll-off scrap containers'
-    ],
-    negativeKeywords: [
-      'used car dealership', 'auto salvage retail', 'mechanic shop',
-      'pawn shop', 'residential junk collection', 'antique store',
-      'appliance repair', 'electronics repair', 'plastic recycling',
-      'paper recycling', 'e-waste', 'bottle recycling', 'cardboard'
-    ],
-    signals: {
-      primary: [
-        { term: 'scrap metal', weight: 30 },
-        { term: 'metal recycling', weight: 30 },
-        { term: 'ferrous scrap', weight: 30 },
-        { term: 'non-ferrous scrap', weight: 25 },
-        { term: 'recycling', weight: 20 },
-      ],
-      secondary: [
-        { term: 'metal', weight: 10 },
-        { term: 'scrap', weight: 10 },
-        { term: 'metal processing', weight: 10 },
-        { term: 'scrap yard', weight: 10 },
-        { term: 'metal shredding', weight: 10 },
-        { term: 'metal baler', weight: 10 },
-      ],
-      negative: [
-        { term: 'used car', weight: -30 },
-        { term: 'auto salvage', weight: -30 },
-        { term: 'mechanic shop', weight: -30 },
-        { term: 'plastic', weight: -30 },
-        { term: 'paper recycling', weight: -30 },
-      ],
-    },
-    scoringWeights: SHARED_SCORING_WEIGHTS,
-    baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
-    createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Medical waste collection, biohazard cleanup, sharps disposal, clinical waste pickup', disposal: 'Autoclave sterilization, regulated medical waste incineration, treatment' },
   },
 
   marine_construction: {
@@ -437,6 +298,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
     createdAt: NOW,
     providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Pile driving, seawall construction, bulkhead installation, dredging, dock building', disposal: 'Dredge spoils disposal, marine debris management, sheet piling removal' },
   },
 
   concrete: {
@@ -491,6 +353,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
     providers: createProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Industrial demolition, concrete breaking, selective demolition, building implosion', disposal: 'Demolition debris processing, concrete crushing, landfill disposal' },
   },
 
   stormwater_compliance: {
@@ -537,6 +400,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
     createdAt: NOW,
     providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'SWPPP development, stormwater inspections, compliance monitoring, erosion control', disposal: 'Stormwater treatment, sediment basin cleaning, silt removal, erosion control installation' },
   },
 
   industrial_wastewater: {
@@ -586,6 +450,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 15, contactEnrichmentWeight: 10, assetSignalWeight: 20 },
     createdAt: NOW,
     providers: createProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Industrial wastewater treatment, process water management, pH adjustment, filtration', disposal: 'Treated effluent discharge, sludge dewatering, wastewater hauling' },
   },
 
   tank_testing: {
@@ -650,6 +515,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
     createdAt: NOW,
     providers: createProviders([tomtom, overpass]),
+    matrixNode: { labor: 'UST testing, tank tightness testing, leak detection, cathodic protection testing', disposal: 'Tank removal, disposal, soil remediation, groundwater monitoring' },
   },
 
   elevator_inspection: {
@@ -692,6 +558,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
     createdAt: NOW,
     providers: createProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Elevator safety inspection, certification, load testing, ASME compliance', disposal: 'Elevator modernization, obsolete equipment removal' },
   },
 
   hvac_balance: {
@@ -742,6 +609,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
     createdAt: NOW,
     providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'HVAC test and balance, air balancing, TAB services, airflow measurement', disposal: 'HVAC equipment disposal, refrigerant recovery, ductwork removal' },
   },
 
   fire_sprinkler: {
@@ -787,142 +655,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
     providers: createSearchOnlyProviders([tomtom, overpass]),
-  },
-
-  fire_extinguisher: {
-    id: 'fire_extinguisher',
-    slug: 'fire_extinguisher',
-    industryName: 'Fire Extinguisher Inspection & Filling',
-    searchQueries: [
-      'fire extinguisher service', 'fire extinguisher inspection',
-      'fire extinguisher recharge', 'commercial fire protection',
-      'fire safety equipment'
-    ],
-    targetNaicsCodes: ['423990', '561621', '811490'],
-    equipmentKeywords: [
-      'hydrostatic test unit', 'extinguisher fill station', 'dry chemical refill',
-      'CO2 fill manifold', 'pressure gauge'
-    ],
-    negativeKeywords: [
-      'buy smoke detector home', 'extinguisher mount bracket amazon', 'fire protection engineering degree',
-      'fireplace', 'firewood', 'fire pit', 'fire alarm installation',
-      'fire sprinkler', 'smoke detector', 'security system'
-    ],
-    signals: {
-      primary: [
-        { term: 'fire extinguisher', weight: 30 },
-        { term: 'recharge', weight: 30 },
-        { term: 'hydrotesting', weight: 30 },
-        { term: 'fire', weight: 15 },
-      ],
-      secondary: [
-        { term: 'NFPA 10', weight: 10 },
-        { term: 'inspection tag', weight: 10 },
-        { term: 'safety inspection', weight: 10 },
-        { term: 'dry chemical', weight: 10 },
-        { term: 'CO2 refill', weight: 10 },
-        { term: 'extinguisher service', weight: 10 },
-      ],
-      negative: [
-        { term: 'home extinguisher', weight: -30 },
-        { term: 'fireplace', weight: -30 },
-        { term: 'firewood', weight: -30 },
-        { term: 'smoke detector', weight: -30 },
-      ],
-    },
-    scoringWeights: SHARED_SCORING_WEIGHTS,
-    baseScoringWeights: { distanceWeight: 15, contactEnrichmentWeight: 10, assetSignalWeight: 20 },
-    createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
-  },
-
-  kitchen_exhaust: {
-    id: 'kitchen_exhaust',
-    slug: 'kitchen_exhaust',
-    industryName: 'Commercial Kitchen Hood Degreasing',
-    searchQueries: [
-      'restaurant hood cleaning', 'commercial kitchen cleaning',
-      'hood exhaust cleaning', 'kitchen degreasing service',
-      'hood suppression system'
-    ],
-    targetNaicsCodes: ['561790', '926150'],
-    equipmentKeywords: [
-      'pressure washer', 'hood filter cart', 'exhaust fan cleaning tool',
-      'grease removal system', 'duct cleaning kit'
-    ],
-    negativeKeywords: [
-      'residential kitchen hood filter replacement', 'home cleaning service', 'maid service',
-      'chef', 'vegan', 'meal prep', 'food delivery', 'catering', 'private chef'
-    ],
-    signals: {
-      primary: [
-        { term: 'hood', weight: 30 },
-        { term: 'kitchen', weight: 30 },
-        { term: 'kitchen exhaust', weight: 30 },
-        { term: 'hood cleaning', weight: 35 },
-        { term: 'grease removal', weight: 25 },
-      ],
-      secondary: [
-        { term: 'NFPA 96', weight: 10 },
-        { term: 'restaurant', weight: 10 },
-        { term: 'duct cleaning', weight: 10 },
-        { term: 'pressure washer', weight: 10 },
-        { term: 'exhaust cleaning', weight: 10 },
-      ],
-      negative: [
-        { term: 'residential cleaning', weight: -30 },
-      ],
-    },
-    scoringWeights: SHARED_SCORING_WEIGHTS,
-    baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
-    createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
-  },
-
-  backflow_testing: {
-    id: 'backflow_testing',
-    slug: 'backflow_testing',
-    industryName: 'Backflow Prevention Testing',
-    searchQueries: [
-      'commercial plumbing backflow', 'backflow testing service',
-      'certified backflow tester', 'RPZ testing',
-      'commercial backflow assembly inspector'
-    ],
-    targetNaicsCodes: ['238220', '541380'],
-    equipmentKeywords: [
-      'backflow test kit', 'pressure gauge', 'differential pressure meter',
-      'RPZ tester', 'double check valve tester'
-    ],
-    negativeKeywords: [
-      'residential water filtration pitcher', 'swimming pool backwash valve', 'sewer line replacement',
-      'water heater repair', 'water softener installation', 'plumbing',
-      'drain cleaning', 'sewer line', 'faucet repair', 'toilet repair'
-    ],
-    signals: {
-      primary: [
-        { term: 'backflow', weight: 30 },
-        { term: 'RPZ', weight: 30 },
-        { term: 'cross connection', weight: 30 },
-      ],
-      secondary: [
-        { term: 'water testing', weight: 10 },
-        { term: 'certified tester', weight: 10 },
-        { term: 'assembly testing', weight: 10 },
-        { term: 'backflow preventer', weight: 10 },
-        { term: 'double check valve', weight: 10 },
-        { term: 'pressure gauge', weight: 10 },
-      ],
-      negative: [
-        { term: 'pool', weight: -30 },
-        { term: 'home filter', weight: -30 },
-        { term: 'water heater', weight: -30 },
-        { term: 'plumbing', weight: -30 },
-      ],
-    },
-    scoringWeights: SHARED_SCORING_WEIGHTS,
-    baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
-    createdAt: NOW,
-    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Fire sprinkler hydrostatic testing, flow testing, NFPA 25 inspection', disposal: 'Sprinkler system decommissioning, obsolete component recycling' },
   },
 
   generator_testing: {
@@ -971,7 +704,281 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
     createdAt: NOW,
     providers: createProviders([tomtom, overpass]),
-  }
+    matrixNode: { labor: 'Generator load bank testing, NFPA 110 compliance, emergency power testing', disposal: 'Generator decommissioning, fuel polishing waste disposal, battery recycling' },
+  },
+
+  high_voltage_electrical: {
+    id: 'high_voltage_electrical',
+    slug: 'high_voltage_electrical',
+    industryName: 'High-Voltage Electrical Testing & Maintenance',
+    searchQueries: ['high voltage testing service', 'electrical maintenance contractor', 'transformer testing service', 'switchgear testing', 'power distribution testing'],
+    targetNaicsCodes: ['238210', '238990', '541350'],
+    equipmentKeywords: ['megohmmeter', 'power factor test set', 'DC hi-pot tester', 'circuit breaker analyzer', 'relay test set', 'thermographic camera'],
+    negativeKeywords: ['home electrical repair', 'residential electrician', 'lighting installation', 'ceiling fan', 'outlet repair', 'home automation', 'low voltage', 'alarm system', 'security camera'],
+    signals: {
+      primary: [
+        { term: 'high voltage', weight: 30 },
+        { term: 'transformer testing', weight: 30 },
+        { term: 'switchgear testing', weight: 30 },
+        { term: 'electrical testing', weight: 25 },
+      ],
+      secondary: [
+        { term: 'NFPA 70E', weight: 10 },
+        { term: 'power factor', weight: 10 },
+        { term: 'circuit breaker', weight: 10 },
+        { term: 'protective relay', weight: 10 },
+        { term: 'cable testing', weight: 10 },
+        { term: 'partial discharge', weight: 10 },
+        { term: 'OSHA', weight: 10 },
+      ],
+      negative: [
+        { term: 'home electrical', weight: -30 },
+        { term: 'residential', weight: -40 },
+        { term: 'low voltage', weight: -30 },
+      ],
+    },
+    scoringWeights: SHARED_SCORING_WEIGHTS,
+    baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
+    createdAt: NOW,
+    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'High voltage testing, transformer maintenance, switchgear testing, cable testing, NFPA 70E compliance', disposal: 'PCB transformer disposal, SF6 recycling, decommissioned equipment recycling' },
+  },
+
+  trench_shoring: {
+    id: 'trench_shoring',
+    slug: 'trench_shoring',
+    industryName: 'Trench Shoring & Excavation Safety',
+    searchQueries: ['trench shoring rental', 'shoring contractor', 'excavation safety', 'slide rail system', 'trench box rental'],
+    targetNaicsCodes: ['532490', '238910', '238990'],
+    equipmentKeywords: ['hydraulic shore', 'slide rail', 'trench box', 'aluminum hydraulic shore', 'manhole shield', 'municipal shore'],
+    negativeKeywords: ['residential landscaping', 'hand digging', 'pool installation', 'foundation repair', 'backfill', 'sprinkler installation'],
+    signals: {
+      primary: [
+        { term: 'trench shoring', weight: 30 },
+        { term: 'shoring', weight: 25 },
+        { term: 'slide rail', weight: 30 },
+        { term: 'trench box', weight: 30 },
+      ],
+      secondary: [
+        { term: 'excavation safety', weight: 10 },
+        { term: 'hydraulic shore', weight: 10 },
+        { term: 'manhole shield', weight: 10 },
+        { term: 'aluminum shore', weight: 10 },
+        { term: 'OSHA', weight: 15 },
+        { term: 'CalOSHA', weight: 15 },
+        { term: 'competent person', weight: 10 },
+      ],
+      negative: [
+        { term: 'landscaping', weight: -30 },
+        { term: 'foundation', weight: -30 },
+        { term: 'pool', weight: -30 },
+      ],
+    },
+    scoringWeights: SHARED_SCORING_WEIGHTS,
+    baseScoringWeights: { distanceWeight: 20, contactEnrichmentWeight: 10, assetSignalWeight: 15 },
+    createdAt: NOW,
+    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Trench shoring, slide rail systems, hydraulic shores, trench boxes, excavation safety, CalOSHA compliance', disposal: 'Shoring equipment decontamination, steel recycling, HDPE shoring disposal' },
+  },
+
+  industrial_sandblasting: {
+    id: 'industrial_sandblasting',
+    slug: 'industrial_sandblasting',
+    industryName: 'Industrial Sandblasting & Surface Preparation',
+    searchQueries: ['industrial sandblasting', 'abrasive blasting contractor', 'surface preparation contractor', 'sandblasting service', 'industrial coating removal'],
+    targetNaicsCodes: ['238320', '238990', '562910'],
+    equipmentKeywords: ['abrasive blaster', 'dustless blasting', 'vacuum blasting', 'silica sand', 'steel shot', 'soda blaster', 'hydro blaster'],
+    negativeKeywords: ['home painting', 'furniture refinishing', 'brick cleaning', 'art restoration', 'car restoration', 'DIY blasting', 'sandblasting cabinet'],
+    signals: {
+      primary: [
+        { term: 'sandblasting', weight: 30 },
+        { term: 'abrasive blasting', weight: 30 },
+        { term: 'surface preparation', weight: 25 },
+        { term: 'industrial blasting', weight: 30 },
+      ],
+      secondary: [
+        { term: 'dustless blasting', weight: 10 },
+        { term: 'vacuum blasting', weight: 10 },
+        { term: 'steel shot', weight: 10 },
+        { term: 'coating removal', weight: 10 },
+        { term: 'lead abatement', weight: 15 },
+        { term: 'hydro blasting', weight: 10 },
+        { term: 'OSHA', weight: 10 },
+      ],
+      negative: [
+        { term: 'home', weight: -30 },
+        { term: 'furniture', weight: -30 },
+        { term: 'art', weight: -30 },
+        { term: 'cabinet', weight: -30 },
+        { term: 'car detail', weight: -30 },
+        { term: 'concrete polishing', weight: -30 },
+      ],
+    },
+    scoringWeights: SHARED_SCORING_WEIGHTS,
+    baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
+    createdAt: NOW,
+    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Abrasive blasting, sandblasting, surface preparation, industrial coating removal, lead paint abatement', disposal: 'Spent abrasive disposal, hazardous media transport, EPA TCLP compliant disposal' },
+  },
+
+  dewatering_bypass: {
+    id: 'dewatering_bypass',
+    slug: 'dewatering_bypass',
+    industryName: 'Construction Dewatering & Bypass Pumping',
+    searchQueries: ['construction dewatering', 'bypass pumping service', 'wellpoint dewatering', 'groundwater control', 'pump rental dewatering'],
+    targetNaicsCodes: ['238910', '532490', '237110'],
+    equipmentKeywords: ['submersible pump', 'wellpoint system', 'dewatering pump', 'bypass pump', 'centrifugal pump', 'diesel pump', 'hydraulic submersible'],
+    negativeKeywords: ['septic pumping', 'pool pump', 'water feature', 'irrigation pump', 'residential sump pump', 'pond aerator', 'sewage ejector'],
+    signals: {
+      primary: [
+        { term: 'dewatering', weight: 30 },
+        { term: 'bypass pumping', weight: 30 },
+        { term: 'wellpoint', weight: 30 },
+        { term: 'groundwater control', weight: 25 },
+      ],
+      secondary: [
+        { term: 'construction dewatering', weight: 15 },
+        { term: 'pump rental', weight: 10 },
+        { term: 'submersible pump', weight: 10 },
+        { term: 'centrifugal pump', weight: 10 },
+        { term: 'diesel pump', weight: 10 },
+        { term: 'NPDES', weight: 10 },
+        { term: 'OSHA', weight: 10 },
+      ],
+      negative: [
+        { term: 'septic', weight: -50 },
+        { term: 'pool', weight: -30 },
+        { term: 'irrigation', weight: -30 },
+        { term: 'residential sump', weight: -30 },
+        { term: 'sewer', weight: -30 },
+      ],
+    },
+    scoringWeights: SHARED_SCORING_WEIGHTS,
+    baseScoringWeights: { distanceWeight: 15, contactEnrichmentWeight: 10, assetSignalWeight: 20 },
+    createdAt: NOW,
+    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Construction dewatering, wellpoint systems, bypass pumping, groundwater control, trench dewatering', disposal: 'Sediment basin discharge, filtration treatment, NPDEs permitted outfall discharge' },
+  },
+
+  hazardous_soil: {
+    id: 'hazardous_soil',
+    slug: 'hazardous_soil',
+    industryName: 'Hazardous Soil Remediation & Transport',
+    searchQueries: ['contaminated soil removal', 'hazardous soil remediation', 'environmental remediation contractor', 'soil excavation', 'brownfield remediation'],
+    targetNaicsCodes: ['562910', '562211', '562219'],
+    equipmentKeywords: ['excavator', 'soil vapor extraction', 'bio-remediation', 'thermal desorption', 'soil washing plant', 'air sparge', 'vacuum truck'],
+    negativeKeywords: ['landscaping', 'topsoil delivery', 'compost', 'mulch', 'garden soil', 'lawn care', 'organic farming', 'landfill general'],
+    signals: {
+      primary: [
+        { term: 'contaminated soil', weight: 30 },
+        { term: 'soil remediation', weight: 30 },
+        { term: 'hazardous soil', weight: 30 },
+        { term: 'environmental remediation', weight: 25 },
+      ],
+      secondary: [
+        { term: 'soil excavation', weight: 10 },
+        { term: 'brownfield', weight: 10 },
+        { term: 'soil vapor', weight: 10 },
+        { term: 'bio-remediation', weight: 10 },
+        { term: 'thermal desorption', weight: 10 },
+        { term: 'soil washing', weight: 10 },
+        { term: 'EPA', weight: 10 },
+        { term: 'DTSC', weight: 10 },
+        { term: 'RCRA', weight: 10 },
+      ],
+      negative: [
+        { term: 'landscape', weight: -40 },
+        { term: 'topsoil', weight: -30 },
+        { term: 'compost', weight: -30 },
+        { term: 'lawn', weight: -30 },
+        { term: 'garden', weight: -30 },
+      ],
+    },
+    scoringWeights: SHARED_SCORING_WEIGHTS,
+    baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
+    createdAt: NOW,
+    providers: createProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Soil excavation, contaminated soil removal, site remediation, bio-remediation', disposal: 'Hazmat soil transport, TSCA/RCRA permitted landfill disposal, thermal treatment' },
+  },
+
+  solar_industrial: {
+    id: 'solar_industrial',
+    slug: 'solar_industrial',
+    industryName: 'Industrial & Commercial Solar Installation',
+    searchQueries: ['commercial solar installation', 'industrial solar contractor', 'solar PV system design', 'large scale solar', 'commercial solar panel installation'],
+    targetNaicsCodes: ['238210', '221114', '423690'],
+    equipmentKeywords: ['PV panel', 'inverter', 'solar tracker', 'transformer', 'breaker panel', 'solar racking', 'power optimizer'],
+    negativeKeywords: ['residential solar', 'home solar panel', 'solar attic fan', 'solar water heater', 'diy solar', 'solar garden light', 'rv solar'],
+    signals: {
+      primary: [
+        { term: 'commercial solar', weight: 30 },
+        { term: 'solar installation', weight: 30 },
+        { term: 'solar PV', weight: 30 },
+        { term: 'industrial solar', weight: 30 },
+      ],
+      secondary: [
+        { term: 'PV panel', weight: 10 },
+        { term: 'inverter', weight: 10 },
+        { term: 'solar tracker', weight: 10 },
+        { term: 'solar racking', weight: 10 },
+        { term: 'breaker panel', weight: 10 },
+        { term: 'transformer', weight: 10 },
+        { term: 'electrical contractor', weight: 10 },
+        { term: 'OSHA', weight: 10 },
+      ],
+      negative: [
+        { term: 'residential', weight: -40 },
+        { term: 'home solar', weight: -30 },
+        { term: 'diy', weight: -30 },
+        { term: 'solar water heater', weight: -30 },
+        { term: 'garden', weight: -30 },
+      ],
+    },
+    scoringWeights: SHARED_SCORING_WEIGHTS,
+    baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
+    createdAt: NOW,
+    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Solar PV installation, commercial solar mounting, electrical integration, inverter commissioning', disposal: 'Decommissioned panel recycling, inverter disposal, racking scrap metal recovery' },
+  },
+
+  wind_energy: {
+    id: 'wind_energy',
+    slug: 'wind_energy',
+    industryName: 'Wind Energy Testing & Maintenance',
+    searchQueries: ['wind turbine maintenance', 'wind farm service', 'turbine generator testing', 'wind energy contractor', 'commercial wind service'],
+    targetNaicsCodes: ['238210', '541350', '221115'],
+    equipmentKeywords: ['megger tester', 'gearbox analyzer', 'vibration analysis', 'thermal imaging', 'oil analysis kit', 'turbine control system'],
+    negativeKeywords: ['residential wind turbine', 'home wind generator', 'small wind', 'DIY wind turbine', 'wind chime', 'weather station'],
+    signals: {
+      primary: [
+        { term: 'wind turbine', weight: 30 },
+        { term: 'turbine testing', weight: 30 },
+        { term: 'wind farm', weight: 25 },
+        { term: 'wind energy', weight: 25 },
+      ],
+      secondary: [
+        { term: 'gearbox', weight: 10 },
+        { term: 'generator testing', weight: 10 },
+        { term: 'vibration analysis', weight: 10 },
+        { term: 'oil analysis', weight: 10 },
+        { term: 'turbine maintenance', weight: 10 },
+        { term: 'thermal imaging', weight: 10 },
+        { term: 'OSHA', weight: 10 },
+        { term: 'NFPA 70E', weight: 10 },
+      ],
+      negative: [
+        { term: 'home wind', weight: -30 },
+        { term: 'residential', weight: -40 },
+        { term: 'small wind', weight: -30 },
+        { term: 'diy', weight: -30 },
+      ],
+    },
+    scoringWeights: SHARED_SCORING_WEIGHTS,
+    baseScoringWeights: { distanceWeight: 10, contactEnrichmentWeight: 10, assetSignalWeight: 25 },
+    createdAt: NOW,
+    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Wind turbine maintenance, gearbox testing, blade inspection, generator testing, electrical testing', disposal: 'Turbine decommissioning, blade recycling, gearbox disposal, transformer recycling' },
+  },
 };
 
 export async function getVerticalConfigByDomain(contextHeaderValue: string): Promise<VerticalConfigWithProviders | null> {

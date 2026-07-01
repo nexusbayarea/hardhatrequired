@@ -25,6 +25,7 @@ export interface TenantScoreResult {
   score: number;
   grade: 'A' | 'B' | 'C' | 'D';
   confidence: number;
+  fitType: 'DIRECT_OPERATOR' | 'INDIRECT_VENDOR' | 'DISPOSAL_NODE' | 'REGULATORY_NODE';
   components: ScoreComponents;
   matchedSignals: string[];
   negativeHits: string[];

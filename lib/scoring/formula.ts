@@ -1,10 +1,10 @@
-import { Company } from '@/types/company';
+import type { Permit } from '@/types/company';
 import { VerticalConfig } from '@/types/config';
 import { ScoreComponents } from './tenant';
 
 export interface FiveComponentInput {
   baseRelevanceScore: number;
-  hasRegulatoryPermit: boolean;
+  permits?: Permit[];
   distanceMiles?: number;
   feedbackPositiveCount?: number;
   feedbackNegativeCount?: number;
@@ -38,9 +38,12 @@ export function calculateFiveComponentScore(
 ): ScoreComponents {
   const baseRelevance = Math.min(50, input.baseRelevanceScore);
 
-  const compliance = input.hasRegulatoryPermit ? tenantWeights.compliance : 0;
+  const activePermits = (input.permits ?? []).filter(p => p.status === 'Active').length;
+  const expiredPermits = (input.permits ?? []).filter(p => p.status === 'Expired' || p.status === 'Revoked').length;
+  const permitBonus = Math.min(tenantWeights.compliance, activePermits * 20);
+  const expiredPenalty = expiredPermits * 10;
   const hasLicense = (input.scrapedLicenseNumbers?.length ?? 0) > 0;
-  const complianceScore = Math.min(tenantWeights.compliance, compliance + (hasLicense ? 10 : 0));
+  const complianceScore = Math.max(0, Math.min(tenantWeights.compliance, permitBonus + (hasLicense ? 10 : 0) - expiredPenalty));
 
   let geoScore = 0;
   const d = input.distanceMiles;

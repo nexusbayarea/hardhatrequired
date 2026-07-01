@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { waitUntil } from '@vercel/functions';
 import { IndexIntelligenceEngine } from '@/lib/market/adapter';
-import { getVerticalConfigByDomain } from '@/lib/market/registry';
+import { getVerticalConfigByDomain, VERTICAL_REGISTRY } from '@/lib/market/registry';
 import { withTimeout } from '@/lib/timeouts';
 import { writeAudit } from '@/lib/telemetry/index';
+import { redis, redisAvailable } from '@/lib/redis';
+import { ScoreEngine } from '@/lib/scoring/engine';
+import { createTenantProfile, getGrade } from '@/lib/scoring/tenant';
 import { enqueueBatch, scrapeDirect, qstashAvailable } from '@/lib/market/workers/enrichQueue';
 import type { SearchResult } from '@/types/search';
+
+const SEARCH_CACHE_TTL = 60 * 10;
+
+function searchCacheKey(tenant: string, zip: string): string {
+  return `search:${tenant}:${zip}`;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,6 +34,25 @@ export async function POST(req: NextRequest) {
         { error: `Invalid or unregistered client configuration key: '${clientHeader}'` },
         { status: 403 }
       );
+    }
+
+    // Cache-first: check Redis for pre-ingested results
+    if (redisAvailable()) {
+      const cached = await redis!.get(searchCacheKey(clientHeader, body.zip));
+      if (cached) {
+        const parsed = JSON.parse(cached as string);
+        console.log(`[SEARCH_CACHE] Hit for ${clientHeader}/${body.zip} (${parsed.length} results)`);
+        return NextResponse.json({
+          success: true,
+          tenant: verticalConfig.id,
+          industry: verticalConfig.industryName,
+          count: parsed.length,
+          companies: parsed,
+          contacts: [],
+          cached: true,
+        });
+      }
+      console.log(`[SEARCH_CACHE] Miss for ${clientHeader}/${body.zip}`);
     }
 
     const engine = new IndexIntelligenceEngine();
@@ -51,18 +79,16 @@ export async function POST(req: NextRequest) {
       distanceMiles: c.distanceMiles ?? c.distance ?? null,
       leadScore: c.enrichmentScore ?? c.score ?? 0,
       grade: c.priority ?? 'C',
+      confidence: c.confidence ?? null,
+      fitType: c.fitType ?? null,
       capabilitySummary: c.capabilitySummary ?? null,
+      permits: c.permits ?? undefined,
     }));
 
-    const response = NextResponse.json({
-      success: true,
-      tenant: verticalConfig.id,
-      industry: verticalConfig.industryName,
-      count: normalized.length,
-      companies: normalized,
-      contacts,
-      providerFailures: providerFailures?.length ? providerFailures : undefined,
-    });
+    // Cache results for subsequent searches
+    if (redisAvailable() && normalized.length > 0) {
+      waitUntil(redis!.set(searchCacheKey(clientHeader, body.zip), JSON.stringify(normalized), { ex: SEARCH_CACHE_TTL }));
+    }
 
     waitUntil(
       (async () => {
@@ -82,7 +108,16 @@ export async function POST(req: NextRequest) {
       })()
     );
 
-    return response;
+    return NextResponse.json({
+      success: true,
+      tenant: verticalConfig.id,
+      industry: verticalConfig.industryName,
+      count: normalized.length,
+      companies: normalized,
+      contacts,
+      providerFailures: providerFailures?.length ? providerFailures : undefined,
+      cached: false,
+    });
   } catch (err: any) {
     console.error('[SEARCH_ROUTE_ERROR]', err);
     const message = err?.message || 'Search pipeline failed.';

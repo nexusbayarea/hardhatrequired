@@ -163,6 +163,7 @@ export class IndexIntelligenceEngine {
           negativeHits: sr.negativeHits,
           relevanceReason: sr.relevanceReason,
           confidence: sr.confidence,
+          fitType: sr.fitType,
           status: 'NOT_CONTACTED',
           createdAt: now,
           updatedAt: now,
@@ -228,6 +229,7 @@ export class IndexIntelligenceEngine {
           mergedBase.scrapedIsMismatch = textResult.isMismatch;
           mergedBase.scrapedKeywords = textResult.matchedKeywords;
           mergedBase.scrapedLicenseNumbers = textResult.licenseNumbers;
+          mergedBase.scrapedText = textResult.rawText || undefined;
         }
       }
 
@@ -279,6 +281,7 @@ export class IndexIntelligenceEngine {
       mergedCompany.negativeHits = scoreResult.negativeHits;
       mergedCompany.relevanceReason = scoreResult.relevanceReason;
       mergedCompany.confidence = scoreResult.confidence;
+      mergedCompany.fitType = scoreResult.fitType;
 
       // Stage 5: Hard filter garbage after scoring
       if (scoreResult.score < 65 || scoreResult.grade === 'D') {
@@ -310,6 +313,7 @@ export class IndexIntelligenceEngine {
           status: 'NOT_CONTACTED',
           matchedSignals: ['enterprise_overlay'],
           confidence: 100,
+          fitType: 'DIRECT_OPERATOR',
           relevanceReason: `Enterprise market leader — ${ec.notes || 'injected via overlay'}`,
           createdAt: now,
           updatedAt: now,

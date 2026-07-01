@@ -47,16 +47,6 @@ const INITIAL_VERTICALS: VerticalConfig[] = [
     base_scoring_weights: { distanceWeight: 35, contactEnrichmentWeight: 35, assetSignalWeight: 30 }
   },
   {
-    id: '2',
-    slug: 'grease_trap',
-    industry_name: 'Commercial Grease Trap Pumping & Recycling',
-    search_queries: ['grease trap pumping', 'restaurant grease disposal'],
-    target_naics_codes: ['562219', '562111', '562998'],
-    equipment_keywords: ['grease interceptor', 'vacuum tanker', 'hydro-jetting'],
-    negative_keywords: ['residential plumbing', 'home kitchen cleaning', 'toilet repair'],
-    base_scoring_weights: { distanceWeight: 30, contactEnrichmentWeight: 40, assetSignalWeight: 30 }
-  },
-  {
     id: '3',
     slug: 'asbestos_abatement',
     industry_name: 'Hazardous Asbestos & Lead Abatement',

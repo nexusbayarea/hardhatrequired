@@ -164,7 +164,6 @@ export default function SystemTelemetryMonitor() {
             className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer text-slate-200"
           >
             <option value="slurry_concrete">Concrete Slurry Outbound</option>
-            <option value="grease_trap">Commercial Grease Trap</option>
             <option value="asbestos_abatement">Asbestos Remediation</option>
             <option value="edge-compute">Edge Compute Clusters</option>
             <option value="gas-stations-deli">Gas Station Delis</option>

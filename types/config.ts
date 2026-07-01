@@ -23,6 +23,11 @@ export interface SignalLayers {
   negative: WeightedSignal[];
 }
 
+export interface LaborMatrixNode {
+  labor: string;
+  disposal: string;
+}
+
 export interface VerticalConfig {
   id: string;
   organizationId?: string;
@@ -37,4 +42,5 @@ export interface VerticalConfig {
   scoringWeights: ContactScoringWeights;
   baseScoringWeights: ScoringWeights;
   createdAt: string;
+  matrixNode?: LaborMatrixNode;
 }

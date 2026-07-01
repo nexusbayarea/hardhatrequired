@@ -9,6 +9,17 @@ export type CRMStatus =
   | 'LOST';
 
 export type PriorityGroup = 'A' | 'B' | 'C' | 'D';
+export type FitType = 'DIRECT_OPERATOR' | 'INDIRECT_VENDOR' | 'DISPOSAL_NODE' | 'REGULATORY_NODE';
+export type PermitStatus = 'Active' | 'Expired' | 'Revoked' | 'Pending';
+
+export interface Permit {
+  agency: string;
+  permitType: string;
+  permitNumber: string;
+  status: PermitStatus;
+  effectiveDate?: string;
+  expirationDate?: string;
+}
 
 export type InteractionType = 'CALL' | 'EMAIL' | 'LINKEDIN' | 'NOTE';
 
@@ -37,6 +48,7 @@ export interface Company {
   longitude?: number;
   distanceMiles?: number;
   hasRegulatoryPermit?: boolean;
+  permits?: Permit[];
   googleCategorySignals?: string[];
   googlePrimaryType?: string;
   googleTypes?: string[];
@@ -51,6 +63,7 @@ export interface Company {
   negativeHits?: string[];
   relevanceReason?: string;
   confidence?: number;
+  fitType?: FitType;
   feedbackPositiveCount?: number;
   feedbackNegativeCount?: number;
   scrapedIsCommercial?: boolean;
@@ -58,6 +71,7 @@ export interface Company {
   scrapedIsMismatch?: boolean;
   scrapedKeywords?: string[];
   scrapedLicenseNumbers?: string[];
+  scrapedText?: string;
   notes?: string;
   source?: string;
   createdAt: string;

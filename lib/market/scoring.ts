@@ -1,4 +1,4 @@
-import { Company } from '@/types/company';
+import { Company, FitType } from '@/types/company';
 import { VerticalConfig } from '@/types/config';
 
 export interface ScoreBreakdown {
@@ -18,6 +18,7 @@ export interface ScoreResult {
   score: number;
   priority: 'A' | 'B' | 'C' | 'D';
   confidence: number;
+  fitType: FitType;
   matchedSignals: string[];
   negativeHits: string[];
   relevanceReason: string;
@@ -39,6 +40,31 @@ function containsTerm(text: string, term: string): boolean {
   const escaped = normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const regex = new RegExp(`\\b${escaped}\\b`, 'i');
   return regex.test(normalizedText);
+}
+
+function determineFitType(
+  matchedSignals: string[],
+  company: Partial<Company>,
+): FitType {
+  if (company.source === 'regulatory_permit') return 'REGULATORY_NODE';
+
+  const signalSet = new Set(matchedSignals.map(s => s.toLowerCase()));
+
+  const disposalTerms = ['disposal', 'recycling', 'recycle', 'landfill', 'washout', 'wastewater', 'filtration', 'slurry'];
+  for (const t of disposalTerms) {
+    for (const s of signalSet) {
+      if (s.includes(t)) return 'DISPOSAL_NODE';
+    }
+  }
+
+  const directTerms = ['concrete cutting', 'core drilling', 'saw cutting', 'sawcutting', 'demolition', 'grease trap', 'grease trap cleaning', 'abatement', 'scrap metal', 'marine construction', 'kitchen exhaust', 'fire extinguisher', 'fire sprinkler', 'stormwater'];
+  for (const t of directTerms) {
+    for (const s of signalSet) {
+      if (s.includes(t)) return 'DIRECT_OPERATOR';
+    }
+  }
+
+  return 'INDIRECT_VENDOR';
 }
 
 export function calculateLeadScore(
@@ -128,9 +154,11 @@ export function calculateLeadScore(
     score += profileScore;
     breakdown.profileScore = profileScore;
 
-    if (company.hasRegulatoryPermit) {
-      score += 15;
-      breakdown.regulatoryBonus = 15;
+    const activePermitCount = (company.permits ?? []).filter(p => p.status === 'Active').length;
+    if (activePermitCount > 0) {
+      const permitBonus = Math.min(30, activePermitCount * 15);
+      score += permitBonus;
+      breakdown.regulatoryBonus = permitBonus;
     }
 
     if (company.googleReviewCount && company.googleReviewCount > 15) {
@@ -185,11 +213,43 @@ export function calculateLeadScore(
   breakdown.total = score;
 
   // Confidence
-  let confidence = 50;
-  confidence += matchedSignals.length * 10;
-  confidence += matchedPrimary.size * 15;
-  confidence -= negativeHits.length * 15;
+  let confidence = 30;
+  confidence += Math.min(45, matchedPrimary.size * 15);
+  confidence += Math.min(15, (matchedSignals.length - matchedPrimary.size) * 5);
+
+  const industryTerm = config.industryName?.toLowerCase().split(' ')[0] || '';
+  if (industryTerm && containsTerm(company.companyName || '', industryTerm)) {
+    confidence += 10;
+  }
+
+  if (company.phone) confidence += 8;
+  if (company.website) confidence += 5;
+  if (company.email) confidence += 5;
+
+  const activePermits = (company.permits ?? []).filter(p => p.status === 'Active').length;
+  if (activePermits > 0) confidence += Math.min(25, activePermits * 10);
+
+  if (company.scrapedIsCommercial) confidence += 10;
+  if (company.scrapedKeywords?.length) confidence += 5;
+  if (company.scrapedIsResidential) confidence -= 15;
+  if (company.scrapedIsMismatch) confidence -= 20;
+
+  if (company.googleRating && company.googleRating >= 4.0) confidence += 8;
+  if (company.googleReviewCount && company.googleReviewCount > 10) confidence += 5;
+
+  if (company.apolloDescription) confidence += 5;
+
+  const dist = distanceMiles ?? company.distanceMiles;
+  if (dist !== undefined) {
+    if (dist <= 10) confidence += 5;
+    else if (dist <= 25) confidence += 2;
+  }
+
+  confidence -= Math.min(30, negativeHits.length * 10);
   confidence = Math.max(0, Math.min(100, confidence));
+
+  // Fit type
+  const fitType = determineFitType(matchedSignals, company);
 
   // Priority
   let priority: 'A' | 'B' | 'C' | 'D';
@@ -208,6 +268,7 @@ export function calculateLeadScore(
     score,
     priority,
     confidence,
+    fitType,
     matchedSignals,
     negativeHits,
     relevanceReason,
@@ -221,6 +282,7 @@ export function buildAnalysisText(company: Partial<Company>): string {
     company.address,
     company.notes,
     company.capabilitySummary,
+    company.scrapedText,
   ]
     .filter(Boolean)
     .join(' ');

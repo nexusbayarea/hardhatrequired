@@ -82,6 +82,28 @@ export default function DashboardShell() {
         onVerticalChange={setActiveVertical}
       />
 
+      {/* Grading legend */}
+      <div
+        className="rounded-xl p-4 flex items-center gap-4 flex-wrap"
+        style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+      >
+        <span className="text-sm font-semibold" style={{ color: 'var(--color-muted)' }}>
+          {t('grading:')}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'var(--color-muted)' }}>
+          <span className="font-bold" style={{ color: 'var(--color-green)' }}>A</span>
+          = {t('good to go')}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'var(--color-muted)' }}>
+          <span className="font-bold" style={{ color: 'var(--color-yellow)' }}>B</span>
+          = {t('check website or call to verify')}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'var(--color-muted)' }}>
+          <span className="font-bold" style={{ color: 'var(--color-red)' }}>C</span>
+          = {t('call to verify')}
+        </span>
+      </div>
+
       <div>
         <div className="flex items-baseline justify-between mb-5">
           <h2

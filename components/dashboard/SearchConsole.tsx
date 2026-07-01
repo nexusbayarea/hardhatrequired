@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Crosshair, Loader2 } from 'lucide-react';
+import { Search, MapPin, Crosshair, Loader2, Info } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { VERTICAL_META } from '@/lib/market/verticalMeta';
 import type { SearchResult } from '@/types/search';
 
 interface SearchConsoleProps {
@@ -126,26 +127,24 @@ export default function SearchConsole({
                 className="field-input"
               >
                 <option value="" disabled>{t('(select)')}</option>
-              <option value="asbestos_abatement">{t('asbestos_abatement')}</option>
-              <option value="backflow_testing">{t('backflow_testing')}</option>
-              <option value="grease_trap">{t('grease_trap')}</option>
-              <option value="kitchen_exhaust">{t('kitchen_exhaust')}</option>
-              <option value="concrete">{t('concrete')}</option>
-              <option value="elevator_inspection">{t('elevator_inspection')}</option>
-              <option value="generator_testing">{t('generator_testing')}</option>
-              <option value="fire_extinguisher">{t('fire_extinguisher')}</option>
-              <option value="fire_sprinkler">{t('fire_sprinkler')}</option>
-              <option value="marine_construction">{t('marine_construction')}</option>
-              <option value="hvac_balance">{t('hvac_balance')}</option>
-              <option value="hydro_excavation">{t('hydro_excavation')}</option>
-              <option value="commercial_roofing">{t('commercial_roofing')}</option>
-              <option value="scrap_metal">{t('scrap_metal')}</option>
-              <option value="industrial_wastewater">{t('industrial_wastewater')}</option>
-              <option value="medical_waste">{t('medical_waste')}</option>
-              <option value="slurry_concrete">{t('slurry_concrete')}</option>
-              <option value="stormwater_compliance">{t('stormwater_compliance')}</option>
-              <option value="tank_testing">{t('tank_testing')}</option>
+              {Object.entries(VERTICAL_META).map(([key, meta]) => (
+                <option key={key} value={key}>{meta.label}</option>
+              ))}
             </select>
+            {vertical && VERTICAL_META[vertical] && (
+              <div className="mt-2 p-2 rounded-lg text-[10px] leading-relaxed" style={{ background: 'var(--color-surface2)', color: 'var(--color-muted)', border: '1px solid var(--color-border)' }}>
+                <div className="flex items-start gap-1.5">
+                  <Info className="w-3 h-3 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold uppercase tracking-wider">Labor:</span>
+                    {' '}{VERTICAL_META[vertical].matrixNode.labor}
+                    <br />
+                    <span className="font-semibold uppercase tracking-wider">Disposal:</span>
+                    {' '}{VERTICAL_META[vertical].matrixNode.disposal}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Radius */}
@@ -210,13 +209,6 @@ export default function SearchConsole({
             >
               {loading ? t('scanning your market...') : t('set parameters above and run discovery')}
             </div>
-            {!loading && (
-              <div className="text-xs" style={{ color: 'var(--color-muted)' }}>
-                {t('grading:')} <span style={{ color: 'var(--color-red)' }}>A</span>{t(' = good to go')}{' '}
-                <span style={{ color: 'var(--color-red)' }}>B</span>{t(' = check website or call to verify')}{' '}
-                <span style={{ color: 'var(--color-red)' }}>C</span>{t(' = call to verify')}
-              </div>
-            )}
           </div>
           <button
             onClick={handleSearch}

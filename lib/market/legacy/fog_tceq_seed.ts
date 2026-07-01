@@ -1,0 +1,33 @@
+// Legacy: TX FOG grease trap seed records — preserved for future regulatory scraper
+export const TX_FOG_SEED_RECORDS = [
+  {
+    id: 'reg-tx-fog-darling',
+    companyName: 'Darling Ingredients Inc.',
+    address: '2600 W I-20',
+    city: 'Fort Worth',
+    state: 'TX',
+    zip: '76106',
+    latitude: 32.786,
+    longitude: -97.354,
+    website: 'darlingii.com',
+    phone: '817-624-1136',
+    notes: 'TX FOG Processor #TX-FOG-2023-0042. Grease trap waste collection, rendering, grease recycling. TCEQ permitted grease processor.',
+    source: 'regulatory_permit',
+    permits: [{ agency: 'TCEQ', permitType: 'FOG Processor', permitNumber: 'TX-FOG-2023-0042', status: 'Active' }],
+  },
+  {
+    id: 'reg-tx-fog-valley',
+    companyName: 'Valley Proteins Inc.',
+    address: '8200 Jamacha Rd',
+    city: 'San Antonio',
+    state: 'TX',
+    zip: '78219',
+    latitude: 29.443,
+    longitude: -98.405,
+    website: 'valleyproteins.com',
+    phone: '210-359-5431',
+    notes: 'TX FOG Processor. Grease trap pumping, used cooking oil collection, rendering. TCEQ permitted grease processor.',
+    source: 'regulatory_permit',
+    permits: [{ agency: 'TCEQ', permitType: 'FOG Processor', permitNumber: 'TX-FOG-2022-0017', status: 'Active' }],
+  },
+];

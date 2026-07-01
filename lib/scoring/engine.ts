@@ -76,7 +76,7 @@ export class ScoreEngine {
 
     const input: FiveComponentInput = {
       baseRelevanceScore: existingResult.score,
-      hasRegulatoryPermit: company.hasRegulatoryPermit ?? false,
+      permits: company.permits,
       distanceMiles: company.distanceMiles,
       feedbackPositiveCount: company.feedbackPositiveCount,
       feedbackNegativeCount: company.feedbackNegativeCount,
@@ -114,6 +114,7 @@ export class ScoreEngine {
       score: finalScore,
       grade: getGrade(finalScore),
       confidence: existingResult.confidence,
+      fitType: existingResult.fitType,
       components,
       matchedSignals: existingResult.matchedSignals,
       negativeHits: existingResult.negativeHits,
