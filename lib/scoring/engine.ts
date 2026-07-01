@@ -9,10 +9,14 @@ import {
   TenantScoreResult,
   ScoreComponents,
   getGrade,
-  createTenantProfile,
 } from './tenant';
 import { SignalEvent, resolveImpactedTenants, VendorChangePayload } from './events';
 import { calculateFiveComponentScore, FiveComponentInput } from './formula';
+
+export interface ScoredVendor {
+  result: TenantScoreResult;
+  feedbackAction: 'none' | 'downrank' | 'strong_downrank' | 'blacklist';
+}
 
 export class ScoreEngine {
   private cache: HotScoreCache;
@@ -66,7 +70,7 @@ export class ScoreEngine {
     tenant: TenantProfile,
     company: Partial<Company>,
     config: VerticalConfig,
-  ): Promise<TenantScoreResult> {
+  ): Promise<ScoredVendor> {
     const text = buildAnalysisText(company);
     const existingResult = calculateLeadScore(company, config, text, company.distanceMiles);
 
@@ -94,9 +98,12 @@ export class ScoreEngine {
     const components = calculateFiveComponentScore(input, config, tenant.weights);
 
     const feedbackProfile = await getCompanyProfile(company.id || '', config.id);
+    let feedbackAction: ScoredVendor['feedbackAction'] = 'none';
     let feedbackAdjustment = 0;
     if (feedbackProfile && feedbackProfile.totalVotes >= 3) {
-      feedbackAdjustment = getFeedbackAdjustment(feedbackProfile).adjustment;
+      const adj = getFeedbackAdjustment(feedbackProfile);
+      feedbackAction = adj.action as ScoredVendor['feedbackAction'];
+      feedbackAdjustment = adj.adjustment;
     }
 
     const finalScore = Math.round(Math.max(0, components.total + feedbackAdjustment));
@@ -108,11 +115,14 @@ export class ScoreEngine {
       grade: getGrade(finalScore),
       confidence: existingResult.confidence,
       components,
+      matchedSignals: existingResult.matchedSignals,
+      negativeHits: existingResult.negativeHits,
+      relevanceReason: existingResult.relevanceReason,
       scoredAt: new Date().toISOString(),
     };
 
     await this.cache.setScore(tenant.tenantId, result.vendorId, result);
-    return result;
+    return { result, feedbackAction };
   }
 
   async recalculateVendor(
@@ -123,6 +133,33 @@ export class ScoreEngine {
     await this.cache.invalidateVendor(vendorId);
   }
 
+  async getCachedOrScore(
+    tenant: TenantProfile,
+    company: Partial<Company>,
+    config: VerticalConfig,
+  ): Promise<ScoredVendor | null> {
+    const cached = await this.cache.getScore(tenant.tenantId, company.id || '');
+    if (cached) return { result: cached, feedbackAction: 'none' };
+    return this.hotScore(tenant, company, config);
+  }
+
+  async cacheSearchResults(
+    tenantId: string,
+    verticalId: string,
+    zip: string,
+    results: TenantScoreResult[],
+  ): Promise<void> {
+    await this.cache.cacheSearchResults(tenantId, verticalId, zip, results);
+  }
+
+  async getCachedSearchResults(
+    tenantId: string,
+    verticalId: string,
+    zip: string,
+  ): Promise<TenantScoreResult[] | null> {
+    return this.cache.getSearchResults(tenantId, verticalId, zip);
+  }
+
   async coldScore(
     tenant: TenantProfile,
     companies: Partial<Company>[],
@@ -130,8 +167,8 @@ export class ScoreEngine {
   ): Promise<TenantScoreResult[]> {
     const results: TenantScoreResult[] = [];
     for (const company of companies) {
-      const result = await this.hotScore(tenant, company, config);
-      results.push(result);
+      const scored = await this.hotScore(tenant, company, config);
+      results.push(scored.result);
     }
     return results;
   }

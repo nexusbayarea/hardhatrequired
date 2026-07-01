@@ -26,6 +26,9 @@ export interface TenantScoreResult {
   grade: 'A' | 'B' | 'C' | 'D';
   confidence: number;
   components: ScoreComponents;
+  matchedSignals: string[];
+  negativeHits: string[];
+  relevanceReason: string;
   scoredAt: string;
 }
 

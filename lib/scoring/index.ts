@@ -1,4 +1,5 @@
 export { ScoreEngine } from './engine';
+export type { ScoredVendor } from './engine';
 export { HotScoreCache } from './cache';
 export { createTenantProfile, getGrade } from './tenant';
 export type { TenantProfile, TenantScoringWeights, TenantScoreResult, ScoreComponents } from './tenant';

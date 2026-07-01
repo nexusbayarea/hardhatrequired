@@ -4,10 +4,10 @@ import { VerticalConfigWithProviders, isIrrelevant } from './registry';
 import { getEnterpriseOverlay } from './enterpriseOverlay';
 import { ApolloAdapter } from './providers/apollo';
 import { KeywordSignalExtractor } from './signals';
-import { calculateLeadScore, buildAnalysisText } from './scoring';
+import { buildAnalysisText } from './scoring';
+import { ScoreEngine, createTenantProfile } from '@/lib/scoring';
 import { geocodeZip, haversineDistance } from '@/lib/geo';
-import { getCompanyProfile, getBlacklistedVerticalCompanies } from '@/lib/feedback/storage';
-import { getFeedbackAdjustment } from '@/lib/feedback/trust';
+import { getBlacklistedVerticalCompanies } from '@/lib/feedback/storage';
 import { FastJsonLdScraper } from '@/lib/market/scrapers/fastScraper';
 import { scrapeCompanyWebsite } from '@/lib/market/workers/enrichmentScraper';
 
@@ -15,6 +15,7 @@ export class IndexIntelligenceEngine {
   private apolloAdapter = new ApolloAdapter();
   private signalExtractor = new KeywordSignalExtractor();
   private fastScraper = new FastJsonLdScraper();
+  private scoreEngine = new ScoreEngine();
 
   async executeMarketDiscovery(
     filters: SearchFilters,
@@ -27,6 +28,10 @@ export class IndexIntelligenceEngine {
     const radiusFilter = filters.radius || 50;
     const zipCoords = await geocodeZip(filters.zip);
     const now = new Date().toISOString();
+
+    const tenantId = organizationId || `${config.id}-anon`;
+    const tenant = createTenantProfile(tenantId, organizationId || '', [config.id]);
+    this.scoreEngine.registerTenant(tenant);
 
     const providerResults = await Promise.all(
       providers.map(provider =>
@@ -97,27 +102,23 @@ export class IndexIntelligenceEngine {
         const distance = record.latitude != null && record.longitude != null && zipCoords
           ? Math.round(haversineDistance(zipCoords.lat, zipCoords.lng, record.latitude, record.longitude) * 10) / 10
           : undefined;
-        const text = buildAnalysisText(record);
-        const result = calculateLeadScore(record, config, text, distance);
-        const fbProfile = await getCompanyProfile(record.id || '', config.id);
-        let fbAdj = 0;
-        if (fbProfile && fbProfile.totalVotes >= 3) {
-          fbAdj = getFeedbackAdjustment(fbProfile).adjustment;
-          if (getFeedbackAdjustment(fbProfile).action === 'blacklist') continue;
-        }
-        const score = Math.max(0, result.score + fbAdj);
-        if (score < 65 || result.priority === 'D') continue;
+        const recordWithDist = { ...record, distanceMiles: distance };
+        const scored = await this.scoreEngine.getCachedOrScore(tenant, recordWithDist, config);
+        if (!scored) continue;
+        if (scored.feedbackAction === 'blacklist') continue;
+        const sr = scored.result;
+        if (sr.score < 65 || sr.grade === 'D') continue;
         finalizedCompanies.push({
           ...record,
           organizationId,
           verticalId: config.id,
-          enrichmentScore: score,
-          priority: result.priority,
+          enrichmentScore: sr.score,
+          priority: sr.grade,
           distanceMiles: distance,
-          matchedSignals: result.matchedSignals,
-          negativeHits: result.negativeHits,
-          relevanceReason: result.relevanceReason,
-          confidence: result.confidence,
+          matchedSignals: sr.matchedSignals,
+          negativeHits: sr.negativeHits,
+          relevanceReason: sr.relevanceReason,
+          confidence: sr.confidence,
           status: 'NOT_CONTACTED',
           createdAt: now,
           updatedAt: now,
@@ -205,35 +206,31 @@ export class IndexIntelligenceEngine {
         companyId: mergedCompany.id!
       }));
 
-      const scoringText = buildAnalysisText(mergedCompany);
-      const result = calculateLeadScore(mergedCompany, config, scoringText, mergedCompany.distanceMiles);
-      mergedCompany.enrichmentScore = result.score;
-      mergedCompany.priority = result.priority;
-      mergedCompany.matchedSignals = result.matchedSignals;
-      mergedCompany.negativeHits = result.negativeHits;
-      mergedCompany.relevanceReason = result.relevanceReason;
-      mergedCompany.confidence = result.confidence;
+      // Stage 4: Score via engine (caches per-vendor in Redis, applies 5-component formula + feedback)
+      const scored = await this.scoreEngine.getCachedOrScore(tenant, mergedCompany, config);
+      if (!scored) continue;
 
-      // Stage 4: User Feedback Layer — adjust score based on historical feedback
-      const feedbackProfile = await getCompanyProfile(mergedCompany.id || '', config.id);
-      let feedbackAction = 'none';
-      if (feedbackProfile && feedbackProfile.totalVotes >= 3) {
-        const adj = getFeedbackAdjustment(feedbackProfile);
-        feedbackAction = adj.action;
-        mergedCompany.enrichmentScore = Math.max(0, result.score + adj.adjustment);
-        if (feedbackAction === 'blacklist') {
-          console.log(`[BLACKLIST] ${mergedCompany.companyName} — score=${mergedCompany.enrichmentScore} (${feedbackAction})`);
-          continue;
-        }
-      }
+      const { result: scoreResult, feedbackAction } = scored;
 
-      // Stage 5: Hard filter garbage after scoring + feedback
-      if (result.score < 65 || result.priority === 'D') {
-        console.log(`[FILTERED] ${mergedCompany.companyName} — score=${result.score} confidence=${result.confidence} priority=${result.priority} negatives=${result.negativeHits.join(',')} reason=${result.relevanceReason} feedback=${feedbackAction}`);
+      if (feedbackAction === 'blacklist') {
+        console.log(`[BLACKLIST] ${mergedCompany.companyName} — score=${scoreResult.score} (${feedbackAction})`);
         continue;
       }
 
-      console.log(`[SCORE] ${mergedCompany.companyName} — score=${result.score} confidence=${result.confidence} priority=${result.priority} matched=${result.matchedSignals.join(',')} reason=${result.relevanceReason} feedback=${feedbackAction}`);
+      mergedCompany.enrichmentScore = scoreResult.score;
+      mergedCompany.priority = scoreResult.grade;
+      mergedCompany.matchedSignals = scoreResult.matchedSignals;
+      mergedCompany.negativeHits = scoreResult.negativeHits;
+      mergedCompany.relevanceReason = scoreResult.relevanceReason;
+      mergedCompany.confidence = scoreResult.confidence;
+
+      // Stage 5: Hard filter garbage after scoring
+      if (scoreResult.score < 65 || scoreResult.grade === 'D') {
+        console.log(`[FILTERED] ${mergedCompany.companyName} — score=${scoreResult.score} confidence=${scoreResult.confidence} grade=${scoreResult.grade} negatives=${scoreResult.negativeHits.join(',')} reason=${scoreResult.relevanceReason} feedback=${feedbackAction}`);
+        continue;
+      }
+
+      console.log(`[SCORE] ${mergedCompany.companyName} — score=${scoreResult.score} confidence=${scoreResult.confidence} grade=${scoreResult.grade} matched=${scoreResult.matchedSignals.join(',')} reason=${scoreResult.relevanceReason} feedback=${feedbackAction}`);
 
       const contactId = `contact-${mergedCompany.id}`;
       finalizedCompanies.push(mergedCompany as Company);
