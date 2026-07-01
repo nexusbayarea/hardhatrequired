@@ -1,5 +1,5 @@
 import { Company, Contact, SearchFilters } from '@/types/company';
-import { VerticalConfig } from '@/types/config';
+import { VerticalConfig, SignalLayers } from '@/types/config';
 import { VerticalConfigWithProviders, isIrrelevant } from './registry';
 import { getEnterpriseOverlay } from './enterpriseOverlay';
 import { ApolloAdapter } from './providers/apollo';
@@ -129,6 +129,10 @@ export class IndexIntelligenceEngine {
     const finalizedCompanies: Company[] = [];
     const allContacts: Contact[] = [];
     const scoreBuckets = { A: 0, B: 0, C: 0, D: 0 };
+    const isDisposalMode = filters.mode === 'disposal';
+    const disposalSignals = buildDisposalSignals(config);
+    const signalsToCheck = isDisposalMode ? disposalSignals : config.signals;
+    const scoreConfig = isDisposalMode ? buildDisposalScoreConfig(config) : config;
 
     // Phase 1: Pre-filter + permit fast path
     const toEnrich: { record: Partial<Company>; base: Partial<Company> }[] = [];
@@ -175,14 +179,14 @@ export class IndexIntelligenceEngine {
 
       // Pre-filter before Apollo
       const precheckText = `${record.companyName || ''} ${record.notes || ''} ${record.address || ''}`;
-      const precheck = this.signalExtractor.extract(precheckText, config.signals, config.equipmentKeywords, record);
+      const precheck = this.signalExtractor.extract(precheckText, signalsToCheck, config.equipmentKeywords, record);
       if (!precheck.hasSignals) {
-        console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (no signals)`);
+        console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (no ${isDisposalMode ? 'disposal' : 'labor'} signals)`);
         continue;
       }
       if (precheck.confidence === 'low') {
         const hasPrimaryMatch = precheck.matchedSignals.some(s =>
-          config.signals.primary.some(p => p.term === s)
+          signalsToCheck.primary.some(p => p.term === s)
         );
         if (!hasPrimaryMatch) {
           console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (low confidence, no primary match)`);
@@ -259,7 +263,7 @@ export class IndexIntelligenceEngine {
       }));
 
       // Stage 4: Score via engine (caches per-vendor in Redis, applies 5-component formula + feedback)
-      const scored = await this.scoreEngine.getCachedOrScore(tenant, mergedCompany, config);
+      const scored = await this.scoreEngine.getCachedOrScore(tenant, mergedCompany, scoreConfig);
       if (!scored) continue;
 
       const { result: scoreResult, feedbackAction } = scored;
@@ -307,7 +311,7 @@ export class IndexIntelligenceEngine {
       const signalText = buildAnalysisText(record);
       const signalResult = this.signalExtractor.extract(
         signalText,
-        config.signals,
+        isDisposalMode ? signalsToCheck : config.signals,
         config.equipmentKeywords,
         record
       );
@@ -315,7 +319,7 @@ export class IndexIntelligenceEngine {
         ...record,
         capabilitySummary: signalResult.capabilitySummary,
       };
-      const scored = await this.scoreEngine.getCachedOrScore(tenant, mergedCompany, config);
+      const scored = await this.scoreEngine.getCachedOrScore(tenant, mergedCompany, scoreConfig);
       if (!scored) continue;
       const { result: scoreResult, feedbackAction } = scored;
       if (feedbackAction === 'blacklist') continue;
@@ -383,3 +387,26 @@ export class IndexIntelligenceEngine {
 }
 
 export class IndexIntelligenceOrchestrator extends IndexIntelligenceEngine {}
+
+function buildDisposalSignals(config: VerticalConfig): SignalLayers {
+  const stopWords = new Set(['for', 'and', 'the', 'or', 'of', 'in', 'to', 'a', 'is']);
+  const seen = new Set<string>();
+  const primary: { term: string; weight: number }[] = [];
+  for (const q of (config.disposalQueries || [])) {
+    const words = q.toLowerCase().split(/\s+/).filter(w => w.length >= 3 && !stopWords.has(w));
+    for (const w of words) {
+      if (!seen.has(w)) {
+        seen.add(w);
+        primary.push({ term: w, weight: 15 });
+      }
+    }
+  }
+  return { primary, secondary: [], negative: config.signals.negative || [] };
+}
+
+function buildDisposalScoreConfig(config: VerticalConfig): VerticalConfig {
+  return {
+    ...config,
+    signals: buildDisposalSignals(config),
+  };
+}

@@ -151,7 +151,8 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           params.verticalConfig?.negativeKeywords || [],
           params.lat,
           params.lng,
-          params.verticalConfig
+          params.verticalConfig,
+          searchQueries
         );
         for (const r of results) {
           const key = (r.companyName || '').toLowerCase().trim();
@@ -169,7 +170,8 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       try {
         const nearbyResults = await this.searchNearby(
           params.lat, params.lng, Math.min((params.radius || 50) * 1609, 50000),
-          params.verticalConfig
+          params.verticalConfig,
+          searchQueries
         );
         for (const r of nearbyResults) {
           const key = (r.companyName || '').toLowerCase().trim();
@@ -188,7 +190,8 @@ export class GooglePlacesProvider implements DiscoveryProvider {
 
   async searchNearby(
     lat: number, lng: number, radiusMeters: number,
-    verticalConfig?: VerticalConfig
+    verticalConfig?: VerticalConfig,
+    searchQueries?: string[]
   ): Promise<Partial<Company>[]> {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey) return [];
@@ -229,7 +232,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       const data = await response.json();
       const rawPlaces: GooglePlace[] = data.places || [];
 
-      return this.mapResults(rawPlaces, lat, lng, verticalConfig);
+      return this.mapResults(rawPlaces, lat, lng, verticalConfig, searchQueries);
     } catch {
       return [];
     }
@@ -240,7 +243,8 @@ export class GooglePlacesProvider implements DiscoveryProvider {
     negativeKeywords: string[],
     zipLat?: number,
     zipLng?: number,
-    verticalConfig?: VerticalConfig
+    verticalConfig?: VerticalConfig,
+    searchQueries?: string[]
   ): Promise<Partial<Company>[]> {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey) {
@@ -292,16 +296,17 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       });
     });
 
-    return this.mapResults(filteredPlaces, zipLat, zipLng, verticalConfig);
+    return this.mapResults(filteredPlaces, zipLat, zipLng, verticalConfig, searchQueries);
   }
 
   private mapResults(
     places: GooglePlace[],
     zipLat?: number,
     zipLng?: number,
-    verticalConfig?: VerticalConfig
+    verticalConfig?: VerticalConfig,
+    searchQueries?: string[]
   ): Partial<Company>[] {
-    const searchQueries = verticalConfig?.searchQueries || [];
+    const queries = searchQueries?.length ? searchQueries : (verticalConfig?.searchQueries || []);
     const now = new Date().toISOString();
 
     const mapped: Partial<Company>[] = [];
@@ -314,14 +319,14 @@ export class GooglePlacesProvider implements DiscoveryProvider {
         ),
       ];
 
-      const categorySignals = extractCategorySignals(allTypes, verticalConfig);
+      const categorySignals = extractCategorySignals(allTypes, verticalConfig, queries);
 
       const hasStrongSignals = categorySignals.some((s) => s.strength === 'strong');
 
       const nameLower = (p.displayName?.text || '').toLowerCase();
-      const fullQueryMatch = searchQueries.some(q => nameLower.includes(q.toLowerCase()));
+      const fullQueryMatch = queries.some(q => nameLower.includes(q.toLowerCase()));
       const queryWords = new Set(
-        searchQueries.flatMap(q =>
+        queries.flatMap(q =>
           q.toLowerCase().split(/\s+/).filter(w => w.length >= 4 && !['inspection','service','company','contractor','repair','maintenance','construction','building','supply','solution'].includes(w))
         )
       );
@@ -375,7 +380,8 @@ export class GooglePlacesProvider implements DiscoveryProvider {
 
 function extractCategorySignals(
   googleTypes: string[],
-  verticalConfig?: VerticalConfig
+  verticalConfig?: VerticalConfig,
+  searchQueries?: string[]
 ): CategorySignal[] {
   const mapped: CategorySignal[] = [];
   for (const type of googleTypes) {
@@ -388,6 +394,9 @@ function extractCategorySignals(
     ...verticalConfig.signals.primary.map((s) => s.term.toLowerCase()),
     ...verticalConfig.signals.secondary.map((s) => s.term.toLowerCase()),
     ...verticalConfig.equipmentKeywords.map((k) => k.toLowerCase()),
+    ...(searchQueries || []).flatMap(q =>
+      q.toLowerCase().split(/\s+/).filter(w => w.length >= 3)
+    ),
   ]);
 
   return mapped.filter((signal) => {
