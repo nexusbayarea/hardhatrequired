@@ -10,6 +10,7 @@ import { geocodeZip, haversineDistance } from '@/lib/geo';
 import { getBlacklistedVerticalCompanies } from '@/lib/feedback/storage';
 import { FastJsonLdScraper } from '@/lib/market/scrapers/fastScraper';
 import { scrapeCompanyWebsite } from '@/lib/market/workers/enrichmentScraper';
+import { withTimeout } from '@/lib/timeouts';
 
 export class IndexIntelligenceEngine {
   private apolloAdapter = new ApolloAdapter();
@@ -206,10 +207,12 @@ export class IndexIntelligenceEngine {
     const ENRICH_LIMIT = 20;
     const toRich = toEnrich.slice(0, ENRICH_LIMIT);
     const toBasic = toEnrich.slice(ENRICH_LIMIT);
+    const PER_COMPANY_TIMEOUT = 18000;
     for (const { record, base } of toRich) {
+      const enriched = await withTimeout(
+        (async () => {
       const apolloResult = await this.apolloAdapter.enrich(base, apolloCache);
 
-      // Merge Apollo fields — base (provider data) wins for contacts, Apollo augments
       const mergedBase: Partial<Company> = {
         ...apolloResult.companyFields,
         ...base,
@@ -219,7 +222,6 @@ export class IndexIntelligenceEngine {
         apolloDescription: apolloResult.companyFields.apolloDescription || base.apolloDescription,
       };
 
-      // Stage 2: Scrape website — FastJsonLd + full text in parallel
       if (mergedBase.website) {
         const [jsonLdResult, textResult] = await Promise.all([
           this.fastScraper.extractBusinessData(mergedBase.website),
@@ -243,13 +245,9 @@ export class IndexIntelligenceEngine {
         }
       }
 
-      // Stage 3: Rich signal extraction across all available data
       const signalText = buildAnalysisText(mergedBase);
       const signalResult = this.signalExtractor.extract(
-        signalText,
-        config.signals,
-        config.equipmentKeywords,
-        mergedBase
+        signalText, config.signals, config.equipmentKeywords, mergedBase
       );
 
       const mergedCompany: Partial<Company> = {
@@ -258,15 +256,22 @@ export class IndexIntelligenceEngine {
       };
 
       const companyContacts: Partial<Contact>[] = apolloResult.contacts.map(c => ({
-        ...c,
-        companyId: mergedCompany.id!
+        ...c, companyId: mergedCompany.id!
       }));
 
-      // Stage 4: Score via engine (caches per-vendor in Redis, applies 5-component formula + feedback)
       const scored = await this.scoreEngine.getCachedOrScore(tenant, mergedCompany, scoreConfig);
-      if (!scored) continue;
-
+      if (!scored) return null;
       const { result: scoreResult, feedbackAction } = scored;
+      return { mergedCompany, companyContacts, scoreResult, feedbackAction };
+        })(),
+        PER_COMPANY_TIMEOUT,
+        () => {
+          console.log(`[ENRICH_TIMEOUT] ${record.companyName} — skipped after ${PER_COMPANY_TIMEOUT}ms`);
+          return null;
+        }
+      );
+      if (!enriched) continue;
+      const { mergedCompany, companyContacts, scoreResult, feedbackAction } = enriched;
 
       console.log('[SCORE_RESULT]', {
         company: mergedCompany.companyName,
