@@ -33,7 +33,7 @@ interface ComplianceRule {
   requiredAction: string;
 }
 
-export default function DailyIntelligenceHub({ vertical = 'slurry_concrete', locationState = 'CA', landing }: { vertical?: string; locationState?: string; landing?: boolean }) {
+export default function DailyIntelligenceHub({ vertical = 'slurry_processing', locationState = 'CA', landing }: { vertical?: string; locationState?: string; landing?: boolean }) {
   const [activeTab, setActiveTab] = useState<'news' | 'compliance' | 'bids'>('news');
   const [loading, setLoading] = useState(true);
   const [draftingBidId, setDraftingBidId] = useState<string | null>(null);

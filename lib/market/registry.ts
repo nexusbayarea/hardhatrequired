@@ -35,10 +35,10 @@ const SHARED_SCORING_WEIGHTS = {
 };
 
 export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
-  slurry_concrete: {
-    id: 'slurry_concrete',
-    slug: 'slurry_concrete',
-    industryName: 'Concrete Slurry Recycling & Disposal',
+  slurry_processing: {
+    id: 'slurry_processing',
+    slug: 'slurry_processing',
+    industryName: 'Slurry Wall & Drilling Mud Specialists',
     searchQueries: [
       'concrete cutting',
       'core drilling',
@@ -306,10 +306,10 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     matrixNode: { labor: 'Pile driving, seawall construction, bulkhead installation, dredging, dock building', disposal: 'Dredge spoils disposal, marine debris management, sheet piling removal' },
   },
 
-  concrete: {
-    id: 'concrete',
-    slug: 'concrete',
-    industryName: 'Concrete Services',
+  industrial_demolition: {
+    id: 'industrial_demolition',
+    slug: 'industrial_demolition',
+    industryName: 'Heavy Demolition & Structural Crews',
     searchQueries: [
       'concrete contractor commercial', 'concrete pumping service',
       'ready mix concrete delivery', 'industrial concrete work',
@@ -571,10 +571,10 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     matrixNode: { labor: 'Elevator safety inspection, certification, load testing, ASME compliance', disposal: 'Elevator modernization, obsolete equipment removal' },
   },
 
-  hvac_balance: {
-    id: 'hvac_balance',
-    slug: 'hvac_balance',
-    industryName: 'HVAC Test & Balance',
+  hvac_industrial: {
+    id: 'hvac_industrial',
+    slug: 'hvac_industrial',
+    industryName: 'Industrial HVAC/R Field Technicians',
     searchQueries: [
       'HVAC test and balance', 'air balance contractor',
       'commercial air balancing'
@@ -623,10 +623,10 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     matrixNode: { labor: 'HVAC test and balance, air balancing, TAB services, airflow measurement', disposal: 'HVAC equipment disposal, refrigerant recovery, ductwork removal' },
   },
 
-  fire_sprinkler: {
-    id: 'fire_sprinkler',
-    slug: 'fire_sprinkler',
-    industryName: 'Fire Sprinkler Pressure Testing',
+  fire_sprinklers: {
+    id: 'fire_sprinklers',
+    slug: 'fire_sprinklers',
+    industryName: 'Fire Sprinkler Fitters & Installers',
     searchQueries: [
       'fire sprinkler testing', 'hydrostatic pressure test sprinkler',
       'commercial fire sprinkler inspection'
@@ -796,10 +796,10 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     matrixNode: { labor: 'Trench shoring, slide rail systems, hydraulic shores, trench boxes, excavation safety, CalOSHA compliance', disposal: 'Shoring equipment decontamination, steel recycling, HDPE shoring disposal' },
   },
 
-  industrial_sandblasting: {
-    id: 'industrial_sandblasting',
-    slug: 'industrial_sandblasting',
-    industryName: 'Industrial Sandblasting & Surface Preparation',
+  sandblasting: {
+    id: 'sandblasting',
+    slug: 'sandblasting',
+    industryName: 'Blasting & Industrial Coating Painters',
     searchQueries: ['industrial sandblasting', 'abrasive blasting contractor', 'surface preparation contractor', 'sandblasting service', 'industrial coating removal'],
     disposalQueries: ['spent abrasive disposal', 'blasting media disposal', 'hazardous abrasive waste disposal'],
     targetNaicsCodes: ['238320', '238990', '562910'],
@@ -837,10 +837,10 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     matrixNode: { labor: 'Abrasive blasting, sandblasting, surface preparation, industrial coating removal, lead paint abatement', disposal: 'Spent abrasive disposal, hazardous media transport, EPA TCLP compliant disposal' },
   },
 
-  dewatering_bypass: {
-    id: 'dewatering_bypass',
-    slug: 'dewatering_bypass',
-    industryName: 'Construction Dewatering & Bypass Pumping',
+  dewatering: {
+    id: 'dewatering',
+    slug: 'dewatering',
+    industryName: 'Wellpoint & High-Volume Pump Techs',
     searchQueries: ['construction dewatering', 'bypass pumping service', 'wellpoint dewatering', 'groundwater control', 'pump rental dewatering'],
     disposalQueries: ['sediment disposal', 'dewatering discharge', 'filtered water disposal', 'construction site dewatering disposal'],
     targetNaicsCodes: ['238910', '532490', '237110'],
@@ -877,10 +877,10 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     matrixNode: { labor: 'Construction dewatering, wellpoint systems, bypass pumping, groundwater control, trench dewatering', disposal: 'Sediment basin discharge, filtration treatment, NPDEs permitted outfall discharge' },
   },
 
-  hazardous_soil: {
-    id: 'hazardous_soil',
-    slug: 'hazardous_soil',
-    industryName: 'Hazardous Soil Remediation & Transport',
+  hazardous_soil_remediation: {
+    id: 'hazardous_soil_remediation',
+    slug: 'hazardous_soil_remediation',
+    industryName: 'Hazmat Soil Remediation Operators',
     searchQueries: ['contaminated soil removal', 'hazardous soil remediation', 'environmental remediation contractor', 'soil excavation', 'brownfield remediation'],
     disposalQueries: ['contaminated soil disposal', 'hazmat soil landfill', 'soil treatment facility', 'RCRA disposal facility'],
     targetNaicsCodes: ['562910', '562211', '562219'],
@@ -919,10 +919,10 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     matrixNode: { labor: 'Soil excavation, contaminated soil removal, site remediation, bio-remediation', disposal: 'Hazmat soil transport, TSCA/RCRA permitted landfill disposal, thermal treatment' },
   },
 
-  solar_industrial: {
-    id: 'solar_industrial',
-    slug: 'solar_industrial',
-    industryName: 'Industrial & Commercial Solar Installation',
+  solar_infrastructure: {
+    id: 'solar_infrastructure',
+    slug: 'solar_infrastructure',
+    industryName: 'Utility-Scale Solar PV Electricians',
     searchQueries: ['commercial solar installation', 'industrial solar contractor', 'solar PV system design', 'large scale solar', 'commercial solar panel installation'],
     disposalQueries: ['solar panel recycling', 'PV module disposal', 'inverter recycling', 'solar equipment disposal'],
     targetNaicsCodes: ['238210', '221114', '423690'],
@@ -960,10 +960,10 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     matrixNode: { labor: 'Solar PV installation, commercial solar mounting, electrical integration, inverter commissioning', disposal: 'Decommissioned panel recycling, inverter disposal, racking scrap metal recovery' },
   },
 
-  wind_energy: {
-    id: 'wind_energy',
-    slug: 'wind_energy',
-    industryName: 'Wind Energy Testing & Maintenance',
+  wind_infrastructure: {
+    id: 'wind_infrastructure',
+    slug: 'wind_infrastructure',
+    industryName: 'Wind Turbine Field Technicians',
     searchQueries: ['wind turbine maintenance', 'wind farm service', 'turbine generator testing', 'wind energy contractor', 'commercial wind service'],
     disposalQueries: ['wind turbine disposal', 'blade recycling facility', 'turbine decommissioning disposal', 'composite blade recycling'],
     targetNaicsCodes: ['238210', '541350', '221115'],

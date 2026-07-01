@@ -61,7 +61,7 @@ const INITIAL_TRACES: AuditTrace[] = [
 export default function SystemTelemetryMonitor() {
   const [stats, setStats] = useState<TelemetryStats>(INITIAL_STATS);
   const [traces, setTraces] = useState<AuditTrace[]>(INITIAL_TRACES);
-  const [activeVertical, setActiveVertical] = useState<string>('slurry_concrete');
+  const [activeVertical, setActiveVertical] = useState<string>('slurry_processing');
   const [backpressureCount, setBackpressureCount] = useState<number>(3);
   const [activeTab, setActiveTab] = useState<'realtime' | 'providers' | 'queue'>('realtime');
   const [isLive, setIsLive] = useState<boolean>(true);
@@ -163,7 +163,7 @@ export default function SystemTelemetryMonitor() {
             }}
             className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer text-slate-200"
           >
-            <option value="slurry_concrete">Concrete Slurry Outbound</option>
+            <option value="slurry_processing">Slurry Wall & Drilling Mud</option>
             <option value="asbestos_abatement">Asbestos Remediation</option>
             <option value="edge-compute">Edge Compute Clusters</option>
             <option value="gas-stations-deli">Gas Station Delis</option>

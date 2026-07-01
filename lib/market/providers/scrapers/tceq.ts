@@ -5,7 +5,7 @@ import { haversineDistance } from '@/lib/geo';
 
 export class TCEQScraper implements StateScraper {
   stateCode = 'TX';
-  supportedVerticals = ['slurry_concrete'];
+  supportedVerticals = ['slurry_processing'];
 
   async scrape(params: DiscoveryParams): Promise<ScraperResult> {
     const start = Date.now();
@@ -56,7 +56,7 @@ export class TCEQScraper implements StateScraper {
 
     const now = new Date().toISOString();
 
-    if (vertical === 'slurry_concrete') {
+    if (vertical === 'slurry_processing') {
       return {
         success: true,
         records: [

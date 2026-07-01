@@ -147,7 +147,7 @@ export async function syncCampaignToHermes(
 
 function buildSequence(vertical: string): HermesSequenceStep[] {
   const sequences: Record<string, HermesSequenceStep[]> = {
-    slurry_concrete: [
+    slurry_processing: [
       {
         stepNumber: 1,
         channel: 'email',

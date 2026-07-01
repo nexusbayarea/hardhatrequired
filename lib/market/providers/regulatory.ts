@@ -19,7 +19,7 @@ export class RegulatoryProvider implements DiscoveryProvider {
 
   async search(params: DiscoveryParams): Promise<Partial<Company>[]> {
     const state = getStateFromZip(params.zip);
-    const vertical = params.vertical || 'slurry_concrete';
+    const vertical = params.vertical || 'slurry_processing';
 
     const cached = await getCachedScraperResult(state, vertical);
     if (cached && Array.isArray(cached) && cached.length > 0) {

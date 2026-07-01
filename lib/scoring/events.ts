@@ -63,7 +63,7 @@ export function getTenantVerticalsAffectedByEvent(
   config: VerticalConfig,
 ): string[] {
   const verticalAffinity: Partial<Record<SignalEventType, string[]>> = {
-    NEW_PERMIT_FOUND: ['slurry_concrete', 'industrial_wastewater', 'tank_testing', 'stormwater_compliance'],
+    NEW_PERMIT_FOUND: ['slurry_processing', 'industrial_wastewater', 'tank_testing', 'stormwater_compliance'],
     NEW_BID_POSTED: [],
     USER_FEEDBACK: [],
     NEW_LISTING_DISCOVERED: [],

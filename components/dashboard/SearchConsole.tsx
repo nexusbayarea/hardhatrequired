@@ -133,7 +133,9 @@ export default function SearchConsole({
               >
                 <option value="" disabled>{t('(select)')}</option>
               {Object.entries(VERTICAL_META).map(([key, meta]) => (
-                <option key={key} value={key}>{meta.label}</option>
+                <option key={key} value={key}>
+                  {mode === 'disposal' ? meta.disposalLabel : meta.laborLabel}
+                </option>
               ))}
             </select>
             {vertical && VERTICAL_META[vertical] && (
@@ -141,11 +143,8 @@ export default function SearchConsole({
                 <div className="flex items-start gap-1.5">
                   <Info className="w-3 h-3 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold uppercase tracking-wider">Labor:</span>
-                    {' '}{VERTICAL_META[vertical].matrixNode.labor}
-                    <br />
-                    <span className="font-semibold uppercase tracking-wider">Disposal:</span>
-                    {' '}{VERTICAL_META[vertical].matrixNode.disposal}
+                    <span className="font-semibold uppercase tracking-wider">{mode === 'disposal' ? 'Disposal:' : 'Labor:'}</span>
+                    {' '}{mode === 'disposal' ? VERTICAL_META[vertical].matrixNode.disposal : VERTICAL_META[vertical].matrixNode.labor}
                   </div>
                 </div>
               </div>

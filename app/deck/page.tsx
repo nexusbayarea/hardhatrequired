@@ -38,7 +38,7 @@ interface AuditLog {
 const INITIAL_VERTICALS: VerticalConfig[] = [
   {
     id: '1',
-    slug: 'slurry_concrete',
+    slug: 'slurry_processing',
     industry_name: 'Concrete Slurry Recycling & Disposal',
     search_queries: ['concrete recycling', 'slurry disposal', 'concrete contractors'],
     target_naics_codes: ['562211', '238110', '562112'],

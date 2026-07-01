@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const clientHeader = req.headers.get('x-iie-client-context') || body.vertical || 'slurry_concrete';
+    const clientHeader = req.headers.get('x-iie-client-context') || body.vertical || 'slurry_processing';
     const verticalConfig = await getVerticalConfigByDomain(clientHeader);
 
     if (!verticalConfig) {

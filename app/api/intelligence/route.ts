@@ -42,7 +42,7 @@ interface Feed {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const vertical = req.headers.get('x-iie-client-context') || 'slurry_concrete';
+    const vertical = req.headers.get('x-iie-client-context') || 'slurry_processing';
     const state = body.state || 'CA';
     const city = body.city || 'Hayward';
 
