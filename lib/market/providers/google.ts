@@ -106,6 +106,16 @@ export const GOOGLE_TYPE_TO_VERTICAL_SIGNALS: Record<string, CategorySignal[]> =
     { term: 'fuel tank', weight: 5, strength: 'weak' },
     { term: 'UST', weight: 5, strength: 'weak' },
   ],
+  electrician: [
+    { term: 'generator', weight: 20, strength: 'strong' },
+    { term: 'electrical contractor', weight: 15, strength: 'strong' },
+    { term: 'high voltage', weight: 12, strength: 'weak' },
+  ],
+  electrical_contractor: [
+    { term: 'generator', weight: 20, strength: 'strong' },
+    { term: 'electrical contractor', weight: 15, strength: 'strong' },
+    { term: 'high voltage', weight: 12, strength: 'weak' },
+  ],
   general_contractor: [
     { term: 'contractor', weight: 2, strength: 'weak' },
     { term: 'construction', weight: 2, strength: 'weak' },
@@ -188,6 +198,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       'construction_company', 'demolition_contractor', 'ready_mix_concrete_supplier',
       'excavating_contractor', 'industrial_equipment_supplier',
       'environmental_consultant', 'hazardous_waste_disposal',
+      'electrician', 'electrical_contractor', 'mechanical_contractor',
     ];
 
     const url = 'https://places.googleapis.com/v1/places:searchNearby';
@@ -314,7 +325,14 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           q.toLowerCase().split(/\s+/).filter(w => w.length >= 4 && !['inspection','service','company','contractor','repair','maintenance','construction','building','supply','solution'].includes(w))
         )
       );
-      const hasUsefulNameSignal = fullQueryMatch || [...queryWords].filter(w => nameLower.includes(w)).length >= 2;
+      const signalWords = new Set(
+        (verticalConfig?.signals?.primary || []).flatMap(s =>
+          s.term.toLowerCase().split(/\s+/).filter(w => w.length >= 4)
+        )
+      );
+      const queryWordMatches = [...queryWords].filter(w => nameLower.includes(w)).length;
+      const signalWordMatches = [...signalWords].filter(w => nameLower.includes(w)).length;
+      const hasUsefulNameSignal = fullQueryMatch || queryWordMatches >= 2 || (signalWordMatches >= 1 && queryWordMatches >= 1);
 
       const weakOnly =
         categorySignals.length > 0 &&

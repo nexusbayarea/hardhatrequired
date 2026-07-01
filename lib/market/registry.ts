@@ -153,11 +153,12 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     industryName: 'Hydro-Excavation & Non-Destructive Digging',
     searchQueries: [
       'excavation contractor', 'utility contractor',
-      'underground construction', 'trenching services',
-      'vacuum truck service', 'hydro excavation service'
+      'hydro excavation service', 'vacuum truck service',
+      'trenching services', 'underground construction',
+      'site preparation contractor'
     ],
     targetNaicsCodes: ['562998', '238910', '562119'],
-    disposalQueries: ['slurry disposal facility', 'hydro excavation spoils disposal', 'vacuum truck waste disposal'],
+    disposalQueries: ['slurry disposal facility', 'hydro excavation spoils disposal', 'vacuum truck waste disposal', 'construction site dewatering disposal'],
     equipmentKeywords: [
       'hydrovac truck', 'slurry tanker', 'utility daylighting',
       'high-pressure water jet', 'vacuum excavation rig'
@@ -263,7 +264,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
       'bulkhead construction'
     ],
     targetNaicsCodes: ['237990', '238910'],
-    disposalQueries: ['dredge spoils disposal', 'marine debris disposal', 'hazardous marine waste disposal'],
+    disposalQueries: ['dredge spoils disposal facility', 'marine debris disposal', 'hazardous waste marine', 'construction debris disposal waterfront'],
     equipmentKeywords: [
       'pile driving rig', 'crane barge', 'bulkhead construction',
       'dredge boat', 'sheet piling', 'marine salvage vessel'
@@ -368,11 +369,12 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     industryName: 'Stormwater Compliance / SWPPP',
     searchQueries: [
       'stormwater compliance', 'SWPPP inspection',
-      'environmental consulting', 'construction site inspection',
-      'erosion control service'
+      'environmental consulting', 'erosion control service',
+      'stormwater management', 'environmental engineer',
+      'civil engineering'
     ],
     targetNaicsCodes: ['541620', '562910'],
-    disposalQueries: ['stormwater treatment facility', 'sediment disposal', 'erosion control waste disposal'],
+    disposalQueries: ['stormwater treatment facility', 'sediment disposal', 'erosion control waste disposal', 'stormwater basin cleaning'],
     equipmentKeywords: [
       'sampling kit', 'turbidity meter', 'pH meter',
       'erosion control blanket', 'silt fence'
@@ -675,12 +677,12 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     slug: 'generator_testing',
     industryName: 'Emergency Generator Load Bank Testing',
     searchQueries: [
-      'generator load bank testing', 'emergency generator service',
-      'commercial generator maintenance', 'backup power systems',
-      'diesel generator service'
+      'emergency generator service', 'commercial generator maintenance',
+      'diesel generator service', 'backup power systems',
+      'generator technician', 'generator repair commercial'
     ],
     targetNaicsCodes: ['811310', '238210'],
-    disposalQueries: ['generator disposal', 'battery recycling facility', 'fuel tank removal', 'hazardous waste generator'],
+    disposalQueries: ['generator disposal facility', 'battery recycling center', 'fuel tank removal service', 'hazardous waste disposal generator'],
     equipmentKeywords: [
       'load bank', 'generator analyzer', 'transfer switch tester',
       'fuel polishing system', 'battery load tester'
@@ -725,7 +727,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     slug: 'high_voltage_electrical',
     industryName: 'High-Voltage Electrical Testing & Maintenance',
     searchQueries: ['high voltage testing service', 'electrical maintenance contractor', 'transformer testing service', 'switchgear testing', 'power distribution testing'],
-    disposalQueries: ['transformer disposal', 'PCB disposal facility', 'electrical equipment recycling', 'hazardous electrical waste'],
+    disposalQueries: ['transformer disposal facility', 'PCB disposal facility', 'electrical equipment recycling', 'hazardous waste electrical', 'scrap metal recycling electrical'],
     targetNaicsCodes: ['238210', '238990', '541350'],
     equipmentKeywords: ['megohmmeter', 'power factor test set', 'DC hi-pot tester', 'circuit breaker analyzer', 'relay test set', 'thermographic camera'],
     negativeKeywords: ['home electrical repair', 'residential electrician', 'lighting installation', 'ceiling fan', 'outlet repair', 'home automation', 'low voltage', 'alarm system', 'security camera'],
@@ -801,7 +803,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     slug: 'sandblasting',
     industryName: 'Blasting & Industrial Coating Painters',
     searchQueries: ['industrial sandblasting', 'abrasive blasting contractor', 'surface preparation contractor', 'sandblasting service', 'industrial coating removal'],
-    disposalQueries: ['spent abrasive disposal', 'blasting media disposal', 'hazardous abrasive waste disposal'],
+    disposalQueries: ['spent abrasive disposal', 'blasting media disposal', 'hazardous abrasive waste disposal', 'sandblasting waste disposal', 'industrial waste disposal sandblasting'],
     targetNaicsCodes: ['238320', '238990', '562910'],
     equipmentKeywords: ['abrasive blaster', 'dustless blasting', 'vacuum blasting', 'silica sand', 'steel shot', 'soda blaster', 'hydro blaster'],
     negativeKeywords: ['home painting', 'furniture refinishing', 'brick cleaning', 'art restoration', 'car restoration', 'DIY blasting', 'sandblasting cabinet'],
@@ -882,7 +884,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     slug: 'hazardous_soil_remediation',
     industryName: 'Hazmat Soil Remediation Operators',
     searchQueries: ['contaminated soil removal', 'hazardous soil remediation', 'environmental remediation contractor', 'soil excavation', 'brownfield remediation'],
-    disposalQueries: ['contaminated soil disposal', 'hazmat soil landfill', 'soil treatment facility', 'RCRA disposal facility'],
+    disposalQueries: ['contaminated soil disposal facility', 'hazardous waste landfill', 'soil treatment facility', 'RCRA disposal facility', 'environmental remediation disposal'],
     targetNaicsCodes: ['562910', '562211', '562219'],
     equipmentKeywords: ['excavator', 'soil vapor extraction', 'bio-remediation', 'thermal desorption', 'soil washing plant', 'air sparge', 'vacuum truck'],
     negativeKeywords: ['landscaping', 'topsoil delivery', 'compost', 'mulch', 'garden soil', 'lawn care', 'organic farming', 'landfill general'],
@@ -924,7 +926,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     slug: 'solar_infrastructure',
     industryName: 'Utility-Scale Solar PV Electricians',
     searchQueries: ['commercial solar installation', 'industrial solar contractor', 'solar PV system design', 'large scale solar', 'commercial solar panel installation'],
-    disposalQueries: ['solar panel recycling', 'PV module disposal', 'inverter recycling', 'solar equipment disposal'],
+    disposalQueries: ['solar panel recycling facility', 'PV module disposal', 'electronic waste recycling', 'solar equipment disposal', 'hazardous waste solar'],
     targetNaicsCodes: ['238210', '221114', '423690'],
     equipmentKeywords: ['PV panel', 'inverter', 'solar tracker', 'transformer', 'breaker panel', 'solar racking', 'power optimizer'],
     negativeKeywords: ['residential solar', 'home solar panel', 'solar attic fan', 'solar water heater', 'diy solar', 'solar garden light', 'rv solar'],
@@ -965,7 +967,7 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     slug: 'wind_infrastructure',
     industryName: 'Wind Turbine Field Technicians',
     searchQueries: ['wind turbine maintenance', 'wind farm service', 'turbine generator testing', 'wind energy contractor', 'commercial wind service'],
-    disposalQueries: ['wind turbine disposal', 'blade recycling facility', 'turbine decommissioning disposal', 'composite blade recycling'],
+    disposalQueries: ['wind turbine disposal', 'blade recycling facility', 'turbine decommissioning disposal', 'composite blade recycling', 'industrial recycling wind energy'],
     targetNaicsCodes: ['238210', '541350', '221115'],
     equipmentKeywords: ['megger tester', 'gearbox analyzer', 'vibration analysis', 'thermal imaging', 'oil analysis kit', 'turbine control system'],
     negativeKeywords: ['residential wind turbine', 'home wind generator', 'small wind', 'DIY wind turbine', 'wind chime', 'weather station'],

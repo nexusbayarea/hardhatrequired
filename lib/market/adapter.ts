@@ -198,7 +198,11 @@ export class IndexIntelligenceEngine {
     );
 
     // Phase 2: Enrich + scrape + score (sequential per company to protect Apollo credits)
-    for (const { record, base } of toEnrich) {
+    // Cap enrichment to prevent 60s timeout — further companies get basic scoring
+    const ENRICH_LIMIT = 30;
+    const toRich = toEnrich.slice(0, ENRICH_LIMIT);
+    const toBasic = toEnrich.slice(ENRICH_LIMIT);
+    for (const { record, base } of toRich) {
       const apolloResult = await this.apolloAdapter.enrich(base, apolloCache);
 
       // Merge Apollo fields — base (provider data) wins for contacts, Apollo augments
@@ -296,6 +300,42 @@ export class IndexIntelligenceEngine {
         ...c,
         id: `${contactId}-${i}`
       })) as Contact[]);
+    }
+
+    // Stage 5b: Basic scoring for companies beyond enrichment cap
+    for (const { record, base } of toBasic) {
+      const signalText = buildAnalysisText(record);
+      const signalResult = this.signalExtractor.extract(
+        signalText,
+        config.signals,
+        config.equipmentKeywords,
+        record
+      );
+      const mergedCompany = {
+        ...record,
+        capabilitySummary: signalResult.capabilitySummary,
+      };
+      const scored = await this.scoreEngine.getCachedOrScore(tenant, mergedCompany, config);
+      if (!scored) continue;
+      const { result: scoreResult, feedbackAction } = scored;
+      if (feedbackAction === 'blacklist') continue;
+      if (scoreResult.score < 65 || scoreResult.grade === 'D') continue;
+      finalizedCompanies.push({
+        ...mergedCompany,
+        enrichmentScore: scoreResult.score,
+        priority: scoreResult.grade,
+        matchedSignals: scoreResult.matchedSignals,
+        negativeHits: scoreResult.negativeHits,
+        relevanceReason: scoreResult.relevanceReason,
+        confidence: scoreResult.confidence,
+        fitType: scoreResult.fitType,
+        organizationId: organizationId || '',
+        verticalId: config.id,
+        status: 'NOT_CONTACTED',
+        createdAt: now,
+        updatedAt: now,
+      } as Company);
+      scoreBuckets[scoreResult.grade]++;
     }
 
     // Stage 6: Enterprise overlay — inject known market leaders not found by providers

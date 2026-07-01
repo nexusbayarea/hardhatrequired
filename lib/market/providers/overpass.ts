@@ -7,7 +7,7 @@ const NAICS_TO_OSM_TAGS: Record<string, string[]> = {
   '238110': ['industrial=concrete_batching', 'man_made=silo'],
   '327320': ['industrial=concrete_batching', 'man_made=silo'],
   '221320': ['man_made=wastewater_plant', 'man_made=water_works'],
-  '423930': ['industrial=scrap_yard', 'landuse=industrial'],
+  '423930': ['industrial=scrap_yard', 'amenity=recycling'],
   '562920': ['industrial=scrap_yard', 'amenity=recycling'],
   '237990': ['man_made=pier', 'waterway=dock'],
   '238160': ['industrial=roofing', 'man_made=storage_tank'],
@@ -21,6 +21,19 @@ const NAICS_TO_OSM_TAGS: Record<string, string[]> = {
   '541350': ['office=building_inspector', 'craft=inspector', 'office=company'],
   '561790': ['industrial=cleaning_plant', 'amenity=industrial_kitchen'],
   '541380': ['office=testing_laboratory', 'industrial=testing'],
+  '221114': ['industrial=solar', 'man_made=solar_panel', 'industrial=power_plant'],
+  '221115': ['industrial=wind', 'man_made=wind_turbine', 'industrial=power_plant'],
+  '237110': ['craft=excavation', 'man_made=water_well', 'industrial=pipeline'],
+  '238210': ['craft=electrician'],
+  '238320': ['craft=painter', 'industrial=sandblasting', 'craft=blasting'],
+  '238910': ['craft=excavation', 'industrial=excavation'],
+  '238990': ['industrial=construction', 'craft=specialty'],
+  '423320': ['industrial=construction_material', 'industrial=wholesale'],
+  '423690': ['industrial=electronics', 'craft=electrician'],
+  '532490': ['industrial=equipment_rental', 'amenity=rental'],
+  '562112': ['amenity=hazardous_waste', 'industrial=hazardous_waste'],
+  '562119': ['industrial=waste', 'amenity=waste_disposal'],
+  '562998': ['industrial=waste_processing', 'amenity=waste_transfer_station'],
 };
 
 export class OverpassProvider implements DiscoveryProvider {
