@@ -1,24 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useSearchState } from '@/context/SearchStateContext';
 import MetricsRow from './MetricsRow';
 import SearchConsole from './SearchConsole';
 import ResultsView from './ResultsView';
 import type { SearchPane } from './SearchConsole';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
-
-interface SearchPaneData {
-  data: { companies: SearchResult[]; count: number } | null;
-  loading: boolean;
-  error: string | null;
-  vertical: string;
-}
-
-function emptyPane(): SearchPaneData {
-  return { data: null, loading: false, error: null, vertical: '' };
-}
 
 type Tab = { id: SearchPane; label: string; disabled?: boolean };
 
@@ -31,8 +21,7 @@ const TABS: Tab[] = [
 
 export default function DashboardShell() {
   const { t, language } = useLanguage();
-  const [activePane, setActivePane] = useState<SearchPane>('labor');
-  const [searchState, setSearchState] = useState<SearchPaneData>(emptyPane);
+  const { searchState, setSearchState, activePane, setActivePane } = useSearchState();
 
   const handleFeedback = useCallback(async (company: SearchResult, voteType: VoteType) => {
     if (!searchState.vertical) return;
