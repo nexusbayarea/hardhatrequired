@@ -1,5 +1,8 @@
 import { redis, redisAvailable } from '@/lib/redis';
 import { TenantScoreResult } from './tenant';
+import { withTimeout } from '@/lib/timeouts';
+
+const REDIS_TIMEOUT = 5000;
 
 function hotScoreKey(tenantId: string, vendorId: string): string {
   return `tenant:${tenantId}:vendor:${vendorId}`;
@@ -20,20 +23,32 @@ export class HotScoreCache {
   async getScore(tenantId: string, vendorId: string): Promise<TenantScoreResult | null> {
     if (!redisAvailable()) return null;
     const key = hotScoreKey(tenantId, vendorId);
-    return (await redis!.get(key)) as TenantScoreResult | null;
+    return withTimeout(
+      redis!.get(key) as Promise<TenantScoreResult | null>,
+      REDIS_TIMEOUT,
+      () => null
+    );
   }
 
   async setScore(tenantId: string, vendorId: string, result: TenantScoreResult): Promise<void> {
     if (!redisAvailable()) return;
     const key = hotScoreKey(tenantId, vendorId);
-    await redis!.set(key, result, { ex: HOT_SCORE_TTL });
+    await withTimeout(
+      redis!.set(key, result, { ex: HOT_SCORE_TTL }),
+      REDIS_TIMEOUT,
+      () => undefined
+    );
   }
 
   async getScores(tenantId: string, vendorIds: string[]): Promise<(TenantScoreResult | null)[]> {
     if (!redisAvailable()) return vendorIds.map(() => null);
     if (vendorIds.length === 0) return [];
     const keys = vendorIds.map(v => hotScoreKey(tenantId, v));
-    return (await redis!.mget(...keys)) as (TenantScoreResult | null)[];
+    return withTimeout(
+      redis!.mget(...keys) as Promise<(TenantScoreResult | null)[]>,
+      REDIS_TIMEOUT,
+      () => vendorIds.map(() => null)
+    );
   }
 
   async setScores(tenantId: string, results: TenantScoreResult[]): Promise<void> {
