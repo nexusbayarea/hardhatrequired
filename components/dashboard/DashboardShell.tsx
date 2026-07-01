@@ -89,6 +89,24 @@ export default function DashboardShell() {
     <div className="space-y-6 md:space-y-8">
       <MetricsRow />
 
+      {/* Two search tables */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <SearchConsole
+          onResults={lh.handleResults}
+          onError={lh.handleError}
+          onSearchStart={lh.handleSearchStart}
+          vertical={left.vertical}
+          onVerticalChange={lh.setVertical}
+        />
+        <SearchConsole
+          onResults={rh.handleResults}
+          onError={rh.handleError}
+          onSearchStart={rh.handleSearchStart}
+          vertical={right.vertical}
+          onVerticalChange={rh.setVertical}
+        />
+      </div>
+
       {/* Grading legend */}
       <div
         className="rounded-xl p-4 flex items-center gap-4 flex-wrap"
@@ -111,40 +129,22 @@ export default function DashboardShell() {
         </span>
       </div>
 
-      {/* Two search panes */}
+      {/* Two results */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <SearchConsole
-            onResults={lh.handleResults}
-            onError={lh.handleError}
-            onSearchStart={lh.handleSearchStart}
-            vertical={left.vertical}
-            onVerticalChange={lh.setVertical}
-          />
-          <ResultsView
-            results={left.data?.companies ?? null}
-            loading={left.loading}
-            error={left.error !== null}
-            vertical={left.vertical}
-            onFeedback={(c, v) => handleFeedback(c, v, left.vertical)}
-          />
-        </div>
-        <div className="space-y-6">
-          <SearchConsole
-            onResults={rh.handleResults}
-            onError={rh.handleError}
-            onSearchStart={rh.handleSearchStart}
-            vertical={right.vertical}
-            onVerticalChange={rh.setVertical}
-          />
-          <ResultsView
-            results={right.data?.companies ?? null}
-            loading={right.loading}
-            error={right.error !== null}
-            vertical={right.vertical}
-            onFeedback={(c, v) => handleFeedback(c, v, right.vertical)}
-          />
-        </div>
+        <ResultsView
+          results={left.data?.companies ?? null}
+          loading={left.loading}
+          error={left.error !== null}
+          vertical={left.vertical}
+          onFeedback={(c, v) => handleFeedback(c, v, left.vertical)}
+        />
+        <ResultsView
+          results={right.data?.companies ?? null}
+          loading={right.loading}
+          error={right.error !== null}
+          vertical={right.vertical}
+          onFeedback={(c, v) => handleFeedback(c, v, right.vertical)}
+        />
       </div>
     </div>
   );
