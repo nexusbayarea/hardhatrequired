@@ -41,6 +41,20 @@ export function groupResults(results: SearchResult[]): FitTypeGroup[] {
     });
 }
 
+export const FIT_COLORS: Record<string, { bg: string; text: string }> = {
+  DIRECT_OPERATOR: { bg: 'color-mix(in srgb, var(--color-green) 14%, transparent)', text: 'var(--color-green)' },
+  INDIRECT_VENDOR: { bg: 'color-mix(in srgb, var(--color-yellow) 14%, transparent)', text: 'var(--color-yellow)' },
+  DISPOSAL_NODE: { bg: 'color-mix(in srgb, #3b82f6 14%, transparent)', text: '#3b82f6' },
+  REGULATORY_NODE: { bg: 'color-mix(in srgb, #a855f7 14%, transparent)', text: '#a855f7' },
+};
+
+export const FIT_ICONS: Record<string, string> = {
+  DIRECT_OPERATOR: '🔧',
+  INDIRECT_VENDOR: '🚛',
+  DISPOSAL_NODE: '♻️',
+  REGULATORY_NODE: '📋',
+};
+
 export function getFitTypeLabel(fitType: FitType | null | undefined): string {
   if (!fitType) return 'Other';
   const config = SECTION_CONFIG.find(c => c.fitType === fitType);

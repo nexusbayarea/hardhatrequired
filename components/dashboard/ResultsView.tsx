@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { Search, ChevronDown, ChevronRight, Phone, Globe, MapPin, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import ResultsTable from './ResultsTable';
-import { groupResults } from '@/lib/results/groups';
+import { groupResults, FIT_COLORS, FIT_ICONS, getFitTypeLabel } from '@/lib/results/groups';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
+import type { SearchPane } from './SearchConsole';
 
 interface ResultsViewProps {
   results: SearchResult[] | null;
@@ -14,10 +15,11 @@ interface ResultsViewProps {
   error?: boolean;
   vertical?: string;
   onFeedback?: (company: SearchResult, voteType: VoteType) => void;
+  activePane: SearchPane;
 }
 
-/* ── Mobile card view — optimised for glove use ── */
-function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeedback?: (company: SearchResult, voteType: VoteType) => void }) {
+/* ── Mobile card view ── */
+function ResultsCards({ results, onFeedback, activePane }: { results: SearchResult[]; onFeedback?: (company: SearchResult, voteType: VoteType) => void; activePane: SearchPane }) {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, VoteType>>({});
@@ -28,15 +30,14 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
   };
 
   const groups = groupResults(results);
+  const isDisposal = activePane === 'disposal';
 
   return (
     <div className="space-y-8">
       {groups.map((group) => (
         <div key={group.fitType}>
-          <div
-            className="flex items-center gap-2 mb-3 px-1"
-          >
-            <span className="text-lg">{group.icon}</span>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <span className="text-lg">{FIT_ICONS[group.fitType] ?? '📌'}</span>
             <h3
               className="font-bold uppercase tracking-wider"
               style={{ fontSize: '0.75rem', color: 'var(--color-muted)' }}
@@ -54,10 +55,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
           <div className="space-y-3">
             {group.results.map((r) => {
               const isExpanded = expanded === r.id;
-              const gradeColor =
-                r.grade === 'A' ? 'var(--color-green)' :
-                r.grade === 'B' ? 'var(--color-yellow)' :
-                'var(--color-muted)';
+              const fitColor = (r.fitType ? FIT_COLORS[r.fitType] : undefined) ?? { bg: 'var(--color-surface2)', text: 'var(--color-muted)' };
 
               return (
                 <div
@@ -75,18 +73,41 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                         >
                           {r.companyName}
                         </div>
-                        <div className="flex items-center gap-2 mt-1">
-                          {r.distanceMiles != null && (
-                            <span className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>
-                              {r.distanceMiles.toFixed(1)} {t('mi away')}
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          {r.fitType && (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+                              style={{ background: fitColor.bg, color: fitColor.text }}
+                            >
+                              {FIT_ICONS[r.fitType]} {getFitTypeLabel(r.fitType)}
                             </span>
                           )}
                           {r.confidence != null && (
                             <span className="text-xs font-medium" style={{ color: 'var(--color-muted)' }}>
-                              · {r.confidence}% confidence
+                              {r.confidence}% confidence
                             </span>
                           )}
                         </div>
+                        {!isDisposal && r.distanceMiles != null && (
+                          <div className="text-sm font-medium mt-1" style={{ color: 'var(--color-muted)' }}>
+                            {r.distanceMiles.toFixed(1)} {t('mi away')}
+                          </div>
+                        )}
+                        {isDisposal && r.permits && r.permits.length > 0 && (
+                          <div className="mt-1">
+                            <span
+                              className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
+                              style={{
+                                background: r.permits.some(p => p.status === 'Active')
+                                  ? 'color-mix(in srgb, var(--color-green) 12%, transparent)'
+                                  : 'color-mix(in srgb, var(--color-red) 12%, transparent)',
+                                color: r.permits.some(p => p.status === 'Active') ? 'var(--color-green)' : 'var(--color-red)',
+                              }}
+                            >
+                              {r.permits.some(p => p.status === 'Active') ? 'ACTIVE PERMIT' : 'PERMIT'}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="text-right flex-shrink-0">
                         <div
@@ -94,7 +115,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                           style={{
                             fontFamily: "'Barlow Condensed', sans-serif",
                             fontSize: '2rem',
-                            color: gradeColor,
+                            color: r.grade === 'A' ? 'var(--color-green)' : r.grade === 'B' ? 'var(--color-yellow)' : 'var(--color-muted)',
                           }}
                         >
                           {r.grade}
@@ -105,7 +126,14 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                       </div>
                     </div>
 
-                    {/* Action buttons — 56px height for gloves */}
+                    {/* Signals / waste accepted */}
+                    {r.capabilitySummary && (
+                      <div className="mb-3 text-sm leading-relaxed" style={{ color: 'var(--color-muted)' }}>
+                        {r.capabilitySummary}
+                      </div>
+                    )}
+
+                    {/* Action buttons */}
                     <div className="flex gap-3">
                       <a
                         href={r.phone ? `tel:${r.phone}` : '#'}
@@ -128,7 +156,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                         className="flex-1 flex items-center justify-center gap-2 rounded-xl font-bold text-base text-white transition-all"
                         style={{
                           height: '56px',
-                          background: 'var(--color-red)',
+                          background: isDisposal ? '#3b82f6' : 'var(--color-red)',
                           border: 'none',
                           cursor: 'pointer',
                         }}
@@ -138,7 +166,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                       </button>
                     </div>
 
-                    {/* Mobile feedback buttons */}
+                    {/* Mobile feedback */}
                     <div className="flex gap-3 mt-3">
                       {(['accurate', 'bad'] as const).map((v) => {
                         const isVoted = voted[r.id] === v;
@@ -157,9 +185,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                                   : 'color-mix(in srgb, var(--color-red) 12%, transparent)'
                                 : 'var(--color-surface2)',
                               color: isVoted
-                                ? v === 'accurate'
-                                  ? 'var(--color-green)'
-                                  : 'var(--color-red)'
+                                ? v === 'accurate' ? 'var(--color-green)' : 'var(--color-red)'
                                 : 'var(--color-muted)',
                               display: 'flex',
                               alignItems: 'center',
@@ -174,7 +200,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                     </div>
                   </div>
 
-                  {/* Expanded detail panel */}
+                  {/* Expanded detail */}
                   {isExpanded && (
                     <div
                       className="px-5 pb-5 pt-4 space-y-4 border-t"
@@ -187,11 +213,7 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                         </div>
                       )}
                       {r.phone && (
-                        <a
-                          href={`tel:${r.phone}`}
-                          className="flex items-center gap-3 text-base"
-                          style={{ color: 'var(--color-blue)', textDecoration: 'none' }}
-                        >
+                        <a href={`tel:${r.phone}`} className="flex items-center gap-3 text-base" style={{ color: 'var(--color-blue)', textDecoration: 'none' }}>
                           <Phone className="w-5 h-5 flex-shrink-0" />
                           {r.phone}
                         </a>
@@ -199,10 +221,8 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                       {r.website && (
                         <a
                           href={`https://${r.website.replace(/^https?:\/\//, '').replace(/^https?\//, '').replace(/^\//, '')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 text-base"
-                          style={{ color: 'var(--color-blue)', textDecoration: 'none' }}
+                          target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-3 text-base" style={{ color: 'var(--color-blue)', textDecoration: 'none' }}
                         >
                           <Globe className="w-5 h-5 flex-shrink-0" />
                           <span className="truncate">{r.website}</span>
@@ -210,72 +230,40 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
                       )}
                       {r.confidence != null && (
                         <div className="flex items-center gap-3">
-                          <div className="text-xs font-black uppercase tracking-widest shrink-0" style={{ color: 'var(--color-muted)' }}>
-                            {t('confidence')}
-                          </div>
+                          <span className="text-xs font-black uppercase tracking-widest shrink-0" style={{ color: 'var(--color-muted)' }}>{t('confidence')}</span>
                           <div className="flex-1 max-w-[120px] h-2 rounded-full bg-surface2 overflow-hidden">
                             <div className="h-full rounded-full" style={{
                               width: `${r.confidence}%`,
-                              background: r.confidence >= 70
-                                ? 'var(--color-green)'
-                                : r.confidence >= 40
-                                  ? 'var(--color-yellow)'
-                                  : 'var(--color-muted)',
+                              background: r.confidence >= 70 ? 'var(--color-green)' : r.confidence >= 40 ? 'var(--color-yellow)' : 'var(--color-muted)',
                             }} />
                           </div>
                           <span className="text-sm font-bold">{r.confidence}%</span>
                         </div>
                       )}
-                      {r.fitType && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>
-                            {t('type')}
-                          </span>
-                          <span className="text-xs font-semibold px-2 py-1 rounded-lg" style={{
-                            background: 'var(--color-surface)',
-                            color: 'var(--color-muted)',
-                            border: '1px solid var(--color-border)',
-                          }}>
-                            {r.fitType === 'DIRECT_OPERATOR' ? '🔧 ' : r.fitType === 'INDIRECT_VENDOR' ? '🚛 ' : r.fitType === 'DISPOSAL_NODE' ? '♻️ ' : '📋 '}
-                            {r.fitType === 'DIRECT_OPERATOR' ? 'Labor' : r.fitType === 'INDIRECT_VENDOR' ? 'Vendor' : r.fitType === 'DISPOSAL_NODE' ? 'Disposal' : 'Permitted'}
-                          </span>
+                      {r.permits && r.permits.length > 0 && (
+                        <div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('permits')}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {r.permits.map((p, i) => (
+                              <span
+                                key={i}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium"
+                                style={{
+                                  background: p.status === 'Active' ? 'color-mix(in srgb, var(--color-green) 10%, transparent)' : 'color-mix(in srgb, var(--color-red) 10%, transparent)',
+                                  color: p.status === 'Active' ? 'var(--color-green)' : 'var(--color-red)',
+                                  border: '1px solid var(--color-border)',
+                                }}
+                              >
+                                {p.agency} · {p.permitType} · {p.permitNumber}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       )}
-                      {r.permits && r.permits.length > 0 && (
-                <div>
-                  <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>
-                    {t('permits')}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {r.permits.map((p, i) => (
-                      <span
-                        key={i}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium"
-                        style={{
-                          background: p.status === 'Active'
-                            ? 'color-mix(in srgb, var(--color-green) 10%, transparent)'
-                            : 'color-mix(in srgb, var(--color-red) 10%, transparent)',
-                          color: p.status === 'Active' ? 'var(--color-green)' : 'var(--color-red)',
-                          border: '1px solid var(--color-border)',
-                        }}
-                      >
-                        {p.agency} · {p.permitType} · {p.permitNumber}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {r.capabilitySummary && (
+                      {r.capabilitySummary && (
                         <div>
-                            <div
-                              className="text-xs font-black uppercase tracking-widest mb-2"
-                              style={{ color: 'var(--color-muted)' }}
-                            >
-                              {t('signals')}
-                            </div>
-                          <p className="text-base leading-relaxed" style={{ color: 'var(--color-muted)' }}>
-                            {r.capabilitySummary}
-                          </p>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('signals')}</div>
+                          <p className="text-base leading-relaxed" style={{ color: 'var(--color-muted)' }}>{r.capabilitySummary}</p>
                         </div>
                       )}
                     </div>
@@ -291,22 +279,15 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
   );
 }
 
-/* ── Main export: table on desktop, cards on mobile ── */
-export default function ResultsView({ results, loading, error, vertical, onFeedback }: ResultsViewProps) {
+/* ── Main export ── */
+export default function ResultsView({ results, loading, error, vertical, onFeedback, activePane }: ResultsViewProps) {
   const { t } = useLanguage();
-  /* Empty / loading / error states */
+
   const EmptyState = ({ msg }: { msg: string }) => (
-    <div
-      className="rounded-xl p-12 flex flex-col items-center justify-center text-center"
-      style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
-    >
+    <div className="rounded-xl p-12 flex flex-col items-center justify-center text-center"
+      style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
       <Search className="w-10 h-10 mb-4" style={{ color: 'var(--color-muted)' }} />
-      <div
-        className="font-bold mb-2"
-        style={{ fontSize: '1.125rem', color: 'var(--color-text)' }}
-      >
-        {t('no results yet')}
-      </div>
+      <div className="font-bold mb-2" style={{ fontSize: '1.125rem', color: 'var(--color-text)' }}>{t('no results yet')}</div>
       <div className="text-base" style={{ color: 'var(--color-muted)' }}>{msg}</div>
     </div>
   );
@@ -314,19 +295,9 @@ export default function ResultsView({ results, loading, error, vertical, onFeedb
   const LoadingCards = () => (
     <div className="space-y-3">
       {[1, 2, 3].map((i) => (
-        <div
-          key={i}
-          className="rounded-xl p-5 animate-pulse"
-          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
-        >
-          <div
-            className="h-5 rounded w-2/3 mb-2"
-            style={{ background: 'var(--color-surface2)' }}
-          />
-          <div
-            className="h-4 rounded w-1/4 mb-4"
-            style={{ background: 'var(--color-surface2)' }}
-          />
+        <div key={i} className="rounded-xl p-5 animate-pulse" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+          <div className="h-5 rounded w-2/3 mb-2" style={{ background: 'var(--color-surface2)' }} />
+          <div className="h-4 rounded w-1/4 mb-4" style={{ background: 'var(--color-surface2)' }} />
           <div className="flex gap-3">
             <div className="flex-1 h-14 rounded-xl" style={{ background: 'var(--color-surface2)' }} />
             <div className="flex-1 h-14 rounded-xl" style={{ background: 'var(--color-surface2)' }} />
@@ -338,12 +309,9 @@ export default function ResultsView({ results, loading, error, vertical, onFeedb
 
   return (
     <>
-      {/* Desktop: table */}
       <div className="hidden lg:block">
-        <ResultsTable companies={results ?? undefined} loading={loading} vertical={vertical} onFeedback={onFeedback} />
+        <ResultsTable companies={results ?? undefined} loading={loading} vertical={vertical} onFeedback={onFeedback} activePane={activePane} />
       </div>
-
-      {/* Mobile / tablet: cards */}
       <div className="block lg:hidden">
         {loading ? (
           <LoadingCards />
@@ -352,7 +320,7 @@ export default function ResultsView({ results, loading, error, vertical, onFeedb
         ) : !results || results.length === 0 ? (
           <EmptyState msg={t('set your parameters above and run a discovery search')} />
         ) : (
-          <ResultsCards results={results} onFeedback={onFeedback} />
+          <ResultsCards results={results} onFeedback={onFeedback} activePane={activePane} />
         )}
       </div>
     </>

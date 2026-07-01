@@ -29,7 +29,7 @@ export default function SearchPage() {
       </div>
 
       <div className="w-full relative z-10">
-        <SearchConsole onResults={handleResults} onSearchStart={handleSearchStart} />
+        <SearchConsole onResults={handleResults} onSearchStart={handleSearchStart} activePane="labor" />
       </div>
 
       <div className="grid grid-cols-12 gap-6">

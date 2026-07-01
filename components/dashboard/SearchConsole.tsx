@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Crosshair, Loader2, Info } from 'lucide-react';
+import { Search, MapPin, Crosshair, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { VERTICAL_META } from '@/lib/market/verticalMeta';
+import { verticalMatrix } from '@/lib/verticals/matrix';
 import type { SearchResult } from '@/types/search';
+
+export type SearchPane = 'labor' | 'disposal' | 'equipment' | 'bids';
 
 interface SearchConsoleProps {
   onResults: (data: { companies: SearchResult[]; count: number; industry?: string }) => void;
@@ -14,9 +16,15 @@ interface SearchConsoleProps {
   onVerticalChange?: (v: string) => void;
   zip?: string;
   onZipChange?: (z: string) => void;
-  headerLabel?: string;
-  mode?: 'labor' | 'disposal';
+  activePane: SearchPane;
 }
+
+const PANE_META: Record<SearchPane, { title: string; desc: string; placeholder: string }> = {
+  labor: { title: 'Find Contractors / Operators', desc: 'Search certified crews, operators, and specialty contractors.', placeholder: 'Labor Search' },
+  disposal: { title: 'Find Disposal Facilities', desc: 'Search permitted facilities, reclamation yards, and tipping sites.', placeholder: 'Disposal Search' },
+  equipment: { title: 'Equipment', desc: '', placeholder: 'Equipment Search' },
+  bids: { title: 'Bids', desc: '', placeholder: 'Bids' },
+};
 
 export default function SearchConsole({
   onResults,
@@ -26,8 +34,7 @@ export default function SearchConsole({
   onVerticalChange,
   zip: controlledZip,
   onZipChange,
-  headerLabel,
-  mode,
+  activePane,
 }: SearchConsoleProps) {
   const [internalVertical, setInternalVertical] = useState('');
   const [internalZip, setInternalZip] = useState('');
@@ -42,7 +49,17 @@ export default function SearchConsole({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const isActive = activePane === 'labor' || activePane === 'disposal';
+
+  const verticalOptions = Object.values(verticalMatrix).map(v => ({
+    value: v.id,
+    label: activePane === 'disposal' ? v.disposalLabel : v.laborLabel,
+  }));
+
+  const meta = PANE_META[activePane];
+
   const handleSearch = async () => {
+    if (!isActive) return;
     if (!zip.trim()) {
       setError(t('enter a zip code to begin search.'));
       return;
@@ -64,7 +81,7 @@ export default function SearchConsole({
           zip: zip.trim(),
           radius: parseInt(radius),
           vertical,
-          mode,
+          mode: activePane,
         }),
       });
       const data = await res.json();
@@ -93,11 +110,15 @@ export default function SearchConsole({
         <div
           className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{
-            background: 'color-mix(in srgb, var(--color-red) 12%, var(--color-surface))',
-            border: '1px solid color-mix(in srgb, var(--color-red) 25%, var(--color-border))',
+            background: activePane === 'disposal'
+              ? 'color-mix(in srgb, #3b82f6 12%, var(--color-surface))'
+              : 'color-mix(in srgb, var(--color-red) 12%, var(--color-surface))',
+            border: activePane === 'disposal'
+              ? '1px solid color-mix(in srgb, #3b82f6 25%, var(--color-border))'
+              : '1px solid color-mix(in srgb, var(--color-red) 25%, var(--color-border))',
           }}
         >
-          <Search className="w-6 h-6" style={{ color: 'var(--color-red)' }} />
+          <Search className="w-6 h-6" style={{ color: activePane === 'disposal' ? '#3b82f6' : 'var(--color-red)' }} />
         </div>
         <div>
           <div
@@ -109,11 +130,13 @@ export default function SearchConsole({
               letterSpacing: '0.04em',
             }}
           >
-            {headerLabel ?? t('market search')}
+            {meta.title}
           </div>
-          <div className="text-sm font-medium mt-0.5" style={{ color: 'var(--color-muted)' }}>
-            {t('define your target market parameters')}
-          </div>
+          {meta.desc && (
+            <div className="text-sm font-medium mt-0.5" style={{ color: 'var(--color-muted)' }}>
+              {meta.desc}
+            </div>
+          )}
         </div>
       </div>
 
@@ -122,31 +145,24 @@ export default function SearchConsole({
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-6">
           {/* Vertical */}
           <div>
-              <label className="field-label">
-                <Crosshair className="w-4 h-4" />
-                {t('index')}
-              </label>
-              <select
-                value={vertical}
-                onChange={e => setVertical(e.target.value)}
-                className="field-input"
-              >
-                <option value="" disabled>{t('(select)')}</option>
-              {Object.entries(VERTICAL_META).map(([key, meta]) => (
-                <option key={key} value={key}>
-                  {mode === 'disposal' ? meta.disposalLabel : meta.laborLabel}
-                </option>
+            <label className="field-label">
+              <Crosshair className="w-4 h-4" />
+              {t('index')}
+            </label>
+            <select
+              value={vertical}
+              onChange={e => setVertical(e.target.value)}
+              className="field-input"
+              disabled={!isActive}
+            >
+              <option value="" disabled>{t('(select)')}</option>
+              {verticalOptions.map(({ value, label }) => (
+                <option key={value} value={value}>{label}</option>
               ))}
             </select>
-            {vertical && VERTICAL_META[vertical] && (
+            {vertical && verticalMatrix[vertical] && isActive && (
               <div className="mt-2 p-2 rounded-lg text-[10px] leading-relaxed" style={{ background: 'var(--color-surface2)', color: 'var(--color-muted)', border: '1px solid var(--color-border)' }}>
-                <div className="flex items-start gap-1.5">
-                  <Info className="w-3 h-3 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-semibold uppercase tracking-wider">{mode === 'disposal' ? 'Disposal:' : 'Labor:'}</span>
-                    {' '}{mode === 'disposal' ? VERTICAL_META[vertical].matrixNode.disposal : VERTICAL_META[vertical].matrixNode.labor}
-                  </div>
-                </div>
+                {activePane === 'disposal' ? verticalMatrix[vertical].disposalDesc : verticalMatrix[vertical].laborDesc}
               </div>
             )}
           </div>
@@ -154,15 +170,16 @@ export default function SearchConsole({
           {/* Radius */}
           <div>
             <label className="field-label">
-                <MapPin className="w-4 h-4" />
-                {t('radius')}
-              </label>
-              <select
-                value={radius}
-                onChange={e => setRadius(e.target.value)}
-                className="field-input"
-              >
-                <option value="" disabled>{t('(select)')}</option>
+              <MapPin className="w-4 h-4" />
+              {t('radius')}
+            </label>
+            <select
+              value={radius}
+              onChange={e => setRadius(e.target.value)}
+              className="field-input"
+              disabled={!isActive}
+            >
+              <option value="" disabled>{t('(select)')}</option>
               <option value="10">10 miles</option>
               <option value="20">20 miles</option>
               <option value="50">50 miles</option>
@@ -173,24 +190,23 @@ export default function SearchConsole({
           {/* ZIP */}
           <div>
             <label className="field-label">
-                <MapPin className="w-4 h-4" />
-                {t('zip code')}
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={zip}
-                onChange={e => setZip(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                placeholder={t('enter zip code')}
-                className="field-input"
+              <MapPin className="w-4 h-4" />
+              {t('zip code')}
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={zip}
+              onChange={e => setZip(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              placeholder={t('enter zip code')}
+              className="field-input"
+              disabled={!isActive}
             />
           </div>
-
         </div>
 
-        {/* Error */}
         {error && (
           <div
             className="mb-5 p-4 rounded-xl text-base font-semibold flex items-center gap-3"
@@ -204,31 +220,28 @@ export default function SearchConsole({
           </div>
         )}
 
-        {/* Run button */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <div
-              className="text-sm font-semibold"
-              style={{ color: 'var(--color-muted)' }}
-            >
-              {loading ? t('scanning your market...') : t('set parameters above and run discovery')}
-            </div>
+          <div
+            className="text-sm font-semibold"
+            style={{ color: 'var(--color-muted)' }}
+          >
+            {loading ? t('scanning your market...') : isActive ? t('set parameters above and run discovery') : t('select a tab to begin')}
           </div>
           <button
             onClick={handleSearch}
-            disabled={loading}
+            disabled={loading || !isActive}
             className="btn-primary"
             style={{
               width: '100%',
               maxWidth: '280px',
-              opacity: loading ? 0.7 : 1,
-              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading || !isActive ? 0.5 : 1,
+              cursor: loading || !isActive ? 'not-allowed' : 'pointer',
             }}
           >
             {loading ? (
               <><Loader2 className="w-5 h-5 animate-spin" /> {t('searching...')}</>
             ) : (
-              <><Search className="w-5 h-5" /> {t('run discovery')}</>
+              <><Search className="w-5 h-5" /> {activePane === 'disposal' ? 'Search Disposal' : 'Search Labor'}</>
             )}
           </button>
         </div>

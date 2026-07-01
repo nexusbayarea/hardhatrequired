@@ -4,9 +4,10 @@ import { Fragment, useState } from 'react';
 import { ChevronDown, ChevronRight, Phone, ExternalLink, Loader2, Search, MapPin, Globe, ThumbsUp, ThumbsDown, Minus } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import Badge from '@/components/ui/Badge';
-import { groupResults, getFitTypeLabel } from '@/lib/results/groups';
+import { groupResults, getFitTypeLabel, FIT_ICONS } from '@/lib/results/groups';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
+import type { SearchPane } from './SearchConsole';
 
 interface Contact {
   id: string;
@@ -26,6 +27,7 @@ interface ResultsTableProps {
   loading?: boolean;
   vertical?: string;
   onFeedback?: (company: SearchResult, voteType: VoteType) => void;
+  activePane?: SearchPane;
 }
 
 const gradeColor = (g: string) => {
@@ -43,7 +45,7 @@ function formatDistance(d: number | null): string {
   return `${d.toFixed(1)} mi`;
 }
 
-export default function ResultsTable({ companies, contacts: allContacts, loading, onFeedback }: ResultsTableProps) {
+export default function ResultsTable({ companies, contacts: allContacts, loading, onFeedback, activePane }: ResultsTableProps) {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, VoteType>>({});
@@ -77,9 +79,13 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
     <div className="bg-surface rounded-3xl border border-border overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[900px]">
-          <thead>
+            <thead>
             <tr className="border-b border-border">
-              {[t('company'), t('grade'), t('distance'), t('score'), t('confidence'), t('signals'), t('accurate?'), ''].map((h) => (
+              {(
+                activePane === 'disposal'
+                  ? [t('company'), t('permit status'), t('distance'), t('score'), t('confidence'), t('signals'), t('accurate?'), '']
+                  : [t('company'), t('grade'), t('distance'), t('score'), t('confidence'), t('signals'), t('accurate?'), '']
+              ).map((h) => (
                 <th key={h} className="text-left text-[10px] font-semibold text-muted uppercase tracking-wider px-4 py-3">
                   {h}
                 </th>
@@ -95,7 +101,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                 >
                   <td colSpan={8} className="px-4 py-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">{group.icon}</span>
+                      <span className="text-sm">{FIT_ICONS[group.fitType] ?? '📌'}</span>
                       <span
                         className="text-xs font-bold uppercase tracking-wider"
                         style={{ color: 'var(--color-muted)' }}
