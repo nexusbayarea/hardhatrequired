@@ -28,17 +28,18 @@ export async function POST(req: NextRequest) {
     }
 
     const engine = new IndexIntelligenceEngine();
-    const { companies, contacts } = await withTimeout(
+    const result = await withTimeout(
       engine.executeMarketDiscovery(body, verticalConfig),
       60000,
-      () => ({ companies: [], contacts: [] } as any)
+      () => { throw new Error('Search pipeline timeout after 60 seconds'); }
     );
+    const { companies, contacts, providerFailures } = result;
 
     writeAudit({
       provider: 'search',
       action: 'market_discovery',
       orgId: verticalConfig.id,
-      metadata: { zip: body.zip, radius: body.radius, vertical: clientHeader, companyCount: companies?.length || 0 },
+      metadata: { zip: body.zip, radius: body.radius, vertical: clientHeader, companyCount: companies?.length || 0, providerFailures: providerFailures?.join(',') || '' },
     });
 
     const normalized: SearchResult[] = companies.map((c: any) => ({
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
       count: normalized.length,
       companies: normalized,
       contacts,
+      providerFailures: providerFailures?.length ? providerFailures : undefined,
     });
 
     waitUntil(
@@ -82,12 +84,11 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (err: any) {
-    console.error("Core Engine Error:", err);
-    return NextResponse.json({
-      success: true,
-      count: 0,
-      companies: [],
-      contacts: [],
-    });
+    console.error('[SEARCH_ROUTE_ERROR]', err);
+    const message = err?.message || 'Search pipeline failed.';
+    return NextResponse.json(
+      { success: false, error: message, companies: [], contacts: [] },
+      { status: 500 }
+    );
   }
 }

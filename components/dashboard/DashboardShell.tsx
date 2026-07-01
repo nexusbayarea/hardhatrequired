@@ -12,9 +12,11 @@ export default function DashboardShell() {
   const { t, language } = useLanguage();
   const [searchData, setSearchData] = useState<{ companies: SearchResult[]; count: number } | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [activeVertical, setActiveVertical] = useState('');
 
-  const handleResults = useCallback(async (data: { companies: SearchResult[]; count: number }) => {
+  const handleResults = useCallback(async (data: { companies: SearchResult[]; count: number; providerFailures?: string[] }) => {
+    setSearchError(null);
     let companies = data.companies.filter(c => c.grade !== 'D');
 
     if (language === 'es' && companies.length > 0) {
@@ -41,8 +43,15 @@ export default function DashboardShell() {
     setSearchLoading(false);
   }, [language]);
 
+  const handleError = useCallback((error: string) => {
+    setSearchError(error);
+    setSearchData(null);
+    setSearchLoading(false);
+  }, []);
+
   const handleSearchStart = useCallback(() => {
     setSearchLoading(true);
+    setSearchError(null);
   }, []);
 
   const handleFeedback = useCallback(async (company: SearchResult, voteType: VoteType) => {
@@ -67,6 +76,7 @@ export default function DashboardShell() {
 
       <SearchConsole
         onResults={handleResults}
+        onError={handleError}
         onSearchStart={handleSearchStart}
         vertical={activeVertical}
         onVerticalChange={setActiveVertical}
@@ -91,14 +101,29 @@ export default function DashboardShell() {
           >
             {searchLoading
               ? t('searching...')
+              : searchError
+              ? t('search failed')
               : searchData
               ? `${searchData.count} ${t('companies found')}`
               : t('run a search above')}
           </div>
         </div>
+        {searchError && (
+          <div
+            className="mb-5 p-4 rounded-xl text-base font-semibold flex items-center gap-3"
+            style={{
+              background: 'color-mix(in srgb, var(--color-red) 10%, var(--color-surface2))',
+              border: '1px solid color-mix(in srgb, var(--color-red) 30%, transparent)',
+              color: 'var(--color-red)',
+            }}
+          >
+            ⚠ {searchError}
+          </div>
+        )}
         <ResultsView
           results={searchData?.companies ?? null}
           loading={searchLoading}
+          error={searchError !== null}
           vertical={activeVertical}
           onFeedback={handleFeedback}
         />

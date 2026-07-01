@@ -21,7 +21,7 @@ export class IndexIntelligenceEngine {
     filters: SearchFilters,
     config: VerticalConfig,
     organizationId?: string
-  ): Promise<{ companies: Company[]; contacts: Contact[] }> {
+  ): Promise<{ companies: Company[]; contacts: Contact[]; providerFailures: string[] }> {
     const configWithProviders = config as VerticalConfigWithProviders;
     const providers = configWithProviders.providers || [];
 
@@ -33,6 +33,7 @@ export class IndexIntelligenceEngine {
     const tenant = createTenantProfile(tenantId, organizationId || '', [config.id]);
     this.scoreEngine.registerTenant(tenant);
 
+    const providerFailures: string[] = [];
     const providerResults = await Promise.all(
       providers.map(provider =>
         provider.search({
@@ -45,6 +46,7 @@ export class IndexIntelligenceEngine {
           verticalConfig: config,
         }).catch(err => {
           console.error(`[${provider.name}] search failed:`, err);
+          providerFailures.push(provider.name);
           return [] as Partial<Company>[];
         })
       )
@@ -272,7 +274,7 @@ export class IndexIntelligenceEngine {
       return (a.distanceMiles ?? Infinity) - (b.distanceMiles ?? Infinity);
     });
 
-    return { companies: finalizedCompanies, contacts: allContacts };
+    return { companies: finalizedCompanies, contacts: allContacts, providerFailures };
   }
 }
 

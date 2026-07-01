@@ -7,6 +7,7 @@ import type { SearchResult } from '@/types/search';
 
 interface SearchConsoleProps {
   onResults: (data: { companies: SearchResult[]; count: number; industry?: string }) => void;
+  onError?: (error: string) => void;
   onSearchStart?: () => void;
   vertical?: string;
   onVerticalChange?: (v: string) => void;
@@ -16,6 +17,7 @@ interface SearchConsoleProps {
 
 export default function SearchConsole({
   onResults,
+  onError,
   onSearchStart,
   vertical: controlledVertical,
   onVerticalChange,
@@ -60,7 +62,10 @@ export default function SearchConsole({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Search failed');
+      if (!res.ok || data.success === false) {
+        onError?.(data.error || 'Search failed');
+        return;
+      }
       onResults(data);
     } catch (err: any) {
       setError(err.message);

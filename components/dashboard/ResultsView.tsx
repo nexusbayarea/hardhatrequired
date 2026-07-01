@@ -10,6 +10,7 @@ import type { VoteType } from '@/types/feedback';
 interface ResultsViewProps {
   results: SearchResult[] | null;
   loading: boolean;
+  error?: boolean;
   vertical?: string;
   onFeedback?: (company: SearchResult, voteType: VoteType) => void;
 }
@@ -203,9 +204,9 @@ function ResultsCards({ results, onFeedback }: { results: SearchResult[]; onFeed
 }
 
 /* ── Main export: table on desktop, cards on mobile ── */
-export default function ResultsView({ results, loading, vertical, onFeedback }: ResultsViewProps) {
+export default function ResultsView({ results, loading, error, vertical, onFeedback }: ResultsViewProps) {
   const { t } = useLanguage();
-  /* Empty / loading states */
+  /* Empty / loading / error states */
   const EmptyState = ({ msg }: { msg: string }) => (
     <div
       className="rounded-xl p-12 flex flex-col items-center justify-center text-center"
@@ -258,6 +259,8 @@ export default function ResultsView({ results, loading, vertical, onFeedback }: 
       <div className="block lg:hidden">
         {loading ? (
           <LoadingCards />
+        ) : error ? (
+          <EmptyState msg={t('search failed — try again or contact support')} />
         ) : !results || results.length === 0 ? (
           <EmptyState msg={t('set your parameters above and run a discovery search')} />
         ) : (
