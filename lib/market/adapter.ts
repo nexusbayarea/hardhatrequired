@@ -154,7 +154,7 @@ export class IndexIntelligenceEngine {
           ? Math.round(haversineDistance(zipCoords.lat, zipCoords.lng, record.latitude, record.longitude) * 10) / 10
           : undefined;
         const recordWithDist = { ...record, distanceMiles: distance };
-        const scored = await this.scoreEngine.getCachedOrScore(tenant, recordWithDist, config);
+        const scored = await this.scoreEngine.getCachedOrScore(tenant, recordWithDist, scoreConfig);
         if (!scored) continue;
         if (scored.feedbackAction === 'blacklist') continue;
         const sr = scored.result;
