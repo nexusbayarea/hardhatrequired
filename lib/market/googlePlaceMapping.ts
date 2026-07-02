@@ -145,4 +145,10 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'fire_protection_service',
     searchModifier: 'fire extinguisher inspection recharge commercial facility',
   },
+  wind_energy: {
+    googlePrimaryType: 'general_contractor',
+    googleSecondaryTypes: ['engineering_consultant'],
+    searchModifier: 'wind turbine farm installation maintenance energy',
+    disposalSearchModifier: 'wind turbine blade recycling decommissioning facility disposal',
+  },
 };

@@ -27,6 +27,7 @@ export const verticalMatrix: Record<string, VerticalMatrixEntry> = {
   tank_testing: { id: 'tank_testing', laborLabel: 'Underground Storage Tank Service', disposalLabel: 'Hazardous Waste Facility', laborDesc: 'UST testing, tank tightness testing, leak detection, cathodic protection testing', disposalDesc: 'Tank removal, disposal, soil remediation, groundwater monitoring' },
   trench_shoring: { id: 'trench_shoring', laborLabel: 'Shoring Contractor', disposalLabel: 'Steel & Lumber Recycling', laborDesc: 'Trench shoring, slide rail systems, hydraulic shores, trench boxes, excavation safety, CalOSHA compliance', disposalDesc: 'Shoring equipment decontamination, steel recycling, HDPE shoring disposal' },
   wind_infrastructure: { id: 'wind_infrastructure', laborLabel: 'Wind Energy Contractor', disposalLabel: 'Industrial Recycling Center', laborDesc: 'Wind turbine maintenance, gearbox testing, blade inspection, generator testing, electrical testing', disposalDesc: 'Turbine decommissioning, blade recycling, gearbox disposal, transformer recycling' },
+  wind_energy: { id: 'wind_energy', laborLabel: 'Wind Energy Contractor', disposalLabel: 'Turbine & Blade Recycling', laborDesc: 'Wind turbine installation, maintenance, blade repair, tower climbing, GWO certified technicians', disposalDesc: 'Turbine decommissioning, blade recycling, gearbox disposal, composite material recycling' },
 };
 
 export function getVerticalLabel(id: string, pane: 'labor' | 'disposal'): string {

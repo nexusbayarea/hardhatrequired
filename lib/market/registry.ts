@@ -1008,6 +1008,62 @@ export const VERTICAL_REGISTRY: Record<string, VerticalConfigWithProviders> = {
     providers: createSearchOnlyProviders([tomtom, overpass]),
     matrixNode: { labor: 'Wind turbine maintenance, gearbox testing, blade inspection, generator testing, electrical testing', disposal: 'Turbine decommissioning, blade recycling, gearbox disposal, transformer recycling' },
   },
+
+  wind_energy: {
+    id: 'wind_energy',
+    slug: 'wind_energy',
+    industryName: 'Wind Energy',
+    searchQueries: [
+      'wind turbine maintenance contractor',
+      'wind energy services',
+      'wind farm operations contractor',
+      'turbine installation company',
+      'wind energy technician services',
+    ],
+    disposalQueries: ['wind turbine disposal', 'blade recycling facility', 'turbine decommissioning', 'composite blade recycling', 'wind farm decommissioning'],
+    targetNaicsCodes: ['237130', '221115', '333611', '811310'],
+    equipmentKeywords: [
+      'nacelle', 'rotor', 'turbine blade', 'tower crane', 'pitch control',
+      'yaw drive', 'gearbox', 'anemometer', 'SCADA', 'substation',
+    ],
+    negativeKeywords: [
+      'solar', 'residential', 'landscaping', 'hvac', 'plumbing',
+      'concrete', 'slurry', 'asbestos',
+    ],
+    signals: {
+      primary: [
+        { term: 'wind turbine',       weight: 25 },
+        { term: 'wind energy',        weight: 25 },
+        { term: 'wind farm',          weight: 25 },
+        { term: 'turbine maintenance', weight: 25 },
+        { term: 'wind power',         weight: 20 },
+      ],
+      secondary: [
+        { term: 'renewable energy',   weight: 10 },
+        { term: 'nacelle',            weight: 15 },
+        { term: 'rotor blade',        weight: 15 },
+        { term: 'GWO certified',      weight: 15 },
+        { term: 'tower climbing',     weight: 10 },
+        { term: 'SCADA',              weight: 10 },
+        { term: 'offshore wind',      weight: 15 },
+        { term: 'onshore wind',       weight: 10 },
+        { term: 'turbine inspection', weight: 10 },
+        { term: 'blade repair',       weight: 15 },
+      ],
+      negative: [
+        { term: 'residential',        weight: -30 },
+        { term: 'landscaping',        weight: -60 },
+        { term: 'concrete',           weight: -40 },
+        { term: 'plumbing',           weight: -60 },
+        { term: 'asbestos',           weight: -50 },
+      ],
+    },
+    scoringWeights: SHARED_SCORING_WEIGHTS,
+    baseScoringWeights: { distanceWeight: 0.15, contactEnrichmentWeight: 0.20, assetSignalWeight: 0.65 },
+    createdAt: NOW,
+    providers: createSearchOnlyProviders([tomtom, overpass]),
+    matrixNode: { labor: 'Wind turbine installation, maintenance, blade repair, tower climbing, GWO certified technicians', disposal: 'Turbine decommissioning, blade recycling, gearbox disposal, composite material recycling' },
+  },
 };
 
 export async function getVerticalConfigByDomain(contextHeaderValue: string): Promise<VerticalConfigWithProviders | null> {
