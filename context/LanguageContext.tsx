@@ -2,13 +2,13 @@
 
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 
-type Language = 'en' | 'es';
+type Language = 'en' | 'es' | 'zh' | 'vi';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string, vars?: Record<string, string | number>) => string;
-  translateText: (text: string) => Promise<string>;
+  translateText: (text: string, target?: Language) => Promise<string>;
   loading: boolean;
 }
 
@@ -19,6 +19,8 @@ const esDictionary: Record<string, string> = {
   'hard hat required': 'Hard Hat Required',
   'english': 'English',
   'español': 'Español',
+  '中文': '中文',
+  'tiếng việt': 'Tiếng Việt',
 
   // ─── Dashboard chrome (sidebar, topbar, bottom nav) ───
   'overview': 'Resumen',
@@ -202,6 +204,58 @@ const esDictionary: Record<string, string> = {
     'Agende una demostración de 20 minutos. Mapearemos su mercado en vivo y le mostraremos exactamente dónde están los ingresos — antes de que sus competidores los encuentren.',
 };
 
+const zhDictionary: Record<string, string> = {
+  'english': '英语',
+  'español': '西班牙语',
+  '中文': '中文',
+  'tiếng việt': '越南语',
+  'hard hat required': 'Hard Hat Required',
+  'dashboard': '仪表盘',
+  'search': '搜索',
+  'settings': '设置',
+  'login': '登录',
+  'radius': '半径',
+  'zip code': '邮政编码',
+  'results': '结果',
+  'company': '公司',
+  'grade': '等级',
+  'distance': '距离',
+  'score': '分数',
+  'contact': '联系人',
+  'bids': '投标',
+  'news': '新闻',
+  'compliance': '合规',
+  'market search': '市场搜索',
+  'run discovery': '执行搜索',
+  'open dashboard': '打开仪表盘',
+};
+
+const viDictionary: Record<string, string> = {
+  'english': 'Tiếng Anh',
+  'español': 'Tiếng Tây Ban Nha',
+  '中文': 'Tiếng Trung',
+  'tiếng việt': 'Tiếng Việt',
+  'hard hat required': 'Hard Hat Required',
+  'dashboard': 'Bảng điều khiển',
+  'search': 'Tìm kiếm',
+  'settings': 'Cài đặt',
+  'login': 'Đăng nhập',
+  'radius': 'Bán kính',
+  'zip code': 'Mã ZIP',
+  'results': 'Kết quả',
+  'company': 'Công ty',
+  'grade': 'Điểm',
+  'distance': 'Khoảng cách',
+  'score': 'Điểm số',
+  'contact': 'Liên hệ',
+  'bids': 'Đấu thầu',
+  'news': 'Tin tức',
+  'compliance': 'Tuân thủ',
+  'market search': 'Tìm kiếm thị trường',
+  'run discovery': 'Chạy khám phá',
+  'open dashboard': 'Mở bảng điều khiển',
+};
+
 function interpolate(text: string, vars: Record<string, string | number>): string {
   return text.replace(/\{(\w+)\}/g, (_, key) => String(vars[key] ?? `{${key}}`));
 }
@@ -222,12 +276,22 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLoading(false);
   };
 
+  const getDictionary = (): Record<string, string> => {
+    switch (language) {
+      case 'es': return esDictionary;
+      case 'zh': return zhDictionary;
+      case 'vi': return viDictionary;
+      default: return {};
+    }
+  };
+
   const t = (text: string, vars?: Record<string, string | number>): string => {
     if (language === 'en') {
       return vars ? interpolate(text, vars) : text;
     }
     const key = text.trim().toLowerCase();
-    const dictTranslation = esDictionary[key];
+    const dict = getDictionary();
+    const dictTranslation = dict[key];
     if (dictTranslation) {
       return vars ? interpolate(dictTranslation, vars) : dictTranslation;
     }
@@ -239,12 +303,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return vars ? interpolate(text, vars) : text;
   };
 
-  const translateText = useCallback(async (text: string): Promise<string> => {
+  const translateText = useCallback(async (text: string, target?: Language): Promise<string> => {
+    const lang = target || language;
+    if (lang === 'en') return text;
     try {
       const res = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, target: 'es' }),
+        body: JSON.stringify({ text, target: lang }),
       });
       const data = await res.json();
       if (data.success && data.translatedText) {
@@ -254,16 +320,16 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     } catch {}
     return text;
-  }, []);
+  }, [language]);
 
   useEffect(() => {
-    if (language === 'es' && missedKeys.current.size > 0) {
+    if (language !== 'en' && missedKeys.current.size > 0) {
       const keys = Array.from(missedKeys.current);
       missedKeys.current.clear();
       fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: keys, target: 'es' }),
+        body: JSON.stringify({ text: keys, target: language }),
       })
         .then(r => r.json())
         .then(data => {

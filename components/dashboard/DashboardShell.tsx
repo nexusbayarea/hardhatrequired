@@ -42,13 +42,13 @@ export default function DashboardShell() {
   const handleResults = useCallback(async (data: { companies: SearchResult[]; count: number; providerFailures?: string[] }) => {
     let companies = data.companies.filter(c => c.grade !== 'D');
 
-    if (language === 'es' && companies.length > 0) {
+    if (language !== 'en' && companies.length > 0) {
       const summaries = companies.map(c => c.capabilitySummary || '');
       try {
         const res = await fetch('/api/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: summaries, target: 'es' }),
+          body: JSON.stringify({ text: summaries, target: language }),
         });
         const td = await res.json();
         if (td.success && Array.isArray(td.translatedText)) {

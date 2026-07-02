@@ -13,23 +13,28 @@ export default function LanguageToggle({ mobile = false }: Props) {
     : 'text-sm font-semibold uppercase tracking-wider rounded-lg transition-colors px-2 py-2';
   const active = { color: 'var(--color-text)' };
   const inactive = { color: 'var(--color-muted)' };
+
+  const langDisplay: { code: 'en' | 'es' | 'zh' | 'vi'; label: string }[] = [
+    { code: 'en', label: 'English' },
+    { code: 'es', label: 'Español' },
+    { code: 'zh', label: '中文' },
+    { code: 'vi', label: 'Tiếng Việt' },
+  ];
+
   return (
-    <div className={`flex items-center ${mobile ? 'gap-1' : 'gap-0'}`}>
-      <button
-        onClick={() => setLanguage('en')}
-        className={base}
-        style={language === 'en' ? active : inactive}
-      >
-        English
-      </button>
-      <span className="text-xs" style={{ color: 'var(--color-muted)' }}>/</span>
-      <button
-        onClick={() => setLanguage('es')}
-        className={base}
-        style={language === 'es' ? active : inactive}
-      >
-        Español
-      </button>
+    <div className={`flex items-center flex-wrap ${mobile ? 'gap-1' : 'gap-0'}`}>
+      {langDisplay.map((lang, i) => (
+        <span key={lang.code} className="flex items-center">
+          {i > 0 && <span className="text-xs" style={{ color: 'var(--color-muted)' }}>|</span>}
+          <button
+            onClick={() => setLanguage(lang.code)}
+            className={base}
+            style={language === lang.code ? active : inactive}
+          >
+            {lang.label}
+          </button>
+        </span>
+      ))}
     </div>
   );
 }
