@@ -84,6 +84,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'utility_contractor',
     googleSecondaryTypes: ['excavating_contractor'],
     searchModifier: 'dewatering high volume pump wellpoint filtration',
+    disposalSearchModifier: 'construction dewatering sediment disposal filtration treatment',
   },
   hazardous_soil_remediation: {
     googlePrimaryType: 'waste_management_service',
@@ -109,6 +110,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'general_contractor',
     googleSecondaryTypes: ['engineering_consultant'],
     searchModifier: 'wind turbine field technician infrastructure energy',
+    disposalSearchModifier: 'wind turbine blade recycling disposal decommissioning facility',
   },
   concrete: {
     googlePrimaryType: 'concrete_contractor',
