@@ -32,6 +32,17 @@ export type OutreachOutcome =
   | 'sent_proposal'
   | 'out_of_service';
 
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+export interface MapLinks {
+  googleMaps: string;
+  appleMaps: string;
+  waze: string;
+}
+
 export interface Company {
   id: string;
   organizationId: string;
@@ -63,7 +74,11 @@ export interface Company {
   negativeHits?: string[];
   relevanceReason?: string;
   confidence?: number;
+  intelligenceScore?: number;
+  evaluatedRing?: number;
   fitType?: FitType;
+  coordinates?: Coordinates;
+  navigation?: MapLinks;
   feedbackPositiveCount?: number;
   feedbackNegativeCount?: number;
   scrapedIsCommercial?: boolean;

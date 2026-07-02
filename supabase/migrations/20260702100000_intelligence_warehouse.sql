@@ -127,129 +127,88 @@ create policy "Service role full access on scrape_jobs"
 -- ── RPC: get_geo_candidates ───────────────────────────────────────────────────
 -- Multi-ring PostGIS lookup + intelligence scoring.
 -- Expands radius through search_rings (25, 50, 100...) until min_results_threshold
--- is met. Returns scored candidates ordered by total_score descending.
+-- is met. Returns scored candidates ordered by intelligence_score descending.
+-- Returns surface coordinates (lat/lng) extracted from the geography column.
 --
 -- Scoring formula:
---   geo      = max(0, 30 - distance_miles)
---   freshness = 20 if scraped < 7d, 10 if < 30d, else 0
---   fit       = DIRECT_OPERATOR=25, DISPOSAL_NODE=20, REGULATORY_NODE=15, INDIRECT_VENDOR=10
---   total    = geo + confidence_score + freshness + fit
+--   geo            = max(0, 30 - distance_miles)
+--   freshness      = 20 if scraped < 7d, 10 if < 30d, else 0
+--   fit            = DIRECT_OPERATOR=25, DISPOSAL_NODE=20, REGULATORY_NODE=15, INDIRECT_VENDOR=10
+--   intelligence  = geo + confidence_score + freshness + fit
 create or replace function public.get_geo_candidates(
-  target_lng float8,
-  target_lat float8,
+  target_lng double precision,
+  target_lat double precision,
   target_vertical text,
   search_rings int[] default '{25,50,100}',
   min_results_threshold int default 5
 )
 returns table (
   id uuid,
-  canonical_key text,
   company_name text,
-  domain text,
   vertical text,
-  address text,
-  city text,
-  state text,
-  zip text,
-  latitude double precision,
-  longitude double precision,
-  fit_type text,
   confidence_score int,
-  signal_hits text[],
-  negative_hits text[],
-  is_commercial boolean,
-  is_residential boolean,
-  is_mismatch boolean,
-  services_ttl timestamptz,
-  equipment_ttl timestamptz,
-  permits_ttl timestamptz,
-  content_ttl timestamptz,
-  last_scraped_at timestamptz,
-  expires_at timestamptz,
-  created_at timestamptz,
-  updated_at timestamptz,
-  distance_miles float8,
-  geo_score float8,
-  freshness_score int,
-  fit_score int,
-  total_score float8
+  fit_type text,
+  distance_miles double precision,
+  intelligence_score int,
+  evaluated_ring int,
+  latitude double precision,
+  longitude double precision
 )
 language plpgsql stable
 as $$
 declare
-  search_point geography;
-  ring_radius int;
-  ring_index int := 1;
+  current_ring int;
+  found_count int := 0;
+  search_point geography := ST_SetSRID(ST_MakePoint(target_lng, target_lat), 4326)::geography;
 begin
-  search_point := ST_SetSRID(ST_MakePoint(target_lng, target_lat), 4326)::geography;
-
-  foreach ring_radius in array search_rings loop
+  foreach current_ring in array search_rings loop
     return query
-    with candidates as (
+    with candidate_pool as (
       select
         dp.id,
-        dp.canonical_key,
         dp.company_name,
-        dp.domain,
         dp.vertical,
-        dp.address,
-        dp.city,
-        dp.state,
-        dp.zip,
-        dp.latitude,
-        dp.longitude,
-        dp.fit_type,
         dp.confidence_score,
-        dp.signal_hits,
-        dp.negative_hits,
-        dp.is_commercial,
-        dp.is_residential,
-        dp.is_mismatch,
-        dp.services_ttl,
-        dp.equipment_ttl,
-        dp.permits_ttl,
-        dp.content_ttl,
-        dp.last_scraped_at,
-        dp.expires_at,
-        dp.created_at,
-        dp.updated_at,
-        ST_Distance(dp.location, search_point) / 1609.34 as distance_miles
-      from public.deep_profiles dp
-      where dp.vertical = target_vertical
-        and dp.location is not null
-        and ST_DWithin(dp.location, search_point, ring_radius * 1609.34)
-        and (dp.expires_at is null or dp.expires_at > now())
-    ),
-    scored as (
-      select
-        candidates.*,
-        greatest(0, 30.0 - candidates.distance_miles) as geo_score,
+        dp.fit_type,
+        ST_Distance(dp.location, search_point) / 1609.344 as dist_miles,
+        ST_Y(dp.location::geometry) as lat,
+        ST_X(dp.location::geometry) as lng,
         case
-          when candidates.last_scraped_at > now() - interval '7 days' then 20
-          when candidates.last_scraped_at > now() - interval '30 days' then 10
+          when dp.last_scraped_at >= now() - interval '7 days' then 20
+          when dp.last_scraped_at >= now() - interval '30 days' then 10
           else 0
-        end as freshness_score,
-        case candidates.fit_type
+        end as freshness_weight,
+        case dp.fit_type
           when 'DIRECT_OPERATOR'  then 25
           when 'DISPOSAL_NODE'    then 20
           when 'REGULATORY_NODE'  then 15
           when 'INDIRECT_VENDOR'  then 10
           else 0
-        end as fit_score
-      from candidates
+        end as fit_weight
+      from public.deep_profiles dp
+      where dp.vertical = target_vertical
+        and dp.location is not null
+        and ST_DWithin(dp.location, search_point, current_ring * 1609.344)
+        and (dp.expires_at is null or dp.expires_at > now())
     )
     select
-      scored.*,
-      (scored.geo_score + scored.confidence_score + scored.freshness_score + scored.fit_score) as total_score
-    from scored
-    order by total_score desc;
+      cp.id,
+      cp.company_name,
+      cp.vertical,
+      cp.confidence_score,
+      cp.fit_type,
+      cp.dist_miles,
+      greatest(0, 30 - cp.dist_miles)::int + cp.confidence_score + cp.freshness_weight + cp.fit_weight as intelligence_score,
+      current_ring,
+      cp.lat,
+      cp.lng
+    from candidate_pool cp
+    order by intelligence_score desc;
 
-    -- If we hit the threshold at this ring, stop expanding
-    if (select count(*) from candidates) >= min_results_threshold then
+    get diagnostics found_count = row_count;
+    if found_count >= min_results_threshold then
       return;
     end if;
-
-    ring_index := ring_index + 1;
   end loop;
 end;
 $$;

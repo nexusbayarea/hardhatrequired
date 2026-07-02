@@ -120,10 +120,8 @@ export interface GeoCandidate {
   updatedAt?: string;
   /** Computed scoring fields from RPC */
   distanceMiles: number;
-  geoScore: number;
-  freshnessScore: number;
-  fitScore: number;
-  totalScore: number;
+  intelligenceScore: number;
+  evaluatedRing: number;
 }
 
 /** Result of L2 search — either hit (serve from Supabase) or miss (trigger scrape) */

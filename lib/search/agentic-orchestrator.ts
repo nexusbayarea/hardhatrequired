@@ -9,6 +9,7 @@ import { getCachedSearch, setCachedSearch } from '@/lib/intelligence/search-cach
 import { getDeepProfile, upsertDeepProfile, updateDeepProfile, buildCanonicalKey, isProfileStale, freshProfileTimestamp } from '@/lib/intelligence/store';
 import { searchL2 } from '@/lib/intelligence/l2-search';
 import { processScrape } from './extraction/pipeline';
+import { generateMapLinks } from './map-utils';
 import { GeoCandidate, L2SearchResult } from '@/lib/intelligence/types';
 
 export interface AgenticSearchResult {
@@ -90,25 +91,35 @@ export class AgenticOrchestrator extends IndexIntelligenceOrchestrator {
     candidates: GeoCandidate[],
     config: VerticalConfig,
   ): Company[] {
-    return candidates.map(c => ({
-      companyName: c.companyName,
-      address: c.address,
-      city: c.city,
-      state: c.state,
-      zip: c.zip,
-      latitude: c.latitude,
-      longitude: c.longitude,
-      distanceMiles: c.distanceMiles,
-      source: 'L2_intel_db',
-      enrichmentScore: c.confidenceScore,
-      confidence: c.confidenceScore,
-      fitType: c.fitType || classifyFitType({ companyName: c.companyName } as Company, ''),
-      priority: c.totalScore >= 70 ? 'A' : c.totalScore >= 50 ? 'B' : 'C',
-      naicsCodes: config.targetNaicsCodes,
-      status: 'NOT_CONTACTED' as const,
-      createdAt: c.createdAt || new Date().toISOString(),
-      updatedAt: c.updatedAt || new Date().toISOString(),
-    })) as Company[];
+    return candidates.map(c => {
+      const coords = c.latitude != null && c.longitude != null
+        ? { lat: c.latitude, lng: c.longitude }
+        : undefined;
+
+      return {
+        companyName: c.companyName,
+        address: c.address,
+        city: c.city,
+        state: c.state,
+        zip: c.zip,
+        latitude: c.latitude,
+        longitude: c.longitude,
+        distanceMiles: c.distanceMiles,
+        source: 'L2_intel_db',
+        enrichmentScore: c.confidenceScore,
+        confidence: c.confidenceScore,
+        intelligenceScore: c.intelligenceScore,
+        evaluatedRing: c.evaluatedRing,
+        fitType: c.fitType || classifyFitType({ companyName: c.companyName } as Company, ''),
+        priority: c.intelligenceScore >= 70 ? 'A' : c.intelligenceScore >= 50 ? 'B' : 'C',
+        naicsCodes: config.targetNaicsCodes,
+        status: 'NOT_CONTACTED' as const,
+        createdAt: c.createdAt || new Date().toISOString(),
+        updatedAt: c.updatedAt || new Date().toISOString(),
+        coordinates: coords,
+        navigation: coords ? generateMapLinks(coords.lat, coords.lng, c.companyName) : undefined,
+      };
+    }) as Company[];
   }
 
   // ── Full pipeline (Stage 1 → 2 → 3) ──────────────────────────────────
