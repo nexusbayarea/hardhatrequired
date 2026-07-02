@@ -220,13 +220,19 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                       )}
                       {r.website && (
                         <a
-                          href={`https://${r.website.replace(/^https?:\/\//, '').replace(/^https?\//, '').replace(/^\//, '')}`}
+                          href={`https://${r.website.replace(/^https?:\/\//, '')}`}
                           target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-3 text-base" style={{ color: 'var(--color-blue)', textDecoration: 'none' }}
                         >
                           <Globe className="w-5 h-5 flex-shrink-0" />
                           <span className="truncate">{r.website}</span>
                         </a>
+                      )}
+                      {r.distanceMiles != null && (
+                        <div className="flex items-center gap-3 text-base" style={{ color: 'var(--color-muted)' }}>
+                          <MapPin className="w-5 h-5 flex-shrink-0" />
+                          <span>{r.distanceMiles.toFixed(1)} mi</span>
+                        </div>
                       )}
                       {r.confidence != null && (
                         <div className="flex items-center gap-3">
