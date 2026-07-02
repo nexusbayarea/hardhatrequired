@@ -100,6 +100,96 @@ const esDictionary: Record<string, string> = {
   'select index type': 'Seleccionar Tipo de Índice',
   'enter zip code': 'Ingrese el Código Postal',
   'compliance': 'Cumplimiento Normativo',
+
+  // ─── Landing page ───
+  'lead generation': 'Generación de Clientes Potenciales',
+  'market intelligence': 'Inteligencia de Mercado',
+  'industry index': 'Índice de la Industria',
+  'source': 'Fuente',
+  'pipeline': 'Tubería de Ventas',
+  'login': 'Iniciar Sesión',
+  'get access': 'Obtener Acceso',
+  'bids': 'Licitaciones',
+  'news': 'Noticias',
+  'find every job': 'Encuentre Cada Trabajo',
+  'win every bid': 'Gane Cada Licitación',
+  'ai-powered market intelligence built for the field.': 'Inteligencia de mercado impulsada por IA, construida para el campo.',
+  'search by zip. score companies. close more contracts —': 'Busque por código postal. Califique empresas. Cierre más contratos —',
+  'whether you\'re on a job site at noon or running a night crew.': 'ya sea que esté en un sitio de trabajo al mediodía o dirigiendo un equipo nocturno.',
+  'built for construction': 'Construido para la Construcción',
+  'geo-targeted search': 'Búsqueda Geo-Dirigida',
+  'ai bid proposals': 'Propuestas de Licitación con IA',
+  'live lead scoring': 'Puntuación de Clientes Potenciales en Vivo',
+  'open dashboard': 'Abrir Panel de Control',
+  'book a demo': 'Solicitar una Demostración',
+  'scroll': 'Desplazar',
+  'how it works': 'Cómo Funciona',
+  'three steps.': 'Tres Pasos.',
+  'zero guesswork.': 'Cero Conjeturas.',
+  'search your market': 'Busque Su Mercado',
+  'score every lead': 'Califique Cada Cliente Potencial',
+  'close the job': 'Cierre el Trabajo',
+  'core engines': 'Motores Principales',
+  'four engines.': 'Cuatro Motores.',
+  'one platform.': 'Una Plataforma.',
+  'industry verticals': 'Verticales de la Industria',
+  'built for your industry.': 'Construido para Su Industria.',
+  'live': 'En Vivo',
+  'beta': 'Beta',
+  'get started today': 'Comience Hoy',
+  'your market.': 'Su Mercado.',
+  'mapped in minutes.': 'Mapeado en Minutos.',
+
+  // ─── Vertical names for search dropdown ───
+  'asbestos_abatement': 'Asbesto y Eliminación de Plomo',
+  'backflow_testing': 'Prueba de Prevención de Flujo Inverso',
+  'grease_trap': 'Bombeo de Trampas de Grasa Comerciales',
+  'kitchen_exhaust': 'Desengrase de Campanas de Cocina Comerciales',
+  'concrete': 'Servicios de Concreto',
+  'elevator_inspection': 'Inspección y Certificación de Elevadores',
+  'generator_testing': 'Prueba de Banco de Carga de Generadores de Emergencia',
+  'fire_extinguisher': 'Inspección y Recarga de Extintores',
+  'fire_sprinkler': 'Prueba de Presión de Rociadores Contra Incendios',
+  'marine_construction': 'Infraestructura Marina y Muelles Pesados',
+  'hvac_balance': 'Prueba y Balanceo de HVAC',
+  'hydro_excavation': 'Hidroexcavación y Excavación No Destructiva',
+  'commercial_roofing': 'Techado Plano Industrial y Comercial',
+  'scrap_metal': 'Procesamiento de Chatarra Industrial',
+  'industrial_wastewater': 'Tratamiento de Aguas Residuales Industriales',
+  'medical_waste': 'Eliminación de Residuos Médicos',
+  'slurry_concrete': 'Slurry / Lechada',
+  'stormwater_compliance': 'Cumplimiento de SWPPP / Aguas Pluviales',
+  'tank_testing': 'Prueba de Tanques Subterráneos',
+
+  // ─── Step bodies (landing) ───
+  'enter a zip code. pick a vertical. we scan every company within your radius — contractors, subs, suppliers.':
+    'Ingrese un código postal. Elija una vertical. Escaneamos cada empresa en su radio — contratistas, subcontratistas, proveedores.',
+  'our ai ranks companies by revenue signals, fleet size, and buying intent. you see who\'s ready to spend.':
+    'Nuestra IA clasifica empresas por señales de ingresos, tamaño de flota e intención de compra. Usted ve quién está listo para gastar.',
+  'one-tap calling, auto-enriched contacts, and ai-drafted bid proposals. done before the next pour.':
+    'Llamadas con un solo toque, contactos enriquecidos automáticamente y propuestas de licitación redactadas por IA. Listo antes del próximo vertido.',
+
+  // ─── Engine titles (landing) ───
+  'discovery engine': 'Motor de Descubrimiento',
+  'enrichment engine': 'Motor de Enriquecimiento',
+  'scoring engine': 'Motor de Calificación',
+  'campaign engine': 'Motor de Campañas',
+
+  // ─── Engine descriptions (landing) ───
+  'search 8+ verticals with geo-intelligence and industry signals. find companies your competitors don\'t know exist.':
+    'Busque en más de 8 verticales con geointeligencia y señales de la industria. Encuentre empresas que sus competidores ni saben que existen.',
+  'auto-populate verified contacts, phones, emails, and decision-maker data for every company found.':
+    'Complete automáticamente contactos verificados, teléfonos, correos electrónicos y datos de tomadores de decisiones para cada empresa encontrada.',
+  'priority rankings based on revenue, fleet, permit activity, and buying signals. know who to call first.':
+    'Clasificaciones prioritarias basadas en ingresos, flota, actividad de permisos y señales de compra. Sepa a quién llamar primero.',
+  'deploy targeted outreach and track every touchpoint from first call to signed contract.':
+    'Despliegue divulgación dirigida y rastree cada punto de contacto desde la primera llamada hasta el contrato firmado.',
+  'every function you need to prospect, enrich, score, and close — unified in a single field-hardened interface built for construction teams.':
+    'Cada función que necesita para prospectar, enriquecer, calificar y cerrar — unificada en una sola interfaz robusta construida para equipos de construcción.',
+
+  // ─── CTA body ───
+  'book a 20-minute demo. we\'ll map your market live and show you exactly where the revenue is — before your competitors find it.':
+    'Agende una demostración de 20 minutos. Mapearemos su mercado en vivo y le mostraremos exactamente dónde están los ingresos — antes de que sus competidores los encuentren.',
 };
 
 const zhDictionary: Record<string, string> = {
