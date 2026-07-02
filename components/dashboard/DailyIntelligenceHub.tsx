@@ -129,7 +129,7 @@ Index Intelligence Partner`;
   }
 
   return (
-    <div className="bg-surface border border-border rounded-xl overflow-hidden shadow-2xl">
+    <div className={`bg-surface border border-border rounded-xl shadow-2xl ${landing ? '' : 'overflow-hidden'}`} style={landing ? { zoom: 2 } as React.CSSProperties : {}}>
       <div className="p-5 border-b border-border bg-surface2/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
