@@ -158,8 +158,6 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       try {
         const results = await this.searchWithPrimaryType(
           typedQuery,
-          mapping.googlePrimaryType,
-          mapping.googleSecondaryTypes,
           params.verticalConfig?.negativeKeywords || [],
           params.lat,
           params.lng,
@@ -304,8 +302,6 @@ export class GooglePlacesProvider implements DiscoveryProvider {
 
   async searchWithPrimaryType(
     queryText: string,
-    primaryType: string,
-    secondaryTypes: string[] | undefined,
     negativeKeywords: string[],
     zipLat?: number,
     zipLng?: number,
@@ -325,13 +321,8 @@ export class GooglePlacesProvider implements DiscoveryProvider {
     for (let page = 0; page < MAX_PAGES; page++) {
       const body: Record<string, unknown> = {
         textQuery: queryText,
-        includedPrimaryTypes: [primaryType],
-        strictTypeFiltering: true,
         pageSize: 20,
       };
-      if (secondaryTypes?.length) {
-        body.includedTypes = secondaryTypes;
-      }
       if (pageToken) body.pageToken = pageToken;
 
       const response = await fetch(url, {
