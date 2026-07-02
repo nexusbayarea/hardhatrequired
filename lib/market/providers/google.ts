@@ -286,8 +286,8 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           'X-Goog-Api-Key': apiKey,
           'X-Goog-FieldMask':
             'places.id,places.displayName,places.formattedAddress,places.location,' +
-            'places.internationalPhoneNumber,places.websiteUri,' +
-            'places.primaryType,places.types,places.rating,places.userRatingCount',
+            'places.primaryType,places.types,places.websiteUri,' +
+            'places.nationalPhoneNumber,places.rating,places.userRatingCount',
         },
         body: JSON.stringify(body),
       });
@@ -344,8 +344,8 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           'X-Goog-Api-Key': apiKey,
           'X-Goog-FieldMask':
             'places.id,places.displayName,places.formattedAddress,places.location,' +
-            'places.internationalPhoneNumber,places.websiteUri,' +
-            'places.primaryType,places.types,places.rating,places.userRatingCount,' +
+            'places.primaryType,places.types,places.websiteUri,' +
+            'places.nationalPhoneNumber,places.rating,places.userRatingCount,' +
             'nextPageToken',
         },
         body: JSON.stringify(body),
@@ -405,9 +405,9 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           'X-Goog-Api-Key': apiKey,
           'X-Goog-FieldMask':
             'places.id,places.displayName,places.formattedAddress,places.location,' +
-            'places.internationalPhoneNumber,places.websiteUri,' +
-            'places.primaryType,places.types,places.rating,places.userRatingCount,' +
-            'nextPageToken',
+             'places.primaryType,places.types,places.websiteUri,' +
+             'places.nationalPhoneNumber,places.rating,places.userRatingCount,' +
+             'nextPageToken',
         },
         body: JSON.stringify(body),
       });
@@ -495,7 +495,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
         id: p.id,
         companyName: p.displayName?.text || 'Unknown',
         address: p.formattedAddress,
-        phone: p.internationalPhoneNumber,
+        phone: p.nationalPhoneNumber,
         website: p.websiteUri,
         googlePrimaryType: p.primaryType,
         googleTypes: p.types || [],
@@ -550,7 +550,7 @@ interface GooglePlace {
   displayName?: { text?: string };
   formattedAddress?: string;
   location?: { latitude?: number; longitude?: number };
-  internationalPhoneNumber?: string;
+  nationalPhoneNumber?: string;
   websiteUri?: string;
   primaryType?: string;
   types?: string[];
