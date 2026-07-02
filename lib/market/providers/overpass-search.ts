@@ -104,9 +104,10 @@ out skel qt;
       }
 
       const data = await response.json();
-      // Filter to elements that have at least a name or addr:street tag
+      // Only keep elements with a real name — addr:street without a business name
+      // produces "Unnamed Facility" entries that score zero on signal matching
       return (data.elements || []).filter(
-        (el: OverpassElement) => el.tags?.name || el.tags?.['addr:street']
+        (el: OverpassElement) => el.tags?.name
       );
     } finally {
       clearTimeout(timer);
