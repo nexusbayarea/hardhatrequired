@@ -457,7 +457,19 @@ export class GooglePlacesProvider implements DiscoveryProvider {
 
     const mapped: Partial<Company>[] = [];
 
+    const DISPOSAL_ADDRESS_FLAGS = /\b(suite|ste[\s\.]|floor|fl[\s\.]|room|rm[\s\.]|building\s+[a-z])\b/i;
+    const DISPOSAL_NAME_BAD = /\b(corporate|headquarters|hq|consulting|solutions)\b/i;
+    const isDisposalResult = searchQueries?.some(q =>
+      /\b(disposal|recycling|landfill|treatment|incineration|removal|dump|decommissioning)\b/i.test(q)
+    );
+
     for (const p of places) {
+      if (isDisposalResult) {
+        const addr = p.formattedAddress || '';
+        if (DISPOSAL_ADDRESS_FLAGS.test(addr)) continue;
+        const name = p.displayName?.text || '';
+        if (DISPOSAL_NAME_BAD.test(name)) continue;
+      }
       const allTypes = [
         ...(p.primaryType ? [p.primaryType] : []),
         ...(p.types || []).filter(

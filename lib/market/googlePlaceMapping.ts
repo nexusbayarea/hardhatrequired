@@ -16,21 +16,25 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'engineering_consultant',
     googleSecondaryTypes: ['general_contractor'],
     searchModifier: 'elevator service mechanic inspection commercial',
+    disposalSearchModifier: 'elevator disposal recycling scrap yard facility',
   },
   generator_testing: {
     googlePrimaryType: 'electrical_installation_service',
     googleSecondaryTypes: ['electrician'],
     searchModifier: 'emergency generator load bank testing commercial',
+    disposalSearchModifier: 'generator disposal recycling scrap yard facility battery',
   },
   marine_construction: {
     googlePrimaryType: 'general_contractor',
     googleSecondaryTypes: ['excavating_contractor'],
     searchModifier: 'marine contractor pile driving dredging port',
+    disposalSearchModifier: 'dredge spoils disposal marine debris dump facility',
   },
   hydro_excavation: {
     googlePrimaryType: 'excavating_contractor',
     googleSecondaryTypes: ['utility_contractor'],
     searchModifier: 'hydro excavation vac operator industrial',
+    disposalSearchModifier: 'hydrovac spoils slurry disposal dump facility landfill',
   },
   industrial_demolition: {
     googlePrimaryType: 'demolition_contractor',
@@ -59,6 +63,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'engineering_consultant',
     googleSecondaryTypes: ['landscaper'],
     searchModifier: 'SWPPP erosion control stormwater compliance crew',
+    disposalSearchModifier: 'stormwater treatment sediment disposal basin cleaning facility',
   },
   tank_testing: {
     googlePrimaryType: 'engineering_consultant',
@@ -70,6 +75,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'electrician',
     googleSecondaryTypes: ['electrical_installation_service'],
     searchModifier: 'high voltage substation grid linemen utility',
+    disposalSearchModifier: 'transformer disposal PCB recycling scrap metal yard facility',
   },
   trench_shoring: {
     googlePrimaryType: 'excavating_contractor',
@@ -80,6 +86,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
   sandblasting: {
     googlePrimaryType: 'home_improvement_contractor',
     searchModifier: 'commercial sandblasting industrial coating painter',
+    disposalSearchModifier: 'spent abrasive blasting media disposal hazardous waste facility',
   },
   dewatering: {
     googlePrimaryType: 'utility_contractor',
@@ -97,15 +104,18 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'fire_protection_service',
     googleSecondaryTypes: ['plumber'],
     searchModifier: 'fire sprinkler fitter installation commercial',
+    disposalSearchModifier: 'fire sprinkler disposal recycling scrap metal yard facility',
   },
   hvac_industrial: {
     googlePrimaryType: 'hvac_contractor',
     searchModifier: 'commercial hvac industrial chiller refrigeration',
+    disposalSearchModifier: 'hvac equipment disposal refrigerant recovery recycling yard',
   },
   solar_infrastructure: {
     googlePrimaryType: 'solar_energy_contractor',
     googleSecondaryTypes: ['electrician'],
     searchModifier: 'utility scale solar PV infrastructure electrician',
+    disposalSearchModifier: 'solar panel recycling PV module disposal e-waste facility',
   },
   wind_infrastructure: {
     googlePrimaryType: 'general_contractor',
@@ -131,6 +141,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
   backflow_testing: {
     googlePrimaryType: 'plumber',
     searchModifier: 'backflow prevention testing cross connection commercial',
+    disposalSearchModifier: 'backflow preventer disposal recycling scrap metal facility',
   },
   grease_trap: {
     googlePrimaryType: 'plumber',
@@ -140,10 +151,12 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
   kitchen_exhaust: {
     googlePrimaryType: 'hvac_contractor',
     searchModifier: 'kitchen exhaust hood cleaning commercial restaurant ventilation',
+    disposalSearchModifier: 'kitchen exhaust hood disposal scrap metal recycling facility',
   },
   fire_extinguisher: {
     googlePrimaryType: 'fire_protection_service',
     searchModifier: 'fire extinguisher inspection recharge commercial facility',
+    disposalSearchModifier: 'fire extinguisher disposal recycling scrap metal facility',
   },
   wind_energy: {
     googlePrimaryType: 'general_contractor',

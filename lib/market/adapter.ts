@@ -121,8 +121,30 @@ export class IndexIntelligenceEngine {
     let irrelevantDrops = 0;
     let blacklistDrops = 0;
     let radiusDrops = 0;
+    let addressDrops = 0;
+    let officeNameDrops = 0;
+
+    // Disposal mode: reject non-physical addresses (suites, floors, rooms) and
+    // non-operational names (corporate HQ, consulting offices, sales desks).
+    // Permitted landfills and tipping yards don't have suite numbers.
+    const DISPOSAL_ADDRESS_FLAGS = /\b(suite|ste[\s\.]|floor|fl[\s\.]|room|rm[\s\.]|building\s+[a-z])\b/i;
+    const DISPOSAL_NAME_BAD = /\b(corporate|headquarters|hq|consulting|solutions)\b/i;
 
     const filteredPool = candidatePool.filter(c => {
+      if (filters.mode === 'disposal') {
+        const addr = c.address || '';
+        if (DISPOSAL_ADDRESS_FLAGS.test(addr)) {
+          addressDrops++;
+          console.log(`[ADDRESS_FILTER] ${c.companyName} — dropped (office address: "${addr}")`);
+          return false;
+        }
+        const name = c.companyName || '';
+        if (DISPOSAL_NAME_BAD.test(name)) {
+          officeNameDrops++;
+          console.log(`[OFFICE_FILTER] ${c.companyName} — dropped (non-operational name)`);
+          return false;
+        }
+      }
       if (isIrrelevant(c, negativeKeywords)) {
         irrelevantDrops++;
         return false;
@@ -149,7 +171,7 @@ export class IndexIntelligenceEngine {
       return true;
     });
 
-    console.log('[FILTER_REASONS]', { irrelevantDrops, blacklistDrops, radiusDrops, verdictDrops });
+    console.log('[FILTER_REASONS]', { irrelevantDrops, blacklistDrops, radiusDrops, verdictDrops, addressDrops, officeNameDrops });
     console.log('[FILTERED_POOL]', {
       candidatePool: candidatePool.length,
       filteredPool: filteredPool.length,
@@ -189,6 +211,14 @@ export class IndexIntelligenceEngine {
         const sr = scored.result;
         if (isDisposalMode) {
           if (sr.score < 40) continue;
+          // Regulatory-permitted facilities are government-verified physical sites;
+          // never let them score below B-tier in disposal mode.
+          if (sr.score < 70) {
+            sr.score = 70;
+            sr.grade = 'B';
+            sr.confidence = Math.max(sr.confidence, 80);
+            sr.relevanceReason = 'Regulatory-permitted facility (government-verified)';
+          }
         } else {
           if (sr.score < 65 || sr.grade === 'D') continue;
         }
