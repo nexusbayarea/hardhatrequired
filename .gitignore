@@ -64,3 +64,9 @@ mem0_quickstart.py
 PROGRESS.md
 README.md
 .env*.local
+
+# generated / runtime data (not code)
+data/
+
+# safety: never reference the old IIE account from this repo
+btwndlinez

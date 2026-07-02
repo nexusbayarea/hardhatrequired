@@ -11,6 +11,28 @@ import { getBlacklistedVerticalCompanies } from '@/lib/feedback/storage';
 import { FastJsonLdScraper } from '@/lib/market/scrapers/fastScraper';
 import { scrapeCompanyWebsite } from '@/lib/market/workers/enrichmentScraper';
 import { withTimeout } from '@/lib/timeouts';
+import fs from 'fs';
+import path from 'path';
+
+const VERDICT_PATH = path.join(process.cwd(), 'data', 'verdicts.json');
+
+function loadVerdictIds(vertical: string, mode: string): { good: Set<string>; bad: Set<string> } {
+  try {
+    if (!fs.existsSync(VERDICT_PATH)) return { good: new Set(), bad: new Set() };
+    const raw = JSON.parse(fs.readFileSync(VERDICT_PATH, 'utf-8'));
+    const entries: any[] = Array.isArray(raw) ? raw : [];
+    const good = new Set<string>();
+    const bad = new Set<string>();
+    for (const e of entries) {
+      if (e.vertical !== vertical || e.mode !== mode) continue;
+      if (e.verdict === 'good') good.add(e.companyId);
+      else if (e.verdict === 'bad') bad.add(e.companyId);
+    }
+    return { good, bad };
+  } catch {
+    return { good: new Set(), bad: new Set() };
+  }
+}
 
 export class IndexIntelligenceEngine {
   private apolloAdapter = new ApolloAdapter();
@@ -93,6 +115,8 @@ export class IndexIntelligenceEngine {
 
     const negativeKeywords = config.negativeKeywords || [];
     const blacklistedIds = await getBlacklistedVerticalCompanies(config.id);
+    const verdictIds = loadVerdictIds(config.id, filters.mode || 'labor');
+    let verdictDrops = 0;
 
     let irrelevantDrops = 0;
     let blacklistDrops = 0;
@@ -108,6 +132,11 @@ export class IndexIntelligenceEngine {
         console.log(`[BLACKLIST] ${c.companyName} — excluded by feedback profile`);
         return false;
       }
+      if (c.id && verdictIds.bad.has(c.id)) {
+        verdictDrops++;
+        console.log(`[VERDICT] ${c.companyName} — excluded by verified bad verdict`);
+        return false;
+      }
       const d = c.distanceMiles ?? (
         c.latitude != null && c.longitude != null && zipCoords
           ? Math.round(haversineDistance(zipCoords.lat, zipCoords.lng, c.latitude, c.longitude) * 10) / 10
@@ -120,7 +149,7 @@ export class IndexIntelligenceEngine {
       return true;
     });
 
-    console.log('[FILTER_REASONS]', { irrelevantDrops, blacklistDrops, radiusDrops });
+    console.log('[FILTER_REASONS]', { irrelevantDrops, blacklistDrops, radiusDrops, verdictDrops });
     console.log('[FILTERED_POOL]', {
       candidatePool: candidatePool.length,
       filteredPool: filteredPool.length,
@@ -354,6 +383,26 @@ export class IndexIntelligenceEngine {
         fc.companyName?.toLowerCase().includes(ec.companyName?.toLowerCase().split(' - ')[0]?.toLowerCase() || '')
       );
       if (!alreadyIncluded) {
+        // Skip if verdict store says the base company name is bad
+        const ecBase = (ec.companyName || '').toLowerCase().split(' - ')[0]?.toLowerCase() || '';
+        let verdictSkipped = false;
+        try {
+          if (fs.existsSync(VERDICT_PATH)) {
+            const raw = JSON.parse(fs.readFileSync(VERDICT_PATH, 'utf-8'));
+            const entries: any[] = Array.isArray(raw) ? raw : [];
+            for (const e of entries) {
+              if (e.vertical !== config.id || e.mode !== (filters.mode || 'labor')) continue;
+              if (e.verdict !== 'bad') continue;
+              const eBase = (e.companyName || '').toLowerCase().split(' - ')[0]?.toLowerCase() || '';
+              if (ecBase && eBase && (ecBase.includes(eBase) || eBase.includes(ecBase))) {
+                verdictSkipped = true;
+                console.log(`[VERDICT] Enterprise skip ${ec.companyName} — matches bad verdict for ${e.companyName}`);
+                break;
+              }
+            }
+          }
+        } catch {}
+        if (verdictSkipped) continue;
         const now = new Date().toISOString();
         finalizedCompanies.push({
           ...ec,
