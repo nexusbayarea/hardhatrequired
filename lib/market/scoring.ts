@@ -131,11 +131,23 @@ export function calculateLeadScore(
   }
 
   // Negative Signals (weighted from all sources)
+  // Physical disposal facilities (landfills, transfer stations, recycling yards) may
+  // match negative terms like "hazardous" or "environmental" in their descriptions
+  // but are legitimate disposal destinations — skip negative penalties for them.
+  const companyName = (company.companyName || '').toLowerCase();
+  const isPhysicalDisposalFacility =
+    /\b(landfill|transfer station|recycling center|recycling yard|mrf|material recovery|waste processing|treatment facility|tsdf|scalehouse?|tipping)\b/i.test(companyName);
+
   for (const sig of config.signals.negative) {
     let penalty = 0;
-    if (containsTerm(baseText, sig.term)) penalty += Math.abs(sig.weight);
-    if (containsTerm(categoryText, sig.term)) penalty += Math.abs(sig.weight) * 0.7;
-    if (containsTerm(apolloText, sig.term)) penalty += Math.abs(sig.weight) * 0.5;
+    if (!isPhysicalDisposalFacility) {
+      if (containsTerm(baseText, sig.term)) penalty += Math.abs(sig.weight);
+      if (containsTerm(categoryText, sig.term)) penalty += Math.abs(sig.weight) * 0.7;
+      if (containsTerm(apolloText, sig.term)) penalty += Math.abs(sig.weight) * 0.5;
+    } else if (sig.weight < -40) {
+      // For heavy negative terms, still apply a reduced penalty even to physical facilities
+      if (containsTerm(companyName, sig.term)) penalty += Math.abs(sig.weight) * 0.3;
+    }
     if (penalty > 0) {
       score -= penalty;
       breakdown.negativePenalty += penalty;

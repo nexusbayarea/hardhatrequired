@@ -23,6 +23,7 @@ export class KeywordSignalExtractor {
     const categoryText = (company?.googleCategorySignals || []).join(' ');
     const apolloText = company?.apolloDescription || '';
 
+    const companyNameNormalized = (company?.companyName || '').toLowerCase();
     const baseNormalized = (text || '').toLowerCase();
     const categoryNormalized = categoryText.toLowerCase();
     const apolloNormalized = apolloText.toLowerCase();
@@ -51,7 +52,7 @@ export class KeywordSignalExtractor {
     const processSignal = (term: string) => {
       if (!hasSignal(fullNormalized, term)) return;
       matched.add(term);
-      if (hasSignal(baseNormalized, term)) {
+      if (hasSignal(companyNameNormalized, term)) {
         addSource(term, 'name');
       }
       if (hasSignal(categoryNormalized, term)) {
