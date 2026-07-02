@@ -10,10 +10,12 @@ import { geocodeZip, haversineDistance } from '@/lib/geo';
 import { getBlacklistedVerticalCompanies, getFeedbackCounts } from '@/lib/feedback/storage';
 import { FastJsonLdScraper } from '@/lib/market/scrapers/fastScraper';
 import { scrapeCompanyWebsite } from '@/lib/market/workers/enrichmentScraper';
-import { GOOGLE_TYPE_TO_VERTICAL_SIGNALS } from '@/lib/market/providers/google';
 import { GeminiScraperAdapter } from '@/lib/market/providers/geminiScraper';
-import { GOOGLE_VERTICAL_MAPPING } from '@/lib/market/googlePlaceMapping';
 import { harvestContractorSignals } from '@/lib/discovery/edgeScraper';
+import { buildDisposalSignals } from './disposal-signals';
+import { disposalPrefilter } from './disposal-prefilter';
+import { GooglePlacesDisposalProvider } from './providers/google-disposal';
+import { OverpassDisposalProvider } from './providers/overpass-disposal';
 import { withTimeout } from '@/lib/timeouts';
 import fs from 'fs';
 import path from 'path';
@@ -96,6 +98,40 @@ export class IndexIntelligenceEngine {
         count: results.length,
       });
     });
+
+    // Stage 1b: Disposal-specific providers run in parallel with each other
+    // but after the main providers — they use disposalSearchModifier directly
+    // instead of generic searchQueries.
+    if (filters.mode === 'disposal') {
+      const disposalRadius = Math.max(filters.radius || 50, 60);
+      const [googleDisposalResults, overpassResults] = await Promise.allSettled([
+        new GooglePlacesDisposalProvider().searchDisposal({
+          zip: filters.zip,
+          lat: zipCoords?.lat,
+          lng: zipCoords?.lng,
+          radiusMiles: disposalRadius,
+          verticalId: config.id,
+          verticalConfig: config,
+        }),
+        zipCoords
+          ? new OverpassDisposalProvider().searchDisposal({
+              lat: zipCoords.lat,
+              lng: zipCoords.lng,
+              radiusMiles: disposalRadius,
+              verticalId: config.id,
+            })
+          : Promise.resolve([]),
+      ]);
+      const disposalExtra = [
+        ...(googleDisposalResults.status === 'fulfilled' ? googleDisposalResults.value : []),
+        ...(overpassResults.status === 'fulfilled' ? overpassResults.value : []),
+      ];
+      console.log('[DISPOSAL_PROVIDERS]', {
+        google: googleDisposalResults.status === 'fulfilled' ? googleDisposalResults.value.length : 'failed',
+        overpass: overpassResults.status === 'fulfilled' ? overpassResults.value.length : 'failed',
+      });
+      providerResults.push(disposalExtra);
+    }
 
     const rawTotal = providerResults.flat().length;
     const candidatePool: Partial<Company>[] = [];
@@ -247,23 +283,32 @@ export class IndexIntelligenceEngine {
       }
 
       // Pre-filter before Apollo
-      // Disposal mode: skip pre-filter entirely. Google's text query IS the relevance
-      // filter — facilities like "Recology" or "GreenWaste" have opaque names that
-      // match no signal words but are legitimate disposal destinations. Apollo
-      // enrichment reveals what they actually do.
+      const precheckText = `${record.companyName || ''} ${record.notes || ''} ${record.address || ''}`;
+      const precheck = this.signalExtractor.extract(precheckText, signalsToCheck, config.equipmentKeywords, record);
+
       if (isDisposalMode) {
+        // Disposal mode: use multi-gate prefilter instead of raw signal check.
+        // Facilities like "Recology" or "GreenWaste" have opaque names with zero
+        // disposal keywords, but are legitimate disposal destinations. The prefilter
+        // checks Google category signals, OSM source, known operator names, and
+        // NAICS codes before falling back to keyword matching.
+        const gate = disposalPrefilter(record, precheck.hasSignals);
+        if (!gate.pass) {
+          console.log(`[DISPOSAL_PREFILTER] ${record.companyName} — dropped (${gate.reason})`);
+          continue;
+        }
+        console.log(`[DISPOSAL_PREFILTER] ${record.companyName} — passed via ${gate.gate} (${gate.reason})`);
         toEnrich.push({ record, base });
         continue;
       }
+
       const isCuratedResult = record.notes?.startsWith('Curated');
       if (isCuratedResult) {
         toEnrich.push({ record, base });
         continue;
       }
-      const precheckText = `${record.companyName || ''} ${record.notes || ''} ${record.address || ''}`;
-      const precheck = this.signalExtractor.extract(precheckText, signalsToCheck, config.equipmentKeywords, record);
       if (!precheck.hasSignals) {
-        console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (no ${isDisposalMode ? 'disposal' : 'labor'} signals)`);
+        console.log(`[PREFILTER] ${record.companyName} — skipped before Apollo (no labor signals)`);
         continue;
       }
       if (precheck.confidence === 'low') {
@@ -546,59 +591,6 @@ export class IndexIntelligenceEngine {
 }
 
 export class IndexIntelligenceOrchestrator extends IndexIntelligenceEngine {}
-
-function buildDisposalSignals(config: VerticalConfig): SignalLayers {
-  const seen = new Set<string>();
-  const primary: { term: string; weight: number }[] = [];
-
-  // Full multi-word phrases from disposalQueries — these match real facility names
-  // like "construction debris recycling yard" not just "recycling".
-  for (const q of (config.disposalQueries || [])) {
-    const phrase = q.toLowerCase().trim();
-    if (phrase.length >= 8 && !seen.has(phrase)) {
-      seen.add(phrase);
-      primary.push({ term: phrase, weight: 30 });
-    }
-    // Individual meaningful words as secondary signals
-    const words = phrase.split(/\s+/).filter(w => w.length >= 4);
-    for (const w of words) {
-      if (!seen.has(w)) {
-        seen.add(w);
-        primary.push({ term: w, weight: 15 });
-      }
-    }
-  }
-
-  // Google type signals for this vertical's GBP type — these bridge the gap for
-  // opaque facility names. If Google returns a company with type
-  // "waste_management_service", signals like "waste management" and "industrial
-  // waste" help match even when the name is just "Recology".
-  const mapping = GOOGLE_VERTICAL_MAPPING[config.id];
-  if (mapping) {
-    const typeSignals = GOOGLE_TYPE_TO_VERTICAL_SIGNALS[mapping.googlePrimaryType];
-    if (typeSignals) {
-      for (const sig of typeSignals) {
-        if (!seen.has(sig.term)) {
-          seen.add(sig.term);
-          primary.push({ term: sig.term, weight: 20 });
-        }
-      }
-    }
-    for (const secondaryType of (mapping.googleSecondaryTypes || [])) {
-      const secondarySignals = GOOGLE_TYPE_TO_VERTICAL_SIGNALS[secondaryType];
-      if (secondarySignals) {
-        for (const sig of secondarySignals) {
-          if (!seen.has(sig.term)) {
-            seen.add(sig.term);
-            primary.push({ term: sig.term, weight: 15 });
-          }
-        }
-      }
-    }
-  }
-
-  return { primary, secondary: [], negative: config.signals?.negative || [] };
-}
 
 function buildDisposalScoreConfig(config: VerticalConfig): VerticalConfig {
   return {

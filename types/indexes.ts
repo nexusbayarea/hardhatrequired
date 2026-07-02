@@ -35,6 +35,7 @@ export interface HHRBaseResult {
   source: string;
   verticalId: string;
   matchedSignals: string[];
+  notes?: string;
   createdAt: string;
 }
 
