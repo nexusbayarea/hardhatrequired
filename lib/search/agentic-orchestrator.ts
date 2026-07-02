@@ -44,7 +44,7 @@ export class AgenticOrchestrator extends IndexIntelligenceOrchestrator {
         sourcesUsed: cached.sourcesUsed || ['L1_cache'],
         stagesExecuted: cached.stagesExecuted || 1,
         decision: 'L1 Redis cache hit',
-        companies: cached.results as Company[],
+        companies: this.enrichCompanies(cached.results as Company[]),
         contacts: [],
         providerFailures: [],
         cacheSource: 'L1_redis',
@@ -141,9 +141,10 @@ export class AgenticOrchestrator extends IndexIntelligenceOrchestrator {
     const decision = evaluateStageDecision(config.id, stage1Result.companies.length, avgConfidence);
 
     if (!decision.runStage2 && !decision.runStage3) {
+      const companies = this.enrichCompanies(stage1Result.companies);
       await setCachedSearch(config.id, filters.zip, radius, mode, {
-        results: stage1Result.companies,
-        resultCount: stage1Result.companies.length,
+        results: companies,
+        resultCount: companies.length,
         avgConfidence,
         cachedAt: new Date().toISOString(),
         sourcesUsed,
@@ -155,7 +156,7 @@ export class AgenticOrchestrator extends IndexIntelligenceOrchestrator {
         sourcesUsed,
         stagesExecuted: 1,
         decision: decision.reason,
-        companies: stage1Result.companies,
+        companies,
         contacts: stage1Result.contacts,
         providerFailures: stage1Result.providerFailures,
         cacheSource: 'L3_scrape',
@@ -178,9 +179,10 @@ export class AgenticOrchestrator extends IndexIntelligenceOrchestrator {
 
       await this.persistProfiles(enriched.companies, config.id, zipCoords);
 
+      const companies = this.enrichCompanies(enriched.companies);
       await setCachedSearch(config.id, filters.zip, radius, mode, {
-        results: enriched.companies,
-        resultCount: enriched.companies.length,
+        results: companies,
+        resultCount: companies.length,
         avgConfidence,
         cachedAt: new Date().toISOString(),
         sourcesUsed,
@@ -192,7 +194,7 @@ export class AgenticOrchestrator extends IndexIntelligenceOrchestrator {
         sourcesUsed,
         stagesExecuted: 3,
         decision: decision.reason,
-        companies: enriched.companies,
+        companies,
         contacts: stage1Result.contacts,
         providerFailures: stage1Result.providerFailures,
         cacheSource: 'L3_scrape',
@@ -200,9 +202,10 @@ export class AgenticOrchestrator extends IndexIntelligenceOrchestrator {
     }
 
     // Stage 2 only
+    const companies = this.enrichCompanies(allCompanies);
     await setCachedSearch(config.id, filters.zip, radius, mode, {
-      results: allCompanies,
-      resultCount: allCompanies.length,
+      results: companies,
+      resultCount: companies.length,
       avgConfidence,
       cachedAt: new Date().toISOString(),
       sourcesUsed,
@@ -214,11 +217,28 @@ export class AgenticOrchestrator extends IndexIntelligenceOrchestrator {
       sourcesUsed,
       stagesExecuted: 2,
       decision: decision.reason,
-      companies: allCompanies,
+      companies,
       contacts: stage1Result.contacts,
       providerFailures: stage1Result.providerFailures,
       cacheSource: 'L3_scrape',
     };
+  }
+
+  // ── Enrich companies with map links ───────────────────────────────────
+  private enrichCompanies(companies: Company[]): Company[] {
+    return companies.map(c => {
+      if (c.coordinates && c.navigation) return c;
+      const lat = c.latitude;
+      const lng = c.longitude;
+      if (lat != null && lng != null) {
+        return {
+          ...c,
+          coordinates: { lat, lng },
+          navigation: generateMapLinks(lat, lng, c.companyName),
+        };
+      }
+      return c;
+    });
   }
 
   private async persistProfiles(
