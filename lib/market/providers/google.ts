@@ -152,12 +152,15 @@ export class GooglePlacesProvider implements DiscoveryProvider {
     const searchQueries = params.searchQueries?.length ? params.searchQueries : [];
 
     if (mapping && params.zip) {
-      // New: single typed Text Search with includedPrimaryTypes + strictTypeFiltering
-      const rawQuery = `${mapping.searchModifier} in ${params.zip}`;
-      const typedQuery = optimizeHhrQuery(rawQuery);
+      const useIncludedType = GooglePlacesProvider.INCLUDED_TYPE_SUPPORTED.has(mapping.googlePrimaryType);
+      const textQuery = useIncludedType
+        ? `${mapping.googlePrimaryType.replace(/_/g, ' ')} in ${params.zip}`
+        : `${mapping.searchModifier} in ${params.zip}`;
+      const typedQuery = optimizeHhrQuery(textQuery);
       try {
         const results = await this.searchWithPrimaryType(
           typedQuery,
+          mapping.googlePrimaryType,
           params.verticalConfig?.negativeKeywords || [],
           params.lat,
           params.lng,
@@ -300,8 +303,13 @@ export class GooglePlacesProvider implements DiscoveryProvider {
     }
   }
 
+  private static readonly INCLUDED_TYPE_SUPPORTED = new Set([
+    'electrician', 'plumber', 'roofing_contractor',
+  ]);
+
   async searchWithPrimaryType(
     queryText: string,
+    primaryType: string,
     negativeKeywords: string[],
     zipLat?: number,
     zipLng?: number,
@@ -323,6 +331,10 @@ export class GooglePlacesProvider implements DiscoveryProvider {
         textQuery: queryText,
         pageSize: 20,
       };
+      if (GooglePlacesProvider.INCLUDED_TYPE_SUPPORTED.has(primaryType)) {
+        body.includedType = primaryType;
+        body.strictTypeFiltering = true;
+      }
       if (pageToken) body.pageToken = pageToken;
 
       const response = await fetch(url, {
