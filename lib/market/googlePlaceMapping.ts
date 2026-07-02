@@ -75,6 +75,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'excavating_contractor',
     googleSecondaryTypes: ['general_contractor'],
     searchModifier: 'trench shoring structural sheet piling support',
+    disposalSearchModifier: 'steel lumber recycling construction debris disposal yard',
   },
   sandblasting: {
     googlePrimaryType: 'home_improvement_contractor',
