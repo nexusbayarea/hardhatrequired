@@ -152,10 +152,16 @@ export class GooglePlacesProvider implements DiscoveryProvider {
     const searchQueries = params.searchQueries?.length ? params.searchQueries : [];
 
     if (mapping && params.zip) {
+      const isDisposalMode = searchQueries.some(q =>
+        /\b(disposal|recycling|landfill|treatment|incineration|removal|dump|decommissioning)\b/i.test(q)
+      );
+      const modifier = isDisposalMode
+        ? (mapping.disposalSearchModifier ?? mapping.searchModifier)
+        : mapping.searchModifier;
       const useIncludedType = GooglePlacesProvider.INCLUDED_TYPE_SUPPORTED.has(mapping.googlePrimaryType);
       const textQuery = useIncludedType
         ? `${mapping.googlePrimaryType.replace(/_/g, ' ')} in ${params.zip}`
-        : `${mapping.searchModifier} in ${params.zip}`;
+        : `${modifier} in ${params.zip}`;
       const typedQuery = optimizeHhrQuery(textQuery);
       try {
         const results = await this.searchWithPrimaryType(

@@ -2,6 +2,7 @@ export interface GooglePlaceMapping {
   googlePrimaryType: string;
   googleSecondaryTypes?: string[];
   searchModifier: string;
+  disposalSearchModifier?: string;
 }
 
 export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
@@ -9,6 +10,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'waste_management_service',
     googleSecondaryTypes: ['home_improvement_contractor'],
     searchModifier: 'asbestos abatement hazardous removal commercial',
+    disposalSearchModifier: 'asbestos disposal landfill waste facility',
   },
   elevator_inspection: {
     googlePrimaryType: 'engineering_consultant',
@@ -34,20 +36,24 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'demolition_contractor',
     googleSecondaryTypes: ['excavating_contractor'],
     searchModifier: 'heavy structural demolition concrete crushing yard',
+    disposalSearchModifier: 'concrete recycling disposal demolition debris dump',
   },
   industrial_wastewater: {
     googlePrimaryType: 'waste_management_service',
     googleSecondaryTypes: ['utility_contractor'],
     searchModifier: 'industrial wastewater plant treatment service',
+    disposalSearchModifier: 'industrial wastewater treatment facility disposal',
   },
   medical_waste: {
     googlePrimaryType: 'waste_management_service',
     searchModifier: 'medical biohazard waste disposal autoclave facility',
+    disposalSearchModifier: 'medical waste disposal treatment autoclave facility',
   },
   slurry_processing: {
     googlePrimaryType: 'excavating_contractor',
     googleSecondaryTypes: ['waste_management_service'],
     searchModifier: 'drilling mud bentonite slurry processing dump site',
+    disposalSearchModifier: 'drilling mud slurry disposal dump processing facility',
   },
   stormwater_compliance: {
     googlePrimaryType: 'engineering_consultant',
@@ -58,6 +64,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'engineering_consultant',
     googleSecondaryTypes: ['waste_management_service'],
     searchModifier: 'UST underground storage tank testing service',
+    disposalSearchModifier: 'underground storage tank removal disposal facility',
   },
   high_voltage_electrical: {
     googlePrimaryType: 'electrician',
@@ -82,6 +89,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
     googlePrimaryType: 'waste_management_service',
     googleSecondaryTypes: ['excavating_contractor'],
     searchModifier: 'hazmat soil remediation contaminated dirt landfill',
+    disposalSearchModifier: 'hazardous waste landfill soil disposal facility',
   },
   fire_sprinklers: {
     googlePrimaryType: 'fire_protection_service',
@@ -105,14 +113,17 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
   concrete: {
     googlePrimaryType: 'concrete_contractor',
     searchModifier: 'commercial concrete contractor structural industrial',
+    disposalSearchModifier: 'concrete recycling yard disposal dump site',
   },
   commercial_roofing: {
     googlePrimaryType: 'roofing_contractor',
     searchModifier: 'commercial industrial roofing contractor waterproofing',
+    disposalSearchModifier: 'roofing tear off disposal dump construction debris',
   },
   scrap_metal: {
     googlePrimaryType: 'steel_fabricator',
     searchModifier: 'steel fabrication metal processing industrial scrap yard',
+    disposalSearchModifier: 'scrap metal recycling yard processing facility',
   },
   backflow_testing: {
     googlePrimaryType: 'plumber',
@@ -121,6 +132,7 @@ export const GOOGLE_VERTICAL_MAPPING: Record<string, GooglePlaceMapping> = {
   grease_trap: {
     googlePrimaryType: 'plumber',
     searchModifier: 'grease trap cleaning interceptor service commercial kitchen',
+    disposalSearchModifier: 'grease trap waste disposal rendering facility',
   },
   kitchen_exhaust: {
     googlePrimaryType: 'hvac_contractor',
