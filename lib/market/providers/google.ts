@@ -379,7 +379,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       });
     });
 
-    return this.mapResults(filteredPlaces, zipLat, zipLng, verticalConfig, searchQueries);
+    return this.mapResults(filteredPlaces, zipLat, zipLng, verticalConfig, searchQueries, queryText, true, primaryType);
   }
 
   async searchWithNegatives(
@@ -448,7 +448,9 @@ export class GooglePlacesProvider implements DiscoveryProvider {
     zipLat?: number,
     zipLng?: number,
     verticalConfig?: VerticalConfig,
-    searchQueries?: string[]
+    searchQueries?: string[],
+    queryText?: string,
+    relaxed?: boolean,
   ): Partial<Company>[] {
     const queries = searchQueries?.length ? searchQueries : (verticalConfig?.searchQueries || []);
     const now = new Date().toISOString();
@@ -466,6 +468,11 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       const categorySignals = extractCategorySignals(allTypes, verticalConfig, queries);
 
       const hasStrongSignals = categorySignals.some((s) => s.strength === 'strong');
+
+      if (relaxed) {
+        mapped.push(this.placeToCompany(p, now, zipLat, zipLng, verticalConfig, undefined, queryText));
+        continue;
+      }
 
       const nameLower = (p.displayName?.text || '').toLowerCase();
       const fullQueryMatch = queries.some(q => nameLower.includes(q.toLowerCase()));
@@ -490,35 +497,48 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       if (!hasStrongSignals && !hasUsefulNameSignal) continue;
       if (weakOnly && !hasUsefulNameSignal) continue;
 
-      const lat = p.location?.latitude;
-      const lng = p.location?.longitude;
-      const distanceMiles =
-        zipLat != null && zipLng != null && lat != null && lng != null
-          ? Math.round(haversineDistance(zipLat, zipLng, lat, lng) * 10) / 10
-          : undefined;
-
-      mapped.push({
-        id: p.id,
-        companyName: p.displayName?.text || 'Unknown',
-        address: p.formattedAddress,
-        phone: p.nationalPhoneNumber,
-        website: p.websiteUri,
-        googlePrimaryType: p.primaryType,
-        googleTypes: p.types || [],
-        googleCategorySignals: categorySignals.map((s) => s.term),
-        googleRating: p.rating,
-        googleReviewCount: p.userRatingCount,
-        latitude: lat,
-        longitude: lng,
-        distanceMiles,
-        source: this.name,
-        status: 'NOT_CONTACTED' as const,
-        createdAt: now,
-        updatedAt: now,
-      });
+      mapped.push(this.placeToCompany(p, now, zipLat, zipLng, verticalConfig, categorySignals));
     }
 
     return mapped;
+  }
+
+  private placeToCompany(
+    p: GooglePlace,
+    now: string,
+    zipLat?: number,
+    zipLng?: number,
+    verticalConfig?: VerticalConfig,
+    categorySignals?: CategorySignal[],
+    queryText?: string,
+  ): Partial<Company> {
+    const lat = p.location?.latitude;
+    const lng = p.location?.longitude;
+    const distanceMiles =
+      zipLat != null && zipLng != null && lat != null && lng != null
+        ? Math.round(haversineDistance(zipLat, zipLng, lat, lng) * 10) / 10
+        : undefined;
+
+    return {
+      id: p.id,
+      companyName: p.displayName?.text || 'Unknown',
+      address: p.formattedAddress,
+      phone: p.nationalPhoneNumber,
+      website: p.websiteUri,
+      googlePrimaryType: p.primaryType,
+      googleTypes: p.types || [],
+      googleCategorySignals: categorySignals?.map((s) => s.term),
+      googleRating: p.rating,
+      googleReviewCount: p.userRatingCount,
+      latitude: lat,
+      longitude: lng,
+      distanceMiles,
+      notes: queryText ? `Matched query: ${queryText.replace(/ in \d+$/, '')}` : undefined,
+      source: this.name,
+      status: 'NOT_CONTACTED' as const,
+      createdAt: now,
+      updatedAt: now,
+    };
   }
 }
 

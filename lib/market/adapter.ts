@@ -187,7 +187,11 @@ export class IndexIntelligenceEngine {
         if (!scored) continue;
         if (scored.feedbackAction === 'blacklist') continue;
         const sr = scored.result;
-        if (sr.score < 65 || sr.grade === 'D') continue;
+        if (isDisposalMode) {
+          if (sr.score < 40) continue;
+        } else {
+          if (sr.score < 65 || sr.grade === 'D') continue;
+        }
         finalizedCompanies.push({
           ...record,
           organizationId,
@@ -208,6 +212,11 @@ export class IndexIntelligenceEngine {
       }
 
       // Pre-filter before Apollo
+      const isCuratedResult = record.notes?.startsWith('Matched query:');
+      if (isCuratedResult) {
+        toEnrich.push({ record, base });
+        continue;
+      }
       const precheckText = `${record.companyName || ''} ${record.notes || ''} ${record.address || ''}`;
       const precheck = this.signalExtractor.extract(precheckText, signalsToCheck, config.equipmentKeywords, record);
       if (!precheck.hasSignals) {
@@ -332,8 +341,10 @@ export class IndexIntelligenceEngine {
       mergedCompany.fitType = scoreResult.fitType;
 
       // Stage 5: Hard filter garbage after scoring
-      if (scoreResult.score < 65 || scoreResult.grade === 'D') {
-        continue;
+      if (isDisposalMode) {
+        if (scoreResult.score < 40) continue;
+      } else {
+        if (scoreResult.score < 65 || scoreResult.grade === 'D') continue;
       }
 
       const contactId = `contact-${mergedCompany.id}`;
@@ -361,7 +372,11 @@ export class IndexIntelligenceEngine {
       if (!scored) continue;
       const { result: scoreResult, feedbackAction } = scored;
       if (feedbackAction === 'blacklist') continue;
-      if (scoreResult.score < 65 || scoreResult.grade === 'D') continue;
+      if (isDisposalMode) {
+        if (scoreResult.score < 40) continue;
+      } else {
+        if (scoreResult.score < 65 || scoreResult.grade === 'D') continue;
+      }
       finalizedCompanies.push({
         ...mergedCompany,
         enrichmentScore: scoreResult.score,
@@ -479,15 +494,14 @@ export class IndexIntelligenceEngine {
 export class IndexIntelligenceOrchestrator extends IndexIntelligenceEngine {}
 
 const GENERIC_WORDS = new Set([
-  'service', 'services', 'facility', 'facilities', 'disposal', 'plant', 'plants',
-  'treatment', 'recycling', 'recycler', 'recyclers', 'company', 'companies',
-  'contractor', 'contractors', 'removal', 'transport', 'management', 'industrial',
-  'commercial', 'waste', 'hazardous', 'center', 'centre', 'system', 'systems',
+  'service', 'services', 'company', 'companies',
+  'contractor', 'contractors', 'industrial',
+  'commercial', 'system', 'systems',
   'solution', 'solutions', 'supply', 'supplies', 'supplier', 'suppliers',
-  'equipment', 'product', 'products', 'material', 'materials', 'processing',
+  'equipment', 'product', 'products', 'material', 'materials',
   'broker', 'brokers', 'consulting', 'consultant', 'consultants',
   'parking', 'tire', 'tires', 'auto', 'automotive', 'repair', 'truck',
-  'trucking', 'hauling', 'storage',
+  'trucking', 'storage',
   'excavation', 'construction',
 ]);
 
