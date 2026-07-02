@@ -378,6 +378,28 @@ export class IndexIntelligenceEngine {
 
     // Stage 6: Enterprise overlay — inject known market leaders not found by providers
     const enterpriseCompanies = getEnterpriseOverlay(config.id, filters.zip, radiusFilter);
+
+    // Calculate distances for enterprise entries using zip geocoding
+    if (enterpriseCompanies.length > 0) {
+      const targetCoords = await geocodeZip(filters.zip);
+      if (targetCoords) {
+        const zipCache = new Map<string, { lat: number; lng: number } | null>();
+        for (const ec of enterpriseCompanies) {
+          if (!ec.zip) continue;
+          if (!zipCache.has(ec.zip)) {
+            zipCache.set(ec.zip, await geocodeZip(ec.zip));
+          }
+          const branchCoords = zipCache.get(ec.zip);
+          if (branchCoords) {
+            ec.distanceMiles = Math.round(haversineDistance(
+              targetCoords.lat, targetCoords.lng,
+              branchCoords.lat, branchCoords.lng
+            ) * 10) / 10;
+          }
+        }
+      }
+    }
+
     for (const ec of enterpriseCompanies) {
       const alreadyIncluded = finalizedCompanies.some(fc =>
         fc.companyName?.toLowerCase().includes(ec.companyName?.toLowerCase().split(' - ')[0]?.toLowerCase() || '')

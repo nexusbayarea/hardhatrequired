@@ -33,7 +33,7 @@ jobs:
 
       # Fetch secrets from Infisical at runtime using OIDC (no static API keys needed)
       - name: Inject secrets from Infisical
-        uses: Infisical/secrets-action@v1
+        uses: Infisical/secrets-action@v1.0.16
         with:
           method: "oidc"
           identity-id: ${{ secrets.INFISICAL_MACHINE_IDENTITY_ID }}
