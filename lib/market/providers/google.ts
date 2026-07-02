@@ -379,7 +379,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       });
     });
 
-    return this.mapResults(filteredPlaces, zipLat, zipLng, verticalConfig, searchQueries, queryText, true, primaryType);
+    return this.mapResults(filteredPlaces, zipLat, zipLng, verticalConfig, searchQueries, queryText, true);
   }
 
   async searchWithNegatives(
