@@ -159,6 +159,22 @@ export async function upsertCompanyProfile(
   };
 }
 
+export async function getFeedbackCounts(
+  companyId: string,
+  vertical: string
+): Promise<{ positiveCount: number; negativeCount: number }> {
+  const client = getClient();
+  if (!client) return { positiveCount: 0, negativeCount: 0 };
+
+  const profile = await getCompanyProfile(companyId, vertical);
+  if (!profile) return { positiveCount: 0, negativeCount: 0 };
+
+  return {
+    positiveCount: profile.accurateVotes,
+    negativeCount: profile.badVotes,
+  };
+}
+
 export async function getVerticalStats(vertical?: string): Promise<{
   total: number;
   accurate: number;

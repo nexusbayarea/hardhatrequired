@@ -233,6 +233,232 @@ const ENTERPRISE_MARKET_LEADERS: Record<string, EnterpriseEntry[]> = {
       ],
     },
   ],
+  fire_sprinklers: [
+    {
+      name: 'Nor-Cal Fire Protection',
+      corporateParent: 'Nor-Cal Fire Protection Inc',
+      naics: [238220],
+      branches: [
+        { region: 'Bay Area', city: 'Gilroy', zip: '95020', phone: '408-776-1580' },
+      ],
+    },
+    {
+      name: 'Transbay Fire Protection',
+      corporateParent: 'Transbay Fire Protection Inc',
+      naics: [238220],
+      branches: [
+        { region: 'Bay Area', city: 'Pleasanton', zip: '94588', phone: '925-455-2751' },
+      ],
+    },
+    {
+      name: 'Integral Fire Protection',
+      corporateParent: 'Integral Fire Protection Inc',
+      naics: [238220],
+      branches: [
+        { region: 'Bay Area', city: 'San Leandro', zip: '94577', phone: '925-206-9508' },
+      ],
+    },
+  ],
+  generator_testing: [
+    {
+      name: 'CD & Power (California Diesel & Power)',
+      corporateParent: 'CD & Power',
+      naics: [811310, 335312],
+      branches: [
+        { region: 'Bay Area', city: 'Martinez', zip: '94553', phone: '925-229-2700' },
+        { region: 'Sacramento', city: 'Sacramento', zip: '95828', phone: '866-468-7697' },
+      ],
+    },
+    {
+      name: 'PowerGen',
+      corporateParent: 'PowerGen Inc',
+      naics: [811310, 335312],
+      branches: [
+        { region: 'Bay Area', city: 'Tracy', zip: '95304', phone: '209-229-1990' },
+      ],
+    },
+    {
+      name: 'OnPoint Generators',
+      corporateParent: 'OnPoint Generators Inc',
+      naics: [811310, 335312],
+      branches: [
+        { region: 'Bay Area', city: 'Los Gatos', zip: '95032', phone: '408-402-3005' },
+      ],
+    },
+  ],
+  hazardous_soil_remediation: [
+    {
+      name: 'Geo Forward',
+      corporateParent: 'Geo Forward Inc',
+      naics: [562910, 541620],
+      branches: [
+        { region: 'Bay Area', city: 'San Francisco', zip: '94105', phone: '888-930-6604' },
+      ],
+    },
+    {
+      name: 'ECM Consultants',
+      corporateParent: 'ECM Consultants Inc',
+      naics: [562910, 541620],
+      branches: [
+        { region: 'Bay Area', city: 'Walnut Creek', zip: '94596', phone: '714-662-2759' },
+      ],
+    },
+  ],
+  high_voltage_electrical: [
+    {
+      name: 'Specialized Engineering Services',
+      corporateParent: 'Specialized Engineering Services Inc',
+      naics: [238210, 811310],
+      branches: [
+        { region: 'Bay Area', city: 'San Jose', zip: '95131', phone: '408-292-9229' },
+      ],
+    },
+    {
+      name: 'RESA Power',
+      corporateParent: 'RESA Power LLC',
+      naics: [238210, 811310],
+      branches: [
+        { region: 'Bay Area', city: 'San Jose', zip: '95131', phone: '415-272-6102' },
+      ],
+    },
+  ],
+  hvac_industrial: [
+    {
+      name: 'Bay Area Mechanical',
+      corporateParent: 'Bay Area Mechanical LLC',
+      naics: [238220, 811310],
+      branches: [
+        { region: 'Bay Area', city: 'Santa Clara', zip: '95050', phone: '888-596-9226' },
+      ],
+    },
+    {
+      name: 'Cold Temp Solutions',
+      corporateParent: 'Cold Temp Solutions Inc',
+      naics: [238220, 811310],
+      branches: [
+        { region: 'Bay Area', city: 'Martinez', zip: '94553', phone: '925-374-4014' },
+      ],
+    },
+  ],
+  marine_construction: [
+    {
+      name: 'Manson Construction Co.',
+      corporateParent: 'Manson Construction Company',
+      naics: [237990],
+      branches: [
+        { region: 'Bay Area', city: 'Long Beach', zip: '90802', phone: '206-762-0850' },
+      ],
+    },
+    {
+      name: 'Mid-Cal Construction',
+      corporateParent: 'Mid-Cal Construction Inc',
+      naics: [237990],
+      branches: [
+        { region: 'Central Valley', city: 'Stockton', zip: '95205', phone: '209-832-4400' },
+      ],
+    },
+  ],
+  sandblasting: [
+    {
+      name: 'Reliable Powder Coating',
+      corporateParent: 'Reliable Powder Coating LLC',
+      naics: [332812, 238320],
+      branches: [
+        { region: 'Bay Area', city: 'San Leandro', zip: '94577', phone: '510-895-5551' },
+      ],
+    },
+    {
+      name: 'Picon FRP',
+      corporateParent: 'Picon Inc',
+      naics: [238320, 332812],
+      branches: [
+        { region: 'Bay Area', city: 'San Pablo', zip: '94806', phone: '510-232-0065' },
+      ],
+    },
+  ],
+  solar_infrastructure: [
+    {
+      name: 'Sun Light & Power',
+      corporateParent: 'Sun Light & Power',
+      naics: [238220, 221114],
+      branches: [
+        { region: 'Bay Area', city: 'Berkeley', zip: '94710', phone: '510-540-1700' },
+      ],
+    },
+    {
+      name: 'Cobalt Power Systems',
+      corporateParent: 'Cobalt Power Systems Inc',
+      naics: [238220, 221114],
+      branches: [
+        { region: 'Bay Area', city: 'San Carlos', zip: '94070', phone: '650-817-7791' },
+      ],
+    },
+  ],
+  stormwater_compliance: [
+    {
+      name: 'Quick SWPPP',
+      corporateParent: 'Quick SWPPP Inc',
+      naics: [541620, 541990],
+      branches: [
+        { region: 'Bay Area', city: 'Concord', zip: '94520', phone: '925-872-7260' },
+      ],
+    },
+    {
+      name: 'California Compliance Environmental',
+      corporateParent: 'California Compliance Environmental',
+      naics: [541620, 562910],
+      branches: [
+        { region: 'Bay Area', city: 'Oakland', zip: '94612', phone: '510-775-8005' },
+      ],
+    },
+  ],
+  trench_shoring: [
+    {
+      name: 'Trench Shoring Company',
+      corporateParent: 'Trench Shoring Company',
+      naics: [532490, 238910],
+      branches: [
+        { region: 'Bay Area', city: 'San Leandro', zip: '94577', phone: '510-900-0595' },
+        { region: 'Sacramento', city: 'Sacramento', zip: '95838', phone: '916-290-4020' },
+      ],
+    },
+  ],
+  dewatering: [
+    {
+      name: 'Viking Drillers',
+      corporateParent: 'Viking Drillers Inc',
+      naics: [237110, 532490],
+      branches: [
+        { region: 'Bay Area', city: 'Granite Bay', zip: '95746', phone: '916-742-1500' },
+      ],
+    },
+    {
+      name: 'SWIMS',
+      corporateParent: 'Storm Water Inspection and Maintenance Services',
+      naics: [237110, 541620],
+      branches: [
+        { region: 'Bay Area', city: 'San Ramon', zip: '94583', phone: '866-967-9467' },
+      ],
+    },
+  ],
+  wind_infrastructure: [
+    {
+      name: 'Spark Power',
+      corporateParent: 'Spark Power Corp',
+      naics: [221115, 811310],
+      branches: [
+        { region: 'Bay Area', city: 'Oakland', zip: '94607', phone: '855-727-5888' },
+      ],
+    },
+    {
+      name: 'BHI Energy',
+      corporateParent: 'BHI Energy',
+      naics: [221115, 811310],
+      branches: [
+        { region: 'Bay Area', city: 'San Francisco', zip: '94105', phone: '800-548-2665' },
+      ],
+    },
+  ],
 };
 
 export function getEnterpriseOverlay(verticalId: string, targetZip: string, targetRadiusMiles: number): Partial<Company>[] {

@@ -7,7 +7,7 @@ import { KeywordSignalExtractor } from './signals';
 import { buildAnalysisText } from './scoring';
 import { ScoreEngine, createTenantProfile } from '@/lib/scoring';
 import { geocodeZip, haversineDistance } from '@/lib/geo';
-import { getBlacklistedVerticalCompanies } from '@/lib/feedback/storage';
+import { getBlacklistedVerticalCompanies, getFeedbackCounts } from '@/lib/feedback/storage';
 import { FastJsonLdScraper } from '@/lib/market/scrapers/fastScraper';
 import { scrapeCompanyWebsite } from '@/lib/market/workers/enrichmentScraper';
 import { withTimeout } from '@/lib/timeouts';
@@ -288,6 +288,10 @@ export class IndexIntelligenceEngine {
         ...c, companyId: mergedCompany.id!
       }));
 
+      const feedbackCounts = await getFeedbackCounts(mergedCompany.id || '', scoreConfig.id);
+      mergedCompany.feedbackPositiveCount = feedbackCounts.positiveCount;
+      mergedCompany.feedbackNegativeCount = feedbackCounts.negativeCount;
+
       const scored = await this.scoreEngine.getCachedOrScore(tenant, mergedCompany, scoreConfig);
       if (!scored) return null;
       const { result: scoreResult, feedbackAction } = scored;
@@ -440,7 +444,7 @@ export class IndexIntelligenceEngine {
           ...ec,
           organizationId: organizationId || '',
           verticalId: config.id,
-          enrichmentScore: 130,
+          enrichmentScore: 100,
           priority: 'A',
           status: 'NOT_CONTACTED',
           matchedSignals: ['enterprise_overlay'],
