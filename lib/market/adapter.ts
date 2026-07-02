@@ -212,7 +212,7 @@ export class IndexIntelligenceEngine {
       }
 
       // Pre-filter before Apollo
-      const isCuratedResult = record.notes?.startsWith('Matched query:');
+      const isCuratedResult = record.notes?.startsWith('Curated');
       if (isCuratedResult) {
         toEnrich.push({ record, base });
         continue;

@@ -533,7 +533,7 @@ export class GooglePlacesProvider implements DiscoveryProvider {
       latitude: lat,
       longitude: lng,
       distanceMiles,
-      notes: queryText ? `Matched query: ${queryText.replace(/ in \d+$/, '')}` : undefined,
+      notes: queryText ? 'Curated query' : undefined,
       source: this.name,
       status: 'NOT_CONTACTED' as const,
       createdAt: now,
