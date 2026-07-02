@@ -68,7 +68,11 @@ Return ONLY a JSON object with { hardware, price_per_hour, available }.`;
   }
 
   private async executeSmartGasWorkflow(intent: ParsedUserIntent) {
-    const stations = await this.placesAdapter.search(`Gas stations in ${intent.location}`);
+    const stations = await this.placesAdapter.search({
+      zip: typeof intent.location === 'string' ? intent.location : '',
+      vertical: 'industrial_wastewater',
+      searchQueries: [`gas station ${typeof intent.location === 'string' ? intent.location : ''}`],
+    });
 
     const enrichedStations = await Promise.all(
       stations.map(async (station) => {

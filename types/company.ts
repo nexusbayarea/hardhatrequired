@@ -72,6 +72,7 @@ export interface Company {
   scrapedKeywords?: string[];
   scrapedLicenseNumbers?: string[];
   scrapedText?: string;
+  aiSummary?: string;
   notes?: string;
   source?: string;
   createdAt: string;

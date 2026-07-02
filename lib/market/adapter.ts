@@ -10,6 +10,8 @@ import { geocodeZip, haversineDistance } from '@/lib/geo';
 import { getBlacklistedVerticalCompanies, getFeedbackCounts } from '@/lib/feedback/storage';
 import { FastJsonLdScraper } from '@/lib/market/scrapers/fastScraper';
 import { scrapeCompanyWebsite } from '@/lib/market/workers/enrichmentScraper';
+import { GeminiScraperAdapter } from '@/lib/market/providers/geminiScraper';
+import { harvestContractorSignals } from '@/lib/discovery/edgeScraper';
 import { withTimeout } from '@/lib/timeouts';
 import fs from 'fs';
 import path from 'path';
@@ -39,6 +41,7 @@ export class IndexIntelligenceEngine {
   private signalExtractor = new KeywordSignalExtractor();
   private fastScraper = new FastJsonLdScraper();
   private scoreEngine = new ScoreEngine();
+  private aiScraper = new GeminiScraperAdapter();
 
   async executeMarketDiscovery(
     filters: SearchFilters,
@@ -291,9 +294,11 @@ export class IndexIntelligenceEngine {
       };
 
       if (mergedBase.website) {
-        const [jsonLdResult, textResult] = await Promise.all([
+        const [jsonLdResult, textResult, aiSignalResult, edgeResult] = await Promise.all([
           this.fastScraper.extractBusinessData(mergedBase.website),
           scrapeCompanyWebsite(mergedBase.website, config.equipmentKeywords || [], config.negativeKeywords),
+          this.aiScraper.scanForSignals(mergedBase.website, config.equipmentKeywords || []).catch(() => null),
+          harvestContractorSignals(mergedBase.website, config.equipmentKeywords || []).catch(() => null),
         ]);
         if (jsonLdResult) {
           if (!mergedBase.phone && jsonLdResult.extractedPhone) mergedBase.phone = jsonLdResult.extractedPhone;
@@ -303,13 +308,22 @@ export class IndexIntelligenceEngine {
               .filter(Boolean).join(' | ');
           }
         }
-        if (textResult) {
+        if (edgeResult) {
+          mergedBase.scrapedIsCommercial = edgeResult.scrapedIsCommercial;
+          mergedBase.scrapedIsResidential = edgeResult.scrapedIsResidential;
+          mergedBase.scrapedKeywords = edgeResult.scrapedKeywords;
+          mergedBase.scrapedLicenseNumbers = edgeResult.scrapedLicenseNumbers;
+          mergedBase.scrapedText = edgeResult.scrapedText;
+        } else if (textResult) {
           mergedBase.scrapedIsCommercial = textResult.isCommercial;
           mergedBase.scrapedIsResidential = textResult.isResidential;
           mergedBase.scrapedIsMismatch = textResult.isMismatch;
           mergedBase.scrapedKeywords = textResult.matchedKeywords;
           mergedBase.scrapedLicenseNumbers = textResult.licenseNumbers;
           mergedBase.scrapedText = textResult.rawText || undefined;
+        }
+        if (aiSignalResult?.hasSignals && aiSignalResult.capabilitySummary) {
+          mergedBase.aiSummary = aiSignalResult.capabilitySummary;
         }
       }
 
