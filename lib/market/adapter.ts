@@ -400,7 +400,17 @@ export class IndexIntelligenceEngine {
       }
     }
 
-    for (const ec of enterpriseCompanies) {
+    // Filter enterprise entries beyond the search radius
+    const filteredEnterprise = enterpriseCompanies.filter(ec => {
+      if (ec.distanceMiles == null) return true;
+      return ec.distanceMiles <= radiusFilter;
+    });
+    const droppedCount = enterpriseCompanies.length - filteredEnterprise.length;
+    if (droppedCount > 0) {
+      console.log(`[ENTERPRISE] Dropped ${droppedCount}/${enterpriseCompanies.length} entries — beyond ${radiusFilter}mi radius`);
+    }
+
+    for (const ec of filteredEnterprise) {
       const alreadyIncluded = finalizedCompanies.some(fc =>
         fc.companyName?.toLowerCase().includes(ec.companyName?.toLowerCase().split(' - ')[0]?.toLowerCase() || '')
       );
