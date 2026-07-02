@@ -72,6 +72,9 @@ export interface Company {
   scrapedKeywords?: string[];
   scrapedLicenseNumbers?: string[];
   scrapedText?: string;
+  extractedServices?: { id: string; confidence: number }[];
+  extractedEquipment?: { id: string; confidence: number }[];
+  extractionConfidence?: number;
   aiSummary?: string;
   naicsCodes?: string[];
   isDisposalFacilityByCategory?: boolean;
