@@ -2,6 +2,7 @@ import { Company } from '@/types/company';
 import { DiscoveryProvider, DiscoveryParams } from './base';
 import { haversineDistance } from '@/lib/geo';
 import { VerticalConfig } from '@/types/config';
+import { GOOGLE_VERTICAL_MAPPING } from '@/lib/market/googlePlaceMapping';
 
 export interface CategorySignal {
   term: string;
@@ -129,6 +130,14 @@ export const GOOGLE_TYPE_TO_VERTICAL_SIGNALS: Record<string, CategorySignal[]> =
   ],
 };
 
+export function optimizeHhrQuery(userInput: string): string {
+  const normalized = userInput.toLowerCase().trim();
+  if (normalized.includes('c&d disposal') || normalized.includes('c&d dump')) {
+    return 'Construction and Demolition Recycling Center';
+  }
+  return userInput;
+}
+
 export class GooglePlacesProvider implements DiscoveryProvider {
   name = 'google_places';
 
@@ -138,16 +147,19 @@ export class GooglePlacesProvider implements DiscoveryProvider {
 
     const allResults: Partial<Company>[] = [];
     const seen = new Set<string>();
+    const vertical = params.vertical;
+    const mapping = GOOGLE_VERTICAL_MAPPING[vertical];
+    const searchQueries = params.searchQueries?.length ? params.searchQueries : [];
 
-    const searchQueries = params.searchQueries?.length
-      ? params.searchQueries
-      : [];
-
-    for (const query of searchQueries) {
-      const textQuery = `${query} ${params.zip}`;
+    if (mapping && params.zip) {
+      // New: single typed Text Search with includedPrimaryTypes + strictTypeFiltering
+      const rawQuery = `${mapping.searchModifier} in ${params.zip}`;
+      const typedQuery = optimizeHhrQuery(rawQuery);
       try {
-        const results = await this.searchWithNegatives(
-          textQuery,
+        const results = await this.searchWithPrimaryType(
+          typedQuery,
+          mapping.googlePrimaryType,
+          mapping.googleSecondaryTypes,
           params.verticalConfig?.negativeKeywords || [],
           params.lat,
           params.lng,
@@ -162,7 +174,54 @@ export class GooglePlacesProvider implements DiscoveryProvider {
           }
         }
       } catch (err) {
-        console.error(`[GooglePlacesProvider] Query failed:`, err);
+        console.error(`[GooglePlacesProvider] Typed search failed for ${vertical}:`, err);
+        // Fallback: iterate searchQueries as before
+        for (const query of searchQueries) {
+          const textQuery = `${query} ${params.zip}`;
+          try {
+            const results = await this.searchWithNegatives(
+              textQuery,
+              params.verticalConfig?.negativeKeywords || [],
+              params.lat,
+              params.lng,
+              params.verticalConfig,
+              searchQueries
+            );
+            for (const r of results) {
+              const key = (r.companyName || '').toLowerCase().trim();
+              if (!seen.has(key)) {
+                seen.add(key);
+                allResults.push(r);
+              }
+            }
+          } catch (err2) {
+            console.error(`[GooglePlacesProvider] Fallback query failed:`, err2);
+          }
+        }
+      }
+    } else {
+      // Legacy: iterate searchQueries verbatim
+      for (const query of searchQueries) {
+        const textQuery = `${query} ${params.zip}`;
+        try {
+          const results = await this.searchWithNegatives(
+            textQuery,
+            params.verticalConfig?.negativeKeywords || [],
+            params.lat,
+            params.lng,
+            params.verticalConfig,
+            searchQueries
+          );
+          for (const r of results) {
+            const key = (r.companyName || '').toLowerCase().trim();
+            if (!seen.has(key)) {
+              seen.add(key);
+              allResults.push(r);
+            }
+          }
+        } catch (err) {
+          console.error(`[GooglePlacesProvider] Query failed:`, err);
+        }
       }
     }
 
@@ -171,7 +230,8 @@ export class GooglePlacesProvider implements DiscoveryProvider {
         const nearbyResults = await this.searchNearby(
           params.lat, params.lng, Math.min((params.radius || 50) * 1609, 50000),
           params.verticalConfig,
-          searchQueries
+          searchQueries,
+          vertical
         );
         for (const r of nearbyResults) {
           const key = (r.companyName || '').toLowerCase().trim();
@@ -191,18 +251,22 @@ export class GooglePlacesProvider implements DiscoveryProvider {
   async searchNearby(
     lat: number, lng: number, radiusMeters: number,
     verticalConfig?: VerticalConfig,
-    searchQueries?: string[]
+    searchQueries?: string[],
+    verticalId?: string
   ): Promise<Partial<Company>[]> {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey) return [];
 
-    const includedTypes = [
-      'recycling_center', 'concrete_contractor', 'waste_management_service',
-      'construction_company', 'demolition_contractor', 'ready_mix_concrete_supplier',
-      'excavating_contractor', 'industrial_equipment_supplier',
-      'environmental_consultant', 'hazardous_waste_disposal',
-      'electrician', 'electrical_contractor', 'mechanical_contractor',
-    ];
+    const mapping = verticalId ? GOOGLE_VERTICAL_MAPPING[verticalId] : undefined;
+    const includedTypes = mapping
+      ? [mapping.googlePrimaryType, ...(mapping.googleSecondaryTypes || [])]
+      : [
+          'recycling_center', 'concrete_contractor', 'waste_management_service',
+          'construction_company', 'demolition_contractor', 'ready_mix_concrete_supplier',
+          'excavating_contractor', 'industrial_equipment_supplier',
+          'environmental_consultant', 'hazardous_waste_disposal',
+          'electrician', 'electrical_contractor', 'mechanical_contractor',
+        ];
 
     const url = 'https://places.googleapis.com/v1/places:searchNearby';
     const body = {
@@ -236,6 +300,77 @@ export class GooglePlacesProvider implements DiscoveryProvider {
     } catch {
       return [];
     }
+  }
+
+  async searchWithPrimaryType(
+    queryText: string,
+    primaryType: string,
+    secondaryTypes: string[] | undefined,
+    negativeKeywords: string[],
+    zipLat?: number,
+    zipLng?: number,
+    verticalConfig?: VerticalConfig,
+    searchQueries?: string[]
+  ): Promise<Partial<Company>[]> {
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (!apiKey) {
+      throw new Error('GOOGLE_PLACES_API_KEY is not configured.');
+    }
+
+    const url = 'https://places.googleapis.com/v1/places:searchText';
+    const allPlaces: GooglePlace[] = [];
+    let pageToken: string | undefined;
+    const MAX_PAGES = 2;
+
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const body: Record<string, unknown> = {
+        textQuery: queryText,
+        includedPrimaryTypes: [primaryType],
+        strictTypeFiltering: true,
+        pageSize: 20,
+      };
+      if (secondaryTypes?.length) {
+        body.includedTypes = secondaryTypes;
+      }
+      if (pageToken) body.pageToken = pageToken;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask':
+            'places.id,places.displayName,places.formattedAddress,places.location,' +
+            'places.internationalPhoneNumber,places.websiteUri,' +
+            'places.primaryType,places.types,places.rating,places.userRatingCount,' +
+            'nextPageToken',
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Google Places API returned status ${response.status}`);
+      }
+
+      const data = await response.json();
+      allPlaces.push(...(data.places || []));
+
+      if (!data.nextPageToken) break;
+      pageToken = data.nextPageToken;
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    const filteredPlaces = allPlaces.filter((place) => {
+      const name = (place.displayName?.text || '').toLowerCase();
+      const address = (place.formattedAddress || '').toLowerCase();
+      const type = (place.primaryType || '').toLowerCase();
+      return !negativeKeywords.some((keyword) => {
+        const cleanK = keyword.toLowerCase();
+        return name.includes(cleanK) || address.includes(cleanK) || type.includes(cleanK);
+      });
+    });
+
+    return this.mapResults(filteredPlaces, zipLat, zipLng, verticalConfig, searchQueries);
   }
 
   async searchWithNegatives(
