@@ -227,7 +227,16 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                     {company.address && (
                                       <div className="flex items-start gap-2 text-sm">
                                         <MapPin className="w-3.5 h-3.5 text-muted shrink-0 mt-0.5" />
-                                        <span className="text-muted">{company.address}</span>
+                                        <a
+                                          href={company.coordinates
+                                            ? `https://www.google.com/maps/search/?api=1&query=${company.coordinates.lat},${company.coordinates.lng}`
+                                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(company.address)}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-muted hover:underline"
+                                        >
+                                          {company.address}
+                                        </a>
                                       </div>
                                     )}
                                     {company.phone && (

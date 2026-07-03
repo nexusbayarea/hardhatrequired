@@ -209,7 +209,17 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                       {r.address && (
                         <div className="flex items-start gap-3">
                           <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-muted)' }} />
-                          <span className="text-base" style={{ color: 'var(--color-muted)' }}>{r.address}</span>
+                          <a
+                            href={r.coordinates
+                              ? `https://www.google.com/maps/search/?api=1&query=${r.coordinates.lat},${r.coordinates.lng}`
+                              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.address)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-base hover:underline"
+                            style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
+                          >
+                            {r.address}
+                          </a>
                         </div>
                       )}
                       {r.phone && (
