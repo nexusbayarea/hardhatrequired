@@ -1,24 +1,63 @@
 import { FitType } from '@/types/company';
-import { CanonicalEntity, ExtractionPayload, EQUIPMENT_ONTOLOGY, getServiceSignals } from './ontology';
+import { dbOntology, EQUIPMENT_ONTOLOGY, getServiceSignals, ExtractionPayload } from './ontology';
+import { matchServices, matchEquipment, matchWasteTypes } from '@/lib/ontology/matcher';
+import { OntologyMatch } from '@/lib/ontology/types';
 
-// ── Layer 1: Direct regex matching ──────────────────────────────────────────
-// Score: 95 for exact phrase match
-
-function matchInText(text: string, aliases: string[]): string | null {
-  const lower = text.toLowerCase();
-  // Sort by length desc so longer, more specific phrases match first
-  const sorted = [...aliases].sort((a, b) => b.length - a.length);
-  return sorted.find(alias => lower.includes(alias)) || null;
-}
-
-// ── Layer 2: Ontology matching ───────────────────────────────────────────────
-// Score: 90 for ontology-validated match
+// ── Layer 1+2: Triebacked ontology matching ────────────────────────────────
+// Uses Aho-Corasick trie via DbBackedOntology (DB + Redis cache).
+// Falls back to hardcoded dictionaries if DB unavailable.
 
 export interface MatchResult {
   id: string;
   matchedAlias: string;
   confidence: number;
 }
+
+export async function runDeterministicExtractionAsync(
+  cleanText: string,
+  vertical: string,
+): Promise<ExtractionPayload> {
+  const lower = cleanText.toLowerCase();
+  const wasteTypes = matchWasteTypes(cleanText);
+
+  let services: OntologyMatch[] = [];
+  let equipment: OntologyMatch[] = [];
+
+  try {
+    const matcher = await dbOntology.getMatcher();
+    services = matchServices(lower, matcher);
+    equipment = matchEquipment(lower, matcher);
+  } catch {
+    // Fallback to synchronous hardcoded version
+    return runDeterministicExtraction(cleanText, vertical);
+  }
+
+  // ── Determine fit type ─────────────────────────────────────────────
+  let fitType: FitType | null = null;
+  if (services.length >= 2 || equipment.length >= 2) {
+    fitType = 'DIRECT_OPERATOR';
+  } else if (wasteTypes.length > 0) {
+    fitType = 'DISPOSAL_NODE';
+  } else if (services.length > 0) {
+    fitType = 'INDIRECT_VENDOR';
+  }
+
+  // ── Overall confidence ─────────────────────────────────────────────
+  const totalHits = services.length + equipment.length;
+  const baseConfidence = totalHits > 0
+    ? Math.min(95, 60 + totalHits * 10)
+    : 0;
+
+  return {
+    services: services.map(s => ({ id: s.canonicalId, confidence: 95 })),
+    equipment: equipment.map(e => ({ id: e.canonicalId, confidence: 95 })),
+    wasteTypes,
+    fitType,
+    confidence: baseConfidence,
+  };
+}
+
+// ── Synchronous fallback (kept for backward compat, uses hardcoded dicts) ────
 
 export function runDeterministicExtraction(
   cleanText: string,
@@ -27,7 +66,7 @@ export function runDeterministicExtraction(
   const lower = cleanText.toLowerCase();
   const services: MatchResult[] = [];
   const equipment: MatchResult[] = [];
-  const wasteTypes: string[] = [];
+  const wasteTypes: string[] = matchWasteTypes(cleanText);
 
   // ── Match services from vertical ontology ───────────────────────────
   const serviceSignals = getServiceSignals(vertical);
@@ -44,23 +83,6 @@ export function runDeterministicExtraction(
     if (matched) {
       equipment.push({ id: canonicalId, matchedAlias: matched, confidence: 95 });
     }
-  }
-
-  // ── Waste type detection (disposal-specific terms) ─────────────────
-  if (/asbestos|lead\s*paint|hazmat|hazardous\s+waste/i.test(lower)) {
-    wasteTypes.push('hazardous');
-  }
-  if (/medical|biohazard|sharps|clinical\s+waste|pathological|regulated\s+medical/i.test(lower)) {
-    wasteTypes.push('medical');
-  }
-  if (/slurry|concrete\s+washout/i.test(lower) && /disposal|recycling|reclaim|dewatering/i.test(lower)) {
-    wasteTypes.push('slurry');
-  }
-  if (/contaminated\s+soil|petroleum|hydrocarbon|brownfield/i.test(lower)) {
-    wasteTypes.push('contaminated_soil');
-  }
-  if (/wastewater|effluent|sludge|industrial\s+liquid/i.test(lower)) {
-    wasteTypes.push('industrial_wastewater');
   }
 
   // ── Determine fit type ─────────────────────────────────────────────
@@ -88,14 +110,8 @@ export function runDeterministicExtraction(
   };
 }
 
-// ── Disposal-specific signal detection ───────────────────────────────────────
-
-const DISPOSAL_KEYWORDS = [
-  'disposal', 'recycling', 'landfill', 'treatment', 'incineration',
-  'remediation', 'dewatering', 'processing',
-];
-
-export function hasDisposalSignals(text: string): boolean {
+function matchInText(text: string, aliases: string[]): string | null {
   const lower = text.toLowerCase();
-  return DISPOSAL_KEYWORDS.some(k => lower.includes(k));
+  const sorted = [...aliases].sort((a, b) => b.length - a.length);
+  return sorted.find(alias => lower.includes(alias)) || null;
 }

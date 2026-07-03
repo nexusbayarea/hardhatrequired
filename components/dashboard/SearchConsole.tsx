@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Crosshair, Loader2 } from 'lucide-react';
+import { Search, MapPin, Crosshair, Droplets, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { verticalMatrix } from '@/lib/verticals/matrix';
 import type { SearchResult } from '@/types/search';
@@ -22,8 +22,8 @@ interface SearchConsoleProps {
 const PANE_META: Record<SearchPane, { title: string; desc: string; placeholder: string }> = {
   labor: { title: 'Find Contractors / Operators', desc: 'Search certified crews, operators, and specialty contractors.', placeholder: 'Labor Search' },
   disposal: { title: 'Find Disposal Facilities', desc: 'Search permitted facilities, reclamation yards, and tipping sites.', placeholder: 'Disposal Search' },
-  equipment: { title: 'Equipment', desc: '', placeholder: 'Equipment Search' },
-  bids: { title: 'Bids', desc: '', placeholder: 'Bids' },
+  equipment: { title: 'Find Equipment Rentals', desc: 'Browse heavy equipment, vac trucks, and specialty tools.', placeholder: 'Equipment Search' },
+  bids: { title: 'Bid Assistance', desc: 'Upload plans or describe scope to generate a vendor list and estimate.', placeholder: 'Bid Search' },
 };
 
 export default function SearchConsole({
@@ -45,11 +45,12 @@ export default function SearchConsole({
   const setZip = onZipChange ?? setInternalZip;
 
   const [radius, setRadius] = useState('');
+  const [gallons, setGallons] = useState('');
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isActive = activePane === 'labor' || activePane === 'disposal';
+  const isActive = activePane === 'labor' || activePane === 'disposal' || activePane === 'equipment' || activePane === 'bids';
 
   const verticalOptions = Object.values(verticalMatrix)
     .map(v => ({
@@ -84,6 +85,7 @@ export default function SearchConsole({
           radius: parseInt(radius),
           vertical,
           mode: activePane,
+          ...(gallons ? { gallons: parseInt(gallons) } : {}),
         }),
       });
       const data = await res.json();
@@ -103,6 +105,7 @@ export default function SearchConsole({
     <div
       className="rounded-xl overflow-hidden"
       style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+      data-agent-context="search-console"
     >
       {/* Header */}
       <div
@@ -144,7 +147,7 @@ export default function SearchConsole({
 
       {/* Fields */}
       <div className="p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-6">
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${activePane === 'disposal' ? 'xl:grid-cols-4' : 'xl:grid-cols-3'} gap-5 mb-6`}>
           {/* Vertical */}
           <div>
             <label className="field-label">
@@ -156,6 +159,8 @@ export default function SearchConsole({
               onChange={e => setVertical(e.target.value)}
               className="field-input"
               disabled={!isActive}
+              data-agent-intent="select-vertical"
+              data-agent-type="dropdown"
             >
               <option value="" disabled>{t('(select)')}</option>
               {verticalOptions.map(({ value, label }) => (
@@ -180,6 +185,8 @@ export default function SearchConsole({
               onChange={e => setRadius(e.target.value)}
               className="field-input"
               disabled={!isActive}
+              data-agent-intent="set-radius"
+              data-agent-type="radius"
             >
               <option value="" disabled>{t('(select)')}</option>
               <option value="10">10 miles</option>
@@ -205,8 +212,30 @@ export default function SearchConsole({
               placeholder={t('enter zip code')}
               className="field-input"
               disabled={!isActive}
+              data-agent-intent="set-zip"
+              data-agent-type="zipcode"
             />
           </div>
+
+          {/* Gallons (disposal mode only) */}
+          {activePane === 'disposal' && (
+            <div>
+              <label className="field-label">
+                <Droplets className="w-4 h-4" />
+                {t('gallons')}
+              </label>
+              <input
+                type="number"
+                value={gallons}
+                onChange={e => setGallons(e.target.value)}
+                placeholder={t('est. volume')}
+                className="field-input"
+                disabled={!isActive}
+                data-agent-intent="set-gallons"
+                data-agent-unit="gallons"
+              />
+            </div>
+          )}
         </div>
 
         {error && (
@@ -239,6 +268,7 @@ export default function SearchConsole({
               opacity: loading || !isActive ? 0.5 : 1,
               cursor: loading || !isActive ? 'not-allowed' : 'pointer',
             }}
+            data-agent-intent="execute-search"
           >
             {loading ? (
               <><Loader2 className="w-5 h-5 animate-spin" /> {t('searching...')}</>

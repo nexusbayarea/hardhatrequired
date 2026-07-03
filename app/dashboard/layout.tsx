@@ -7,11 +7,13 @@ import MobileBottomNav from '@/components/dashboard/MobileBottomNav';
 import Link from 'next/link';
 import { HardHat } from 'lucide-react';
 import { SearchStateProvider } from '@/context/SearchStateContext';
+import { WorkspaceProvider } from '@/context/WorkspaceContext';
 
 function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <SearchStateProvider>
-      <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <WorkspaceProvider>
+        <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
         {/* Desktop: sidebar + topbar */}
         <div className="hidden lg:flex">
           <Sidebar />
@@ -60,6 +62,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           <MobileBottomNav />
         </div>
       </div>
+      </WorkspaceProvider>
     </SearchStateProvider>
   );
 }

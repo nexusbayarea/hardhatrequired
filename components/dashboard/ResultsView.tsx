@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Search, ChevronDown, ChevronRight, Phone, Globe, MapPin, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Search, ChevronDown, ChevronRight, Phone, Globe, MapPin, ThumbsUp, ThumbsDown, Columns, Share2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import ResultsTable from './ResultsTable';
+import VendorComparison from './VendorComparison';
+import ResultsGraph from './ResultsGraph';
 import { groupResults, FIT_COLORS, FIT_ICONS, getFitTypeLabel } from '@/lib/results/groups';
 import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
 import { calculateHaulingCost } from '@/lib/logistics/cost-estimator';
@@ -39,7 +41,7 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
     onFeedback?.(r, voteType);
   };
 
-  const groups = groupResults(results, activePane);
+  const groups = groupResults(results, activePane === 'labor' || activePane === 'disposal' ? activePane : undefined);
   const isDisposal = activePane === 'disposal';
 
   return (
@@ -455,6 +457,7 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
 /* ── Main export ── */
 export default function ResultsView({ results, loading, error, vertical, projectVolume, onVolumeChange, onFeedback, activePane }: ResultsViewProps) {
   const { t } = useLanguage();
+  const [viewMode, setViewMode] = useState<'grouped' | 'compare' | 'graph'>('grouped');
 
   const EmptyState = ({ msg }: { msg: string }) => (
     <div className="rounded-xl p-12 flex flex-col items-center justify-center text-center"
@@ -480,22 +483,79 @@ export default function ResultsView({ results, loading, error, vertical, project
     </div>
   );
 
+  const hasResults = results && results.length > 0;
+
   return (
-    <>
-      <div className="hidden lg:block">
-        <ResultsTable companies={results ?? undefined} loading={loading} vertical={vertical} projectVolume={projectVolume} onFeedback={onFeedback} activePane={activePane} />
-      </div>
-      <div className="block lg:hidden">
-        {loading ? (
-          <LoadingCards />
-        ) : error ? (
-          <EmptyState msg={t('search failed — try again or contact support')} />
-        ) : !results || results.length === 0 ? (
-          <EmptyState msg={t('set your parameters above and run a discovery search')} />
-        ) : (
-          <ResultsCards results={results} onFeedback={onFeedback} activePane={activePane} projectVolume={projectVolume} vertical={vertical} />
-        )}
-      </div>
-    </>
+    <div data-agent-context="results-panel">
+      {/* View mode toggle */}
+      {hasResults && !loading && (
+        <div className="flex items-center gap-2 mb-4">
+          <button
+            onClick={() => setViewMode('grouped')}
+            className="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all"
+            style={{
+              background: viewMode === 'grouped' ? 'var(--color-surface2)' : 'transparent',
+              color: viewMode === 'grouped' ? 'var(--color-text)' : 'var(--color-muted)',
+              border: viewMode === 'grouped' ? '1px solid var(--color-border)' : '1px solid transparent',
+              cursor: 'pointer',
+            }}
+          >
+            {t('grouped')}
+          </button>
+          <button
+            onClick={() => setViewMode('compare')}
+            className="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5"
+            style={{
+              background: viewMode === 'compare' ? 'var(--color-surface2)' : 'transparent',
+              color: viewMode === 'compare' ? 'var(--color-text)' : 'var(--color-muted)',
+              border: viewMode === 'compare' ? '1px solid var(--color-border)' : '1px solid transparent',
+              cursor: 'pointer',
+            }}
+          >
+            <Columns className="w-3 h-3" />
+            {t('compare')}
+          </button>
+          <button
+            onClick={() => setViewMode('graph')}
+            className="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5"
+            style={{
+              background: viewMode === 'graph' ? 'var(--color-surface2)' : 'transparent',
+              color: viewMode === 'graph' ? 'var(--color-text)' : 'var(--color-muted)',
+              border: viewMode === 'graph' ? '1px solid var(--color-border)' : '1px solid transparent',
+              cursor: 'pointer',
+            }}
+          >
+            <Share2 className="w-3 h-3" />
+            {t('graph')}
+          </button>
+          <span className="text-[11px] font-medium ml-auto" style={{ color: 'var(--color-muted)' }}>
+            {results!.length} {t('results')}
+          </span>
+        </div>
+      )}
+
+      {viewMode === 'compare' && hasResults ? (
+        <VendorComparison companies={results!} onFeedback={onFeedback} />
+      ) : viewMode === 'graph' && hasResults ? (
+        <ResultsGraph results={results!} activePane={activePane} />
+      ) : (
+        <>
+          <div className="hidden lg:block">
+            <ResultsTable companies={results ?? undefined} loading={loading} vertical={vertical} projectVolume={projectVolume} onFeedback={onFeedback} activePane={activePane} />
+          </div>
+          <div className="block lg:hidden">
+            {loading ? (
+              <LoadingCards />
+            ) : error ? (
+              <EmptyState msg={t('search failed — try again or contact support')} />
+            ) : !results || results.length === 0 ? (
+              <EmptyState msg={t('set your parameters above and run a discovery search')} />
+            ) : (
+              <ResultsCards results={results} onFeedback={onFeedback} activePane={activePane} projectVolume={projectVolume} vertical={vertical} />
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 }

@@ -1,0 +1,270 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import {
+  Search, Folder, BookmarkCheck, Gavel, ShieldAlert, CalendarClock,
+  ArrowRight, Plus, TrendingUp,
+} from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+import { useWorkspace } from '@/context/WorkspaceContext';
+
+interface StatCard {
+  icon: typeof Search;
+  label: string;
+  value: string;
+  trend?: string;
+  color: string;
+}
+
+interface ActivityItem {
+  title: string;
+  subtitle: string;
+  time: string;
+  type: 'search' | 'project' | 'bid' | 'vendor';
+}
+
+export default function CommandCenter() {
+  const { t } = useLanguage();
+  const { setWorkspace } = useWorkspace();
+
+  const stats: StatCard[] = [
+    { icon: Search, label: 'open searches', value: '12', trend: '+3 today', color: 'var(--color-blue)' },
+    { icon: Folder, label: 'active projects', value: '8', trend: '2 in review', color: 'var(--color-indigo)' },
+    { icon: BookmarkCheck, label: 'saved vendors', value: '47', trend: '5 new', color: 'var(--color-green)' },
+    { icon: Gavel, label: 'bid pipeline', value: '18', trend: '3 closing this week', color: 'var(--color-yellow)' },
+    { icon: ShieldAlert, label: 'compliance alerts', value: '4', trend: '2 critical', color: 'var(--color-red)' },
+    { icon: CalendarClock, label: 'permit expirations', value: '14', trend: '6 within 30d', color: 'var(--color-pink)' },
+  ];
+
+  const recentActivity: ActivityItem[] = useMemo(() => [
+    { title: 'Slurry Processing — Fremont', subtitle: '12 results · 25 mi radius', time: '5 min ago', type: 'search' },
+    { title: 'I-880 Pavement Grind Bid', subtitle: 'Est. $24,500 — due Jul 20', time: '12 min ago', type: 'bid' },
+    { title: 'Alviso Slough Channel Boring', subtitle: 'Bentonite mud extraction', time: '1 hr ago', type: 'project' },
+    { title: 'San Jose Slurry Treatment Center', subtitle: 'Permit: CAD445091233', time: '2 hr ago', type: 'vendor' },
+  ], []);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-black tracking-tight" style={{ color: 'var(--color-text)' }}>
+          {t('command center')}
+        </h1>
+        <p className="text-sm font-medium mt-1" style={{ color: 'var(--color-muted)' }}>
+          {t('construction market intelligence dashboard')}
+        </p>
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className="rounded-xl p-4 transition-all hover:translate-y-[-2px] cursor-pointer"
+            style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+            }}
+            onClick={() => {
+              if (s.label === 'open searches') setWorkspace('search');
+              if (s.label === 'active projects') setWorkspace('projects');
+              if (s.label === 'saved vendors') setWorkspace('saved-vendors');
+              if (s.label === 'bid pipeline') setWorkspace('bids');
+              if (s.label === 'compliance alerts') setWorkspace('market');
+            }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ background: `color-mix(in srgb, ${s.color} 12%, transparent)`, color: s.color }}
+              >
+                <s.icon className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-2xl font-bold font-mono" style={{ color: 'var(--color-text)' }}>
+              {s.value}
+            </div>
+            <div className="text-[11px] font-semibold mt-1" style={{ color: 'var(--color-muted)' }}>
+              {t(s.label)}
+            </div>
+            {s.trend && (
+              <div className="text-[10px] font-medium mt-0.5" style={{ color: 'var(--color-green)' }}>
+                {s.trend}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Main panels */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <div
+          className="rounded-xl p-6"
+          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--color-text)' }}>
+              {t('recent activity')}
+            </h3>
+            <button
+              className="text-xs font-semibold flex items-center gap-1"
+              style={{ color: 'var(--color-blue)' }}
+            >
+              {t('view all')} <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="space-y-3">
+            {recentActivity.map((a, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-3 p-3 rounded-lg transition-colors hover:cursor-pointer"
+                style={{ background: 'var(--color-surface2)' }}
+              >
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                  style={{
+                    background: a.type === 'search'
+                      ? 'color-mix(in srgb, var(--color-blue) 12%, transparent)'
+                      : a.type === 'bid'
+                      ? 'color-mix(in srgb, var(--color-yellow) 12%, transparent)'
+                      : a.type === 'project'
+                      ? 'color-mix(in srgb, var(--color-indigo) 12%, transparent)'
+                      : 'color-mix(in srgb, var(--color-green) 12%, transparent)',
+                    color: a.type === 'search'
+                      ? 'var(--color-blue)'
+                      : a.type === 'bid'
+                      ? 'var(--color-yellow)'
+                      : a.type === 'project'
+                      ? 'var(--color-indigo)'
+                      : 'var(--color-green)',
+                  }}
+                >
+                  {a.type === 'search' ? <Search className="w-4 h-4" /> :
+                   a.type === 'bid' ? <Gavel className="w-4 h-4" /> :
+                   a.type === 'project' ? <Folder className="w-4 h-4" /> :
+                   <BookmarkCheck className="w-4 h-4" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-bold truncate" style={{ color: 'var(--color-text)' }}>
+                    {a.title}
+                  </div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                    {a.subtitle}
+                  </div>
+                </div>
+                <div className="text-[10px] font-medium shrink-0 pt-0.5" style={{ color: 'var(--color-muted)' }}>
+                  {a.time}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setWorkspace('search')}
+            className="w-full mt-4 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors"
+            style={{
+              background: 'color-mix(in srgb, var(--color-blue) 10%, var(--color-surface2))',
+              color: 'var(--color-blue)',
+              border: '1px solid color-mix(in srgb, var(--color-blue) 20%, transparent)',
+            }}
+          >
+            <Plus className="w-4 h-4" /> {t('new search')}
+          </button>
+        </div>
+
+        {/* Quick Actions & Pipeline */}
+        <div
+          className="rounded-xl p-6"
+          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+        >
+          <h3 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--color-text)' }}>
+            {t('quick actions')}
+          </h3>
+          <div className="space-y-2">
+            <button
+              onClick={() => setWorkspace('search')}
+              className="w-full p-4 rounded-lg flex items-center justify-between transition-colors group"
+              style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
+            >
+              <div className="flex items-center gap-3">
+                <Search className="w-5 h-5" style={{ color: 'var(--color-blue)' }} />
+                <div className="text-left">
+                  <div className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{t('search intelligence')}</div>
+                  <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('find operators, facilities & equipment')}</div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4" style={{ color: 'var(--color-muted)' }} />
+            </button>
+            <button
+              onClick={() => setWorkspace('logistics')}
+              className="w-full p-4 rounded-lg flex items-center justify-between transition-colors group"
+              style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
+            >
+              <div className="flex items-center gap-3">
+                <TrendingUp className="w-5 h-5" style={{ color: 'var(--color-green)' }} />
+                <div className="text-left">
+                  <div className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{t('logistics intelligence')}</div>
+                  <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('route analysis, cost modeling & crew planning')}</div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4" style={{ color: 'var(--color-muted)' }} />
+            </button>
+            <button
+              onClick={() => setWorkspace('bids')}
+              className="w-full p-4 rounded-lg flex items-center justify-between transition-colors group"
+              style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
+            >
+              <div className="flex items-center gap-3">
+                <Gavel className="w-5 h-5" style={{ color: 'var(--color-yellow)' }} />
+                <div className="text-left">
+                  <div className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{t('bid intelligence')}</div>
+                  <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('scope analysis, cost breakdown & proposal generation')}</div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4" style={{ color: 'var(--color-muted)' }} />
+            </button>
+            <button
+              onClick={() => setWorkspace('equipment')}
+              className="w-full p-4 rounded-lg flex items-center justify-between transition-colors group"
+              style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
+            >
+              <div className="flex items-center gap-3">
+                <Folder className="w-5 h-5" style={{ color: 'var(--color-indigo)' }} />
+                <div className="text-left">
+                  <div className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{t('equipment exchange')}</div>
+                  <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('rental comparison, availability & rates')}</div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4" style={{ color: 'var(--color-muted)' }} />
+            </button>
+          </div>
+
+          {/* Bid pipeline mini */}
+          <div className="mt-6 pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                {t('bid pipeline — closing soon')}
+              </span>
+            </div>
+            <div className="space-y-2">
+              {[
+                { name: 'I-880 Pavement Grind', due: 'Jul 20', value: '$24,500' },
+                { name: 'Alviso Slough Boring', due: 'Jul 28', value: '$18,200' },
+                { name: 'San Leandro Dewatering', due: 'Aug 5', value: '$31,000' },
+              ].map((bid) => (
+                <div key={bid.name} className="flex items-center justify-between py-1.5">
+                  <div>
+                    <div className="text-xs font-bold" style={{ color: 'var(--color-text)' }}>{bid.name}</div>
+                    <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>Due {bid.due}</div>
+                  </div>
+                  <div className="text-xs font-bold font-mono" style={{ color: 'var(--color-yellow)' }}>{bid.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

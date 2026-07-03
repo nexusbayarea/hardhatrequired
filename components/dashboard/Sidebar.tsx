@@ -1,35 +1,26 @@
 'use client';
 
-import { HardHat, LayoutDashboard, Search, TrendingUp, Layers, Phone, BarChart3, CreditCard, Settings, Shield } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useCallback } from 'react';
+import {
+  HardHat, LayoutDashboard, Search, Truck, Repeat, Gavel, TrendingUp,
+  Bookmark, BookmarkCheck, Folder, Settings,
+} from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useWorkspace } from '@/context/WorkspaceContext';
 
-const navItems = [
-  {
-    section: 'main',
-    items: [
-      { icon: LayoutDashboard, label: 'overview',  href: '/dashboard' },
-      { icon: Search,          label: 'search',    href: '/dashboard/search' },
-      { icon: TrendingUp,      label: 'markets',   href: '/dashboard/markets' },
-    ],
-  },
-  {
-    section: 'sales',
-    items: [
-      { icon: Layers,   label: 'campaigns', href: '/dashboard/campaigns' },
-      { icon: Phone,    label: 'outreach',  href: '/login' },
-      { icon: BarChart3,label: 'reports',   href: '/dashboard/reports' },
-    ],
-  },
-  {
-    section: 'admin section',
-    items: [
-      { icon: CreditCard, label: 'billing',  href: '/dashboard/billing' },
-      { icon: Settings,   label: 'settings', href: '/dashboard/settings' },
-      { icon: Shield,     label: 'admin',    href: '/dashboard/admin' },
-    ],
-  },
+const primaryNav = [
+  { id: 'command-center',  icon: LayoutDashboard, label: 'command center' },
+  { id: 'search',          icon: Search,          label: 'search intelligence' },
+  { id: 'logistics',       icon: Truck,           label: 'logistics intelligence' },
+  { id: 'equipment',       icon: Repeat,          label: 'equipment exchange' },
+  { id: 'bids',            icon: Gavel,           label: 'bid intelligence' },
+  { id: 'market',          icon: TrendingUp,      label: 'market intelligence' },
+];
+
+const secondaryNav = [
+  { id: 'saved-searches', icon: Bookmark,    label: 'saved searches' },
+  { id: 'saved-vendors',  icon: BookmarkCheck, label: 'saved vendors' },
+  { id: 'projects',       icon: Folder,      label: 'projects' },
 ];
 
 interface SidebarProps {
@@ -37,8 +28,12 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ slim = false }: SidebarProps) {
-  const pathname = usePathname();
   const { t } = useLanguage();
+  const { workspace, setWorkspace } = useWorkspace();
+
+  const handleNav = useCallback((id: string) => {
+    setWorkspace(id as any);
+  }, [setWorkspace]);
 
   return (
     <aside
@@ -54,7 +49,7 @@ export default function Sidebar({ slim = false }: SidebarProps) {
         className="h-20 flex items-center justify-center gap-3 border-b shrink-0 px-4"
         style={{ borderColor: 'var(--color-border)' }}
       >
-        <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <button onClick={() => handleNav('command-center')} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div
             className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
             style={{ background: 'var(--color-red)' }}
@@ -73,61 +68,123 @@ export default function Sidebar({ slim = false }: SidebarProps) {
               HHR
             </span>
           )}
-        </Link>
+        </button>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-6">
-        {navItems.map((group) => (
-          <div key={group.section}>
-            {!slim && (
-              <div
-                className="px-4 mb-2 text-[10px] font-black uppercase tracking-widest"
-                style={{ color: 'var(--color-muted)' }}
+      {/* Primary navigation */}
+      <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
+        <div className="space-y-0.5">
+          {primaryNav.map((item) => {
+            const active = workspace === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.id)}
+                title={slim ? item.label : undefined}
+                className={`nav-item ${active ? 'active' : ''} ${slim ? 'justify-center px-0' : ''}`}
+                style={slim ? { borderLeft: 'none', borderRadius: '8px' } : {}}
               >
-                {t(group.section)}
-              </div>
-            )}
-            <div className="space-y-0.5">
-              {group.items.map((item) => {
-                const active = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    title={slim ? item.label : undefined}
-                    className={`nav-item ${active ? 'active' : ''} ${slim ? 'justify-center px-0' : ''}`}
-                    style={slim ? { borderLeft: 'none', borderRadius: '8px' } : {}}
+                <item.icon
+                  className="shrink-0"
+                  style={{
+                    width: '22px',
+                    height: '22px',
+                    color: active ? 'var(--color-red)' : 'var(--color-muted)',
+                    strokeWidth: active ? 2.5 : 1.8,
+                  }}
+                />
+                {!slim && (
+                  <span
+                    style={{
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      color: active ? 'var(--color-red)' : undefined,
+                    }}
                   >
-                    <item.icon
-                      className="shrink-0"
-                      style={{
-                        width: '22px',
-                        height: '22px',
-                        color: active ? 'var(--color-red)' : 'var(--color-muted)',
-                        strokeWidth: active ? 2.5 : 1.8,
-                      }}
-                    />
-                    {!slim && (
-                      <span
-                        style={{
-                          fontSize: '1rem',
-                          fontWeight: 600,
-                          color: active ? 'var(--color-red)' : undefined,
-                        }}
-                      >
-                        {t(item.label)}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
+                    {t(item.label)}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {!slim && (
+          <div
+            className="px-4 my-4 pt-4 border-t text-[10px] font-black uppercase tracking-widest"
+            style={{ borderColor: 'var(--color-border)', color: 'var(--color-muted)' }}
+          >
+            {t('saved')}
           </div>
-        ))}
+        )}
+
+        <div className="space-y-0.5">
+          {secondaryNav.map((item) => {
+            const active = workspace === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.id)}
+                title={slim ? item.label : undefined}
+                className={`nav-item ${active ? 'active' : ''} ${slim ? 'justify-center px-0' : ''}`}
+                style={slim ? { borderLeft: 'none', borderRadius: '8px' } : {}}
+              >
+                <item.icon
+                  className="shrink-0"
+                  style={{
+                    width: '22px',
+                    height: '22px',
+                    color: active ? 'var(--color-red)' : 'var(--color-muted)',
+                    strokeWidth: active ? 2.5 : 1.8,
+                  }}
+                />
+                {!slim && (
+                  <span
+                    style={{
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      color: active ? 'var(--color-red)' : undefined,
+                    }}
+                  >
+                    {t(item.label)}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Settings at bottom */}
+        {!slim && (
+          <div className="pt-4 mt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
+            <button
+              onClick={() => handleNav('settings')}
+              className={`nav-item ${workspace === 'settings' ? 'active' : ''}`}
+            >
+              <Settings
+                className="shrink-0"
+                style={{
+                  width: '22px',
+                  height: '22px',
+                  color: workspace === 'settings' ? 'var(--color-red)' : 'var(--color-muted)',
+                  strokeWidth: workspace === 'settings' ? 2.5 : 1.8,
+                }}
+              />
+              <span
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  color: workspace === 'settings' ? 'var(--color-red)' : undefined,
+                }}
+              >
+                {t('settings')}
+              </span>
+            </button>
+          </div>
+        )}
       </nav>
 
-      {/* Footer: theme toggle + plan info */}
+      {/* Footer */}
       <div
         className="px-2 py-4 border-t shrink-0 space-y-3"
         style={{ borderColor: 'var(--color-border)' }}

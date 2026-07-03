@@ -2,6 +2,7 @@
 
 import { Bell } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useWorkspace } from '@/context/WorkspaceContext';
 import LanguageToggle from '@/components/shared/LanguageToggle';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 
@@ -9,8 +10,22 @@ interface TopbarProps {
   mobile?: boolean;
 }
 
+const WORKSPACE_LABELS: Record<string, string> = {
+  'command-center': 'Command Center',
+  'search': 'Search Intelligence',
+  'logistics': 'Logistics Intelligence',
+  'equipment': 'Equipment Exchange',
+  'bids': 'Bid Intelligence',
+  'market': 'Market Intelligence',
+  'saved-searches': 'Saved Searches',
+  'saved-vendors': 'Saved Vendors',
+  'projects': 'Projects',
+  'settings': 'Settings',
+};
+
 export default function Topbar({ mobile = false }: TopbarProps) {
   const { t } = useLanguage();
+  const { workspace } = useWorkspace();
 
   /* ── Mobile: compact actions only (no search bar) ── */
   if (mobile) {
@@ -62,10 +77,16 @@ export default function Topbar({ mobile = false }: TopbarProps) {
             color: 'var(--color-text)',
           }}
         >
-          {t('dashboard').toUpperCase()}
+          {(WORKSPACE_LABELS[workspace] || t('dashboard')).toUpperCase()}
         </h1>
         <p className="text-sm font-medium mt-0.5" style={{ color: 'var(--color-muted)' }}>
-          {t('construction market intelligence')}
+          {workspace === 'command-center' ? t('construction market intelligence dashboard') :
+           workspace === 'search' ? t('find operators, facilities, equipment, and regulatory records') :
+           workspace === 'logistics' ? t('route analysis, cost modeling, and crew planning') :
+           workspace === 'equipment' ? t('rental comparison, availability, and rate intelligence') :
+           workspace === 'bids' ? t('scope analysis, cost breakdown, and proposal generation') :
+           workspace === 'market' ? t('daily intelligence hub, bid feed, and market trends') :
+           t('construction market intelligence')}
         </p>
       </div>
 

@@ -1,7 +1,8 @@
 import { cleanScrapedText, chunkText } from './cleaner';
-import { runDeterministicExtraction, hasDisposalSignals } from './engine';
+import { runDeterministicExtractionAsync, runDeterministicExtraction } from './engine';
 import { runLlmExtractionFallback } from './llm';
 import { ExtractionPayload } from './ontology';
+import { hasDisposalSignals } from '@/lib/ontology/matcher';
 
 export interface ScrapeResult {
   /** Cleaned text from the scrape */
@@ -18,7 +19,7 @@ export interface ScrapeResult {
  * Full Stage 3 extraction pipeline:
  * 1. Clean raw HTML/text
  * 2. Chunk
- * 3. Deterministic extraction (L1 regex + L2 ontology)
+ * 3. Trie-backed deterministic extraction (DB/Redis with hardcoded fallback)
  * 4. LLM fallback if deterministic weak (L3)
  * 5. Return structured payload
  */
@@ -47,12 +48,11 @@ export async function processScrape(
   result.cleanText = cleanText;
 
   // Step 2: Chunk (for future multi-chunk processing)
-  // For now we extract from full clean text
   const chunks = chunkText(cleanText);
   result.chunkCount = chunks.length;
 
-  // Step 3: Deterministic extraction
-  const deterministic = runDeterministicExtraction(cleanText, vertical);
+  // Step 3: Trie-backed deterministic extraction
+  const deterministic = await runDeterministicExtractionAsync(cleanText, vertical);
   result.extraction = deterministic;
 
   // Step 4: LLM fallback if deterministic was weak
@@ -68,7 +68,7 @@ export async function processScrape(
 
 /**
  * Quick check if text has any useful signals.
- * Returns true if extraction found signals or text mentions the vertical.
+ * Uses synchronous fallback (hardcoded dictionaries).
  */
 export function hasUsefulContent(
   rawText: string | null | undefined,

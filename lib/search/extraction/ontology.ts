@@ -1,4 +1,8 @@
 import { FitType } from '@/types/company';
+import { loadOntology, invalidateMemoryCache } from '@/lib/ontology/loader';
+import { compileMatcher, CompiledMatcher } from '@/lib/ontology/matcher';
+import { CompiledOntology } from '@/lib/ontology/types';
+import { AhoCorasickTrie } from '@/lib/ontology/trie';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -15,7 +19,100 @@ export interface ExtractionPayload {
   confidence: number;
 }
 
-// ── Global Equipment Ontology (cross-vertical) ──────────────────────────────
+// ── DbBackedOntology: DB-first with hardcoded fallback ────────────────────────
+// Loads from Supabase → Redis cache → compiled Aho-Corasick trie.
+// Falls back to hardcoded EQUIPMENT_ONTOLOGY / VERTICAL_SERVICE_ONTOLOGY
+// when DB is unavailable or empty.
+
+class DbBackedOntology {
+  private ontologyPromise: Promise<CompiledOntology> | null = null;
+  private matcherPromise: Promise<CompiledMatcher> | null = null;
+  private matcher: CompiledMatcher | null = null;
+  private hardcodedFallback = false;
+
+  async getMatcher(): Promise<CompiledMatcher> {
+    if (this.matcher) return this.matcher;
+
+    if (!this.matcherPromise) {
+      this.matcherPromise = this.loadMatcher();
+    }
+
+    return this.matcherPromise;
+  }
+
+  private async loadMatcher(): Promise<CompiledMatcher> {
+    try {
+      const ontology = await this.getOntology();
+      if (ontology.entries.length > 0) {
+        this.hardcodedFallback = false;
+        const m = compileMatcher(ontology);
+        this.matcher = m;
+        return m;
+      }
+    } catch {
+      // DB unavailable — fall through to hardcoded
+    }
+
+    this.hardcodedFallback = true;
+    return this.buildHardcodedMatcher();
+  }
+
+  private async getOntology(): Promise<CompiledOntology> {
+    if (!this.ontologyPromise) {
+      this.ontologyPromise = loadOntology({ skipCache: false });
+    }
+    return this.ontologyPromise;
+  }
+
+  private buildHardcodedMatcher(): CompiledMatcher {
+    const aliasMap = new Map();
+    const trie = new AhoCorasickTrie();
+
+    for (const [canonicalId, aliases] of Object.entries(EQUIPMENT_ONTOLOGY)) {
+      for (const alias of aliases) {
+        const key = alias.toLowerCase();
+        aliasMap.set(key, { canonicalId, weight: 100, entityType: 'equipment' });
+        trie.add(key);
+      }
+    }
+
+    for (const [verticalId, services] of Object.entries(VERTICAL_SERVICE_ONTOLOGY)) {
+      for (const [canonicalId, aliases] of Object.entries(services)) {
+        for (const alias of aliases) {
+          const key = alias.toLowerCase();
+          aliasMap.set(key, { canonicalId, weight: 100, entityType: 'service' });
+          trie.add(key);
+        }
+      }
+    }
+
+    trie.build();
+    return { trie, aliasMap };
+  }
+
+  isFallback(): boolean {
+    return this.hardcodedFallback;
+  }
+
+  async refresh(): Promise<void> {
+    this.ontologyPromise = null;
+    this.matcherPromise = null;
+    this.matcher = null;
+    invalidateMemoryCache();
+  }
+
+  getServiceAliases(vertical: string): Record<string, string[]> {
+    return VERTICAL_SERVICE_ONTOLOGY[vertical] || {};
+  }
+
+  getEquipmentAliases(): Record<string, string[]> {
+    return EQUIPMENT_ONTOLOGY;
+  }
+}
+
+export const dbOntology = new DbBackedOntology();
+
+// ── Global Equipment Ontology (cross-vertical) — kept as fallback ────────────
 
 export const EQUIPMENT_ONTOLOGY: Record<string, string[]> = {
   vacuum_truck: [
