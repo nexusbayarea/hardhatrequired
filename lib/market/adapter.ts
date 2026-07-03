@@ -49,6 +49,8 @@ import { harvestContractorSignals } from '@/lib/discovery/edgeScraper';
 import { withTimeout } from '@/lib/timeouts';
 import { buildDisposalSignals } from './disposal-signals';
 import { disposalPrefilter } from './disposal-prefilter';
+import { GooglePlacesDisposalProvider } from './providers/google-disposal';
+import { OverpassDisposalProvider } from './providers/overpass-disposal';
 import fs from 'fs';
 import path from 'path';
 
@@ -176,6 +178,38 @@ export class IndexIntelligenceEngine {
     providerResults.forEach((results, idx) => {
       console.log('[PROVIDER_RESULT]', { provider: providers[idx].name, count: results.length });
     });
+
+    // ── Stage 1b: Disposal-specific providers ────────────────────────────────
+    if (isDisposalMode) {
+      const disposalRadius = Math.max(filters.radius || 50, 60);
+      const [googleDisposalResults, overpassResults] = await Promise.allSettled([
+        new GooglePlacesDisposalProvider().searchDisposal({
+          zip: filters.zip,
+          lat: zipCoords?.lat,
+          lng: zipCoords?.lng,
+          radiusMiles: disposalRadius,
+          verticalId: config.id,
+          verticalConfig: config,
+        }),
+        zipCoords
+          ? new OverpassDisposalProvider().searchDisposal({
+              lat: zipCoords.lat,
+              lng: zipCoords.lng,
+              radiusMiles: disposalRadius,
+              verticalId: config.id,
+            })
+          : Promise.resolve([]),
+      ]);
+      const disposalExtra = [
+        ...(googleDisposalResults.status === 'fulfilled' ? googleDisposalResults.value : []),
+        ...(overpassResults.status === 'fulfilled' ? overpassResults.value : []),
+      ];
+      console.log('[DISPOSAL_PROVIDERS]', {
+        google: googleDisposalResults.status === 'fulfilled' ? googleDisposalResults.value.length : 'failed',
+        overpass: overpassResults.status === 'fulfilled' ? overpassResults.value.length : 'failed',
+      });
+      providerResults.push(disposalExtra);
+    }
 
     // ── Dedup ─────────────────────────────────────────────────────────────────
     const rawTotal = providerResults.flat().length;
