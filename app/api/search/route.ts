@@ -9,6 +9,7 @@ import { ScoreEngine } from '@/lib/scoring/engine';
 import { createTenantProfile, getGrade } from '@/lib/scoring/tenant';
 import { enqueueBatch, scrapeDirect, qstashAvailable } from '@/lib/market/workers/enrichQueue';
 import type { SearchResult } from '@/types/search';
+import { generateMapLinks } from '@/lib/search/map-utils';
 
 const SEARCH_CACHE_TTL = 60 * 10;
 
@@ -70,20 +71,28 @@ export async function POST(req: NextRequest) {
       metadata: { zip: body.zip, radius: body.radius, vertical: clientHeader, companyCount: companies?.length || 0, providerFailures: providerFailures?.join(',') || '' },
     });
 
-    const normalized: SearchResult[] = companies.map((c: any) => ({
-      id: c.id,
-      companyName: c.companyName ?? c.name ?? 'Unknown',
-      address: [c.address, c.city, c.state, c.zip].filter(Boolean).join(', ') || null,
-      phone: c.phone ?? null,
-      website: c.website ? c.website.replace(/^https?:\/\//, '').replace(/^https?\//, '').replace(/^\//, '') : null,
-      distanceMiles: c.distanceMiles ?? c.distance ?? null,
-      leadScore: c.enrichmentScore ?? c.score ?? 0,
-      grade: c.priority ?? 'C',
-      confidence: c.confidence ?? null,
-      fitType: c.fitType ?? null,
-      capabilitySummary: c.capabilitySummary ?? null,
-      permits: c.permits ?? undefined,
-    }));
+    const normalized: SearchResult[] = companies.map((c: any) => {
+      const lat = c.latitude ?? null;
+      const lng = c.longitude ?? null;
+      const coords = lat != null && lng != null ? { lat, lng } : undefined;
+
+      return {
+        id: c.id,
+        companyName: c.companyName ?? c.name ?? 'Unknown',
+        address: [c.address, c.city, c.state, c.zip].filter(Boolean).join(', ') || null,
+        phone: c.phone ?? null,
+        website: c.website ? c.website.replace(/^https?:\/\//, '').replace(/^https?\//, '').replace(/^\//, '') : null,
+        distanceMiles: c.distanceMiles ?? c.distance ?? null,
+        leadScore: c.enrichmentScore ?? c.score ?? 0,
+        grade: c.priority ?? 'C',
+        confidence: c.confidence ?? null,
+        fitType: c.fitType ?? null,
+        capabilitySummary: c.capabilitySummary ?? null,
+        permits: c.permits ?? undefined,
+        coordinates: coords,
+        navigation: coords ? generateMapLinks(coords.lat, coords.lng, c.companyName) : undefined,
+      };
+    });
 
     // Cache results for subsequent searches
     if (redisAvailable() && normalized.length > 0) {
