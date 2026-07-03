@@ -241,13 +241,13 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                     )}
                                     {company.phone && (
                                       <div className="flex items-center gap-2 text-sm">
-                                        <Phone className="w-3.5 h-3.5 text-muted shrink-0" />
+                                        <Phone className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--color-blue)' }} />
                                         <a href={`tel:${company.phone}`} className="text-blue hover:underline">{company.phone}</a>
                                       </div>
                                     )}
                                     {company.website && (
                                       <div className="flex items-center gap-2 text-sm">
-                                        <Globe className="w-3.5 h-3.5 text-muted shrink-0" />
+                                        <Globe className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--color-blue)' }} />
                                         <a href={`https://${company.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="text-blue hover:underline truncate">{company.website}</a>
                                       </div>
                                     )}
