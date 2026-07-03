@@ -244,15 +244,9 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                           <span className="truncate">{r.email}</span>
                         </a>
                       )}
-                      {r.source && (
+                      {r.googleRating != null && (
                         <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--color-muted)' }}>
-                          <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                            style={{ background: 'color-mix(in srgb, var(--color-muted) 10%, transparent)', color: 'var(--color-muted)' }}>
-                            {r.source}
-                          </span>
-                          {r.googleRating != null && (
-                            <span style={{ color: 'var(--color-yellow)' }}>★ {r.googleRating.toFixed(1)} {r.googleReviewCount != null ? `(${r.googleReviewCount})` : ''}</span>
-                          )}
+                          <span style={{ color: 'var(--color-yellow)' }}>★ {r.googleRating.toFixed(1)} {r.googleReviewCount != null ? `(${r.googleReviewCount})` : ''}</span>
                         </div>
                       )}
                       {r.relevanceReason && (

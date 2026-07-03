@@ -257,17 +257,11 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                         <a href={`mailto:${company.email}`} className="text-blue hover:underline truncate">{company.email}</a>
                                       </div>
                                     )}
-                                    {company.source && (
+                                    {company.googleRating != null && (
                                       <div className="flex items-center gap-2 text-sm">
-                                        <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                                          style={{ background: 'color-mix(in srgb, var(--color-muted) 10%, transparent)', color: 'var(--color-muted)' }}>
-                                          {company.source}
+                                        <span className="text-xs" style={{ color: 'var(--color-yellow)' }}>
+                                          ★ {company.googleRating.toFixed(1)} {company.googleReviewCount != null ? `(${company.googleReviewCount})` : ''}
                                         </span>
-                                        {company.googleRating != null && (
-                                          <span className="text-xs" style={{ color: 'var(--color-yellow)' }}>
-                                            ★ {company.googleRating.toFixed(1)} {company.googleReviewCount != null ? `(${company.googleReviewCount})` : ''}
-                                          </span>
-                                        )}
                                       </div>
                                     )}
                                     {company.relevanceReason && (
