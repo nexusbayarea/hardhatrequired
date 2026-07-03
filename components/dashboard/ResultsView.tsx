@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Search, ChevronDown, ChevronRight, Phone, Globe, MapPin, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import ResultsTable from './ResultsTable';
 import { groupResults, FIT_COLORS, FIT_ICONS, getFitTypeLabel } from '@/lib/results/groups';
+import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
+import { calculateHaulingCost } from '@/lib/logistics/cost-estimator';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
 import type { SearchPane } from './SearchConsole';
@@ -14,12 +16,20 @@ interface ResultsViewProps {
   loading: boolean;
   error?: boolean;
   vertical?: string;
+  projectVolume?: number;
+  onVolumeChange?: (v: number) => void;
   onFeedback?: (company: SearchResult, voteType: VoteType) => void;
   activePane: SearchPane;
 }
 
 /* ── Mobile card view ── */
-function ResultsCards({ results, onFeedback, activePane }: { results: SearchResult[]; onFeedback?: (company: SearchResult, voteType: VoteType) => void; activePane: SearchPane }) {
+function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical }: {
+  results: SearchResult[];
+  onFeedback?: (company: SearchResult, voteType: VoteType) => void;
+  activePane: SearchPane;
+  projectVolume?: number;
+  vertical?: string;
+}) {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, VoteType>>({});
@@ -386,6 +396,49 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                           <p className="text-base leading-relaxed italic" style={{ color: 'var(--color-muted)' }}>{r.aiSummary}</p>
                         </div>
                       )}
+                      {r.distanceMiles != null && (() => {
+                        const vol = Math.max(projectVolume || 3000, 0);
+                        const config = getVerticalEstimatorConfig(vertical || '');
+                        const single = calculateHaulingCost(r.distanceMiles, config);
+                        const trips = Math.ceil(vol / config.truckCapacityGallons) || 1;
+                        const totalHauling = single.estimatedHaulingCost * trips;
+                        const totalDisposal = Math.round(vol * config.disposalFeePerGallon);
+                        const total = totalHauling + totalDisposal;
+                        const perGal = vol > 0 ? parseFloat((total / vol).toFixed(3)) : 0;
+                        const totalMins = single.cycleTimeMinutes * trips;
+
+                        return (
+                          <div>
+                            <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('hauling & disposal estimate')}</div>
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
+                              <div className="flex justify-between">
+                                <span style={{ color: 'var(--color-muted)' }}>{t('trips required')}</span>
+                                <span className="font-medium tabular-nums">{trips} haul{trips > 1 ? 's' : ''}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span style={{ color: 'var(--color-muted)' }}>{t('total cycle')}</span>
+                                <span className="font-medium tabular-nums">{totalMins} min</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span style={{ color: 'var(--color-muted)' }}>{t('hauling cost')}</span>
+                                <span className="font-medium tabular-nums">${totalHauling.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span style={{ color: 'var(--color-muted)' }}>{t('disposal fee')}</span>
+                                <span className="font-medium tabular-nums">${totalDisposal.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between col-span-2 border-t pt-1.5 mt-1" style={{ borderColor: 'var(--color-border)' }}>
+                                <span className="font-semibold">{t('total estimated cost')}</span>
+                                <span className="font-semibold tabular-nums">${total.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between col-span-2 text-xs">
+                                <span style={{ color: 'var(--color-muted)' }}>{t('cost per gallon')}</span>
+                                <span className="font-medium tabular-nums">${perGal.toFixed(3)}/gal · {config.truckCapacityGallons.toLocaleString()} gal cap</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
@@ -400,7 +453,7 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
 }
 
 /* ── Main export ── */
-export default function ResultsView({ results, loading, error, vertical, onFeedback, activePane }: ResultsViewProps) {
+export default function ResultsView({ results, loading, error, vertical, projectVolume, onVolumeChange, onFeedback, activePane }: ResultsViewProps) {
   const { t } = useLanguage();
 
   const EmptyState = ({ msg }: { msg: string }) => (
@@ -430,7 +483,7 @@ export default function ResultsView({ results, loading, error, vertical, onFeedb
   return (
     <>
       <div className="hidden lg:block">
-        <ResultsTable companies={results ?? undefined} loading={loading} vertical={vertical} onFeedback={onFeedback} activePane={activePane} />
+        <ResultsTable companies={results ?? undefined} loading={loading} vertical={vertical} projectVolume={projectVolume} onFeedback={onFeedback} activePane={activePane} />
       </div>
       <div className="block lg:hidden">
         {loading ? (
@@ -440,7 +493,7 @@ export default function ResultsView({ results, loading, error, vertical, onFeedb
         ) : !results || results.length === 0 ? (
           <EmptyState msg={t('set your parameters above and run a discovery search')} />
         ) : (
-          <ResultsCards results={results} onFeedback={onFeedback} activePane={activePane} />
+          <ResultsCards results={results} onFeedback={onFeedback} activePane={activePane} projectVolume={projectVolume} vertical={vertical} />
         )}
       </div>
     </>

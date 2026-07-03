@@ -20,6 +20,15 @@ export interface SignalMatch {
   confidence: number;
 }
 
+export interface LogisticsEstimates {
+  oneWayTransitTimeMins: number;
+  totalRoundTripMins: number;
+  haulingCost: number;
+  disposalCost: number;
+  totalCost: number;
+  costPerGallon: number;
+}
+
 export type SearchResult = {
   id: string
   companyName: string
@@ -48,4 +57,5 @@ export type SearchResult = {
   googleReviewCount?: number | null
   extractionConfidence?: number | null
   aiSummary?: string | null
+  logisticsEstimates?: LogisticsEstimates | null
 }

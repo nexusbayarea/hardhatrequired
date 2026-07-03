@@ -10,6 +10,8 @@ import { createTenantProfile, getGrade } from '@/lib/scoring/tenant';
 import { enqueueBatch, scrapeDirect, qstashAvailable } from '@/lib/market/workers/enrichQueue';
 import type { SearchResult } from '@/types/search';
 import { generateMapLinks } from '@/lib/search/map-utils';
+import { calculateHaulingCost } from '@/lib/logistics/cost-estimator';
+import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
 
 const SEARCH_CACHE_TTL = 60 * 10;
 
@@ -92,6 +94,17 @@ export async function POST(req: NextRequest) {
         permits: c.permits ?? undefined,
         coordinates: coords,
         navigation: coords ? generateMapLinks(coords.lat, coords.lng, c.companyName) : undefined,
+        logisticsEstimates: c.distanceMiles != null ? (() => {
+          const m = calculateHaulingCost(c.distanceMiles, getVerticalEstimatorConfig(clientHeader));
+          return {
+            oneWayTransitTimeMins: Math.round(m.transitTimeMinutes / 2),
+            totalRoundTripMins: m.cycleTimeMinutes,
+            haulingCost: m.estimatedHaulingCost,
+            disposalCost: m.estimatedDisposalFee,
+            totalCost: m.totalEstimatedCost,
+            costPerGallon: m.costPerGallon,
+          };
+        })() : null,
         extractedServices: c.extractedServices ?? undefined,
         extractedEquipment: c.extractedEquipment ?? undefined,
         scrapedLicenseNumbers: c.scrapedLicenseNumbers ?? undefined,

@@ -5,6 +5,8 @@ import { ChevronDown, ChevronRight, Phone, ExternalLink, Loader2, Search, MapPin
 import { useLanguage } from '@/context/LanguageContext';
 import Badge from '@/components/ui/Badge';
 import { groupResults, getFitTypeLabel, FIT_ICONS } from '@/lib/results/groups';
+import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
+import { calculateHaulingCost } from '@/lib/logistics/cost-estimator';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
 import type { SearchPane } from './SearchConsole';
@@ -26,6 +28,7 @@ interface ResultsTableProps {
   contacts?: Contact[];
   loading?: boolean;
   vertical?: string;
+  projectVolume?: number;
   onFeedback?: (company: SearchResult, voteType: VoteType) => void;
   activePane?: SearchPane;
 }
@@ -45,7 +48,7 @@ function formatDistance(d: number | null): string {
   return `${d.toFixed(1)} mi`;
 }
 
-export default function ResultsTable({ companies, contacts: allContacts, loading, onFeedback, activePane }: ResultsTableProps) {
+export default function ResultsTable({ companies, contacts: allContacts, loading, vertical, projectVolume, onFeedback, activePane }: ResultsTableProps) {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, VoteType>>({});
@@ -428,6 +431,49 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                 <p className="text-sm text-muted leading-relaxed italic">{company.aiSummary}</p>
                               </div>
                             )}
+                            {company.distanceMiles != null && (() => {
+                              const vol = Math.max(projectVolume || 3000, 0);
+                              const config = getVerticalEstimatorConfig(vertical || '');
+                              const single = calculateHaulingCost(company.distanceMiles, config);
+                              const trips = Math.ceil(vol / config.truckCapacityGallons) || 1;
+                              const totalHauling = single.estimatedHaulingCost * trips;
+                              const totalDisposal = Math.round(vol * config.disposalFeePerGallon);
+                              const total = totalHauling + totalDisposal;
+                              const perGal = vol > 0 ? parseFloat((total / vol).toFixed(3)) : 0;
+                              const totalMins = single.cycleTimeMinutes * trips;
+
+                              return (
+                                <div className="space-y-2">
+                                  <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('hauling & disposal estimate')}</div>
+                                  <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
+                                    <div className="flex justify-between">
+                                      <span className="text-muted">{t('trips required')}</span>
+                                      <span className="font-medium tabular-nums">{trips} haul{trips > 1 ? 's' : ''}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="text-muted">{t('total cycle')}</span>
+                                      <span className="font-medium tabular-nums">{totalMins} min</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="text-muted">{t('hauling cost')}</span>
+                                      <span className="font-medium tabular-nums">${totalHauling.toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="text-muted">{t('disposal fee')}</span>
+                                      <span className="font-medium tabular-nums">${totalDisposal.toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex justify-between col-span-2 border-t pt-1.5 mt-1" style={{ borderColor: 'var(--color-border)' }}>
+                                      <span className="font-semibold">{t('total estimated cost')}</span>
+                                      <span className="font-semibold tabular-nums">${total.toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex justify-between col-span-2 text-[11px]">
+                                      <span className="text-muted">{t('cost per gallon')}</span>
+                                      <span className="font-medium tabular-nums">${perGal.toFixed(3)}/gal · {config.truckCapacityGallons.toLocaleString()} gal cap</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })()}
                               </div>
                             </div>
                           </td>

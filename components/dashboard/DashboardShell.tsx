@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useSearchState } from '@/context/SearchStateContext';
 import MetricsRow from './MetricsRow';
 import SearchConsole from './SearchConsole';
 import ResultsView from './ResultsView';
+import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
 import type { SearchPane } from './SearchConsole';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
@@ -22,6 +23,8 @@ const TABS: Tab[] = [
 export default function DashboardShell() {
   const { t, language } = useLanguage();
   const { searchState, setSearchState, activePane, setActivePane } = useSearchState();
+  const defaultVolume = 3000;
+  const [targetVolume, setTargetVolume] = useState(defaultVolume);
 
   const handleFeedback = useCallback(async (company: SearchResult, voteType: VoteType) => {
     if (!searchState.vertical) return;
@@ -150,12 +153,67 @@ export default function DashboardShell() {
         </span>
       </div>
 
+      {/* Project volume control */}
+      {searchState.data?.companies && searchState.data.companies.length > 0 && (
+        <div
+          className="rounded-xl p-4 md:p-5"
+          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
+                {t('project logistics controller')}
+              </div>
+              <div className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                {t('adjust total volume to see multi-load cost projections across all results')}
+              </div>
+            </div>
+            <div className="flex items-center gap-4" style={{ background: 'var(--color-surface2)', borderRadius: '0.75rem', padding: '0.75rem 1rem' }}>
+              <div className="flex flex-col">
+                <label htmlFor="global-volume" className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+                  {t('target job volume')}
+                </label>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <input
+                    id="global-volume"
+                    type="number"
+                    value={targetVolume}
+                    onChange={(e) => setTargetVolume(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="font-mono text-lg font-bold bg-transparent focus:outline-none w-24"
+                    style={{
+                      color: 'var(--color-text)',
+                      appearance: 'textfield',
+                    }}
+                  />
+                  <span className="text-xs font-semibold" style={{ color: 'var(--color-muted)' }}>GAL</span>
+                </div>
+              </div>
+              <input
+                type="range"
+                min="500"
+                max="50000"
+                step="500"
+                value={targetVolume}
+                onChange={(e) => setTargetVolume(parseInt(e.target.value))}
+                className="w-full md:w-48 h-1.5 rounded-lg appearance-none cursor-pointer"
+                style={{
+                  background: 'var(--color-border)',
+                  accentColor: searchState.vertical?.includes('disposal') || activePane === 'disposal' ? 'var(--color-green)' : 'var(--color-red)',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Results */}
       <ResultsView
         results={searchState.data?.companies ?? null}
         loading={searchState.loading}
         error={searchState.error !== null}
         vertical={searchState.vertical}
+        projectVolume={targetVolume}
+        onVolumeChange={setTargetVolume}
         onFeedback={handleFeedback}
         activePane={activePane}
       />
