@@ -94,7 +94,11 @@ export class KeywordSignalExtractor {
     const capabilitySummary =
       matchedArray.length > 0
         ? matchedArray
-            .map(term => `${term} (${sources[term]?.join('|') || 'unknown'})`)
+            .map(term => {
+              const srcs = (sources[term] || []).filter(s => s !== 'apollo');
+              return srcs.length > 0 ? `${term} (${srcs.join('|')})` : null;
+            })
+            .filter(Boolean)
             .join(', ')
         : '';
 
