@@ -247,6 +247,42 @@ export async function getBlacklistedVerticalCompanies(
   return data.map((r: any) => r.company_id);
 }
 
+export async function batchGetFeedbackCounts(
+  companyIds: string[],
+  vertical: string
+): Promise<Map<string, { positiveCount: number; negativeCount: number }>> {
+  const result = new Map<string, { positiveCount: number; negativeCount: number }>();
+  for (const id of companyIds) result.set(id, { positiveCount: 0, negativeCount: 0 });
+  if (companyIds.length === 0) return result;
+
+  const client = getClient();
+  if (!client) return result;
+
+  try {
+    const { data, error } = await client
+      .from('company_feedback_profiles')
+      .select('company_id, accurate_votes, bad_votes')
+      .in('company_id', companyIds)
+      .eq('vertical', vertical);
+
+    if (error) {
+      console.warn('[batchGetFeedbackCounts] Supabase error (non-fatal):', error.message);
+      return result;
+    }
+
+    for (const row of data ?? []) {
+      result.set(row.company_id, {
+        positiveCount: row.accurate_votes ?? 0,
+        negativeCount: row.bad_votes ?? 0,
+      });
+    }
+  } catch (err) {
+    console.warn('[batchGetFeedbackCounts] Failed (non-fatal):', err);
+  }
+
+  return result;
+}
+
 function computeFeedbackScore(history: FeedbackVoteSummary[]): number {
   if (history.length === 0) return 0;
   const totalImpact = history.reduce((sum, v) => sum + v.weightedImpact, 0);
