@@ -233,7 +233,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                             : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(company.address)}`}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-muted hover:underline"
+                                          className="text-blue hover:underline"
                                         >
                                           {company.address}
                                         </a>

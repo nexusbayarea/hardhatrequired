@@ -216,7 +216,7 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-base hover:underline"
-                            style={{ color: 'var(--color-muted)', textDecoration: 'none' }}
+                            style={{ color: 'var(--color-blue)', textDecoration: 'none' }}
                           >
                             {r.address}
                           </a>
