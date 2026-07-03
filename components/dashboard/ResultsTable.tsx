@@ -251,6 +251,30 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                         <a href={`https://${company.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="text-blue hover:underline truncate">{company.website}</a>
                                       </div>
                                     )}
+                                    {company.email && (
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <svg className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--color-blue)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                        <a href={`mailto:${company.email}`} className="text-blue hover:underline truncate">{company.email}</a>
+                                      </div>
+                                    )}
+                                    {company.source && (
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded"
+                                          style={{ background: 'color-mix(in srgb, var(--color-muted) 10%, transparent)', color: 'var(--color-muted)' }}>
+                                          {company.source}
+                                        </span>
+                                        {company.googleRating != null && (
+                                          <span className="text-xs" style={{ color: 'var(--color-yellow)' }}>
+                                            ★ {company.googleRating.toFixed(1)} {company.googleReviewCount != null ? `(${company.googleReviewCount})` : ''}
+                                          </span>
+                                        )}
+                                      </div>
+                                    )}
+                                    {company.relevanceReason && (
+                                      <div className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                                        {company.relevanceReason}
+                                      </div>
+                                    )}
                                   </div>
 
                                   <div className="space-y-2">
@@ -309,6 +333,72 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                       }}
                                     >
                                       {p.agency} · {p.permitType} · {p.permitNumber}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {company.scrapedLicenseNumbers && company.scrapedLicenseNumbers.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('licenses')}</div>
+                                <div className="flex flex-wrap gap-2">
+                                  {company.scrapedLicenseNumbers.map((lic, i) => (
+                                    <span key={i}
+                                      className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium"
+                                      style={{
+                                        background: 'color-mix(in srgb, #8b5cf6 10%, transparent)',
+                                        color: '#8b5cf6',
+                                        border: '1px solid var(--color-border)',
+                                      }}>
+                                      {lic}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {((company.extractedServices && company.extractedServices.length > 0) ||
+                              (company.extractedEquipment && company.extractedEquipment.length > 0)) && (
+                              <div className="space-y-2">
+                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('detected services & equipment')}</div>
+                                <div className="flex flex-wrap gap-2">
+                                  {company.extractedServices?.map((s, i) => (
+                                    <span key={`s-${i}`}
+                                      className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium"
+                                      style={{
+                                        background: 'color-mix(in srgb, #3b82f6 10%, transparent)',
+                                        color: '#3b82f6',
+                                        border: '1px solid var(--color-border)',
+                                      }}>
+                                      {s.id}
+                                    </span>
+                                  ))}
+                                  {company.extractedEquipment?.map((e, i) => (
+                                    <span key={`e-${i}`}
+                                      className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium"
+                                      style={{
+                                        background: 'color-mix(in srgb, #10b981 10%, transparent)',
+                                        color: '#10b981',
+                                        border: '1px solid var(--color-border)',
+                                      }}>
+                                      {e.id}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {company.matchedSignals && company.matchedSignals.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('matched keywords')}</div>
+                                <div className="flex flex-wrap gap-2">
+                                  {company.matchedSignals.map((s, i) => (
+                                    <span key={i}
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium"
+                                      style={{
+                                        background: 'color-mix(in srgb, var(--color-green) 10%, transparent)',
+                                        color: 'var(--color-green)',
+                                        border: '1px solid var(--color-border)',
+                                      }}>
+                                      {s}
                                     </span>
                                   ))}
                                 </div>

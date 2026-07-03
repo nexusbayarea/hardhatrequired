@@ -238,6 +238,26 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                           <span className="truncate">{r.website}</span>
                         </a>
                       )}
+                      {r.email && (
+                        <a href={`mailto:${r.email}`} className="flex items-center gap-3 text-base" style={{ color: 'var(--color-blue)', textDecoration: 'none' }}>
+                          <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                          <span className="truncate">{r.email}</span>
+                        </a>
+                      )}
+                      {r.source && (
+                        <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--color-muted)' }}>
+                          <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded"
+                            style={{ background: 'color-mix(in srgb, var(--color-muted) 10%, transparent)', color: 'var(--color-muted)' }}>
+                            {r.source}
+                          </span>
+                          {r.googleRating != null && (
+                            <span style={{ color: 'var(--color-yellow)' }}>★ {r.googleRating.toFixed(1)} {r.googleReviewCount != null ? `(${r.googleReviewCount})` : ''}</span>
+                          )}
+                        </div>
+                      )}
+                      {r.relevanceReason && (
+                        <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{r.relevanceReason}</div>
+                      )}
                       {r.distanceMiles != null && (
                         <div className="flex items-center gap-3 text-base" style={{ color: 'var(--color-muted)' }}>
                           <MapPin className="w-5 h-5 flex-shrink-0" />
@@ -271,6 +291,72 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                                 }}
                               >
                                 {p.agency} · {p.permitType} · {p.permitNumber}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {r.scrapedLicenseNumbers && r.scrapedLicenseNumbers.length > 0 && (
+                        <div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('licenses')}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {r.scrapedLicenseNumbers.map((lic, i) => (
+                              <span key={i}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium"
+                                style={{
+                                  background: 'color-mix(in srgb, #8b5cf6 10%, transparent)',
+                                  color: '#8b5cf6',
+                                  border: '1px solid var(--color-border)',
+                                }}>
+                                {lic}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {((r.extractedServices && r.extractedServices.length > 0) ||
+                        (r.extractedEquipment && r.extractedEquipment.length > 0)) && (
+                        <div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('detected services & equipment')}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {r.extractedServices?.map((s, i) => (
+                              <span key={`s-${i}`}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium"
+                                style={{
+                                  background: 'color-mix(in srgb, #3b82f6 10%, transparent)',
+                                  color: '#3b82f6',
+                                  border: '1px solid var(--color-border)',
+                                }}>
+                                {s.id}
+                              </span>
+                            ))}
+                            {r.extractedEquipment?.map((e, i) => (
+                              <span key={`e-${i}`}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium"
+                                style={{
+                                  background: 'color-mix(in srgb, #10b981 10%, transparent)',
+                                  color: '#10b981',
+                                  border: '1px solid var(--color-border)',
+                                }}>
+                                {e.id}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {r.matchedSignals && r.matchedSignals.length > 0 && (
+                        <div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('matched keywords')}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {r.matchedSignals.map((s, i) => (
+                              <span key={i}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium"
+                                style={{
+                                  background: 'color-mix(in srgb, var(--color-green) 10%, transparent)',
+                                  color: 'var(--color-green)',
+                                  border: '1px solid var(--color-border)',
+                                }}>
+                                {s}
                               </span>
                             ))}
                           </div>

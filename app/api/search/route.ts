@@ -82,6 +82,7 @@ export async function POST(req: NextRequest) {
         address: [c.address, c.city, c.state, c.zip].filter(Boolean).join(', ') || null,
         phone: c.phone ?? null,
         website: c.website ? c.website.replace(/^https?:\/\//, '').replace(/^https?\//, '').replace(/^\//, '') : null,
+        email: c.email ?? null,
         distanceMiles: c.distanceMiles ?? c.distance ?? null,
         leadScore: c.enrichmentScore ?? c.score ?? 0,
         grade: c.priority ?? 'C',
@@ -91,6 +92,17 @@ export async function POST(req: NextRequest) {
         permits: c.permits ?? undefined,
         coordinates: coords,
         navigation: coords ? generateMapLinks(coords.lat, coords.lng, c.companyName) : undefined,
+        extractedServices: c.extractedServices ?? undefined,
+        extractedEquipment: c.extractedEquipment ?? undefined,
+        scrapedLicenseNumbers: c.scrapedLicenseNumbers ?? undefined,
+        scrapedKeywords: c.scrapedKeywords ?? undefined,
+        matchedSignals: c.matchedSignals ?? undefined,
+        negativeHits: c.negativeHits ?? undefined,
+        relevanceReason: c.relevanceReason ?? null,
+        source: c.source ?? null,
+        googleRating: c.googleRating ?? null,
+        googleReviewCount: c.googleReviewCount ?? null,
+        aiSummary: c.aiSummary ?? null,
       };
     });
 

@@ -15,12 +15,18 @@ export interface MapLinks {
   waze: string;
 }
 
+export interface SignalMatch {
+  id: string;
+  confidence: number;
+}
+
 export type SearchResult = {
   id: string
   companyName: string
   address: string | null
   phone: string | null
   website: string | null
+  email?: string | null
   distanceMiles: number | null
   leadScore: number
   grade: 'A' | 'B' | 'C' | 'D'
@@ -30,4 +36,15 @@ export type SearchResult = {
   permits?: Permit[]
   coordinates?: Coordinates
   navigation?: MapLinks
+  extractedServices?: SignalMatch[]
+  extractedEquipment?: SignalMatch[]
+  scrapedLicenseNumbers?: string[]
+  scrapedKeywords?: string[]
+  matchedSignals?: string[]
+  negativeHits?: string[]
+  relevanceReason?: string | null
+  source?: string | null
+  googleRating?: number | null
+  googleReviewCount?: number | null
+  aiSummary?: string | null
 }
