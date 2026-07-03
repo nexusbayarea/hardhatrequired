@@ -208,7 +208,7 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                     >
                       {r.address && (
                         <div className="flex items-start gap-3">
-                          <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-muted)' }} />
+                          <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-blue)' }} />
                           <a
                             href={r.coordinates
                               ? `https://www.google.com/maps/search/?api=1&query=${r.coordinates.lat},${r.coordinates.lng}`

@@ -226,7 +226,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                     <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('contact')}</div>
                                     {company.address && (
                                       <div className="flex items-start gap-2 text-sm">
-                                        <MapPin className="w-3.5 h-3.5 text-muted shrink-0 mt-0.5" />
+                                        <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: 'var(--color-blue)' }} />
                                         <a
                                           href={company.coordinates
                                             ? `https://www.google.com/maps/search/?api=1&query=${company.coordinates.lat},${company.coordinates.lng}`
