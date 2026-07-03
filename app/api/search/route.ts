@@ -102,6 +102,7 @@ export async function POST(req: NextRequest) {
         source: c.source ?? null,
         googleRating: c.googleRating ?? null,
         googleReviewCount: c.googleReviewCount ?? null,
+        extractionConfidence: c.extractionConfidence ?? null,
         aiSummary: c.aiSummary ?? null,
       };
     });

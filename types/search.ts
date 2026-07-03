@@ -46,5 +46,6 @@ export type SearchResult = {
   source?: string | null
   googleRating?: number | null
   googleReviewCount?: number | null
+  extractionConfidence?: number | null
   aiSummary?: string | null
 }

@@ -356,10 +356,34 @@ function ResultsCards({ results, onFeedback, activePane }: { results: SearchResu
                           </div>
                         </div>
                       )}
+                      {r.scrapedKeywords && r.scrapedKeywords.length > 0 && (
+                        <div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('scraped keywords')}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {r.scrapedKeywords.map((kw, i) => (
+                              <span key={i}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium"
+                                style={{
+                                  background: 'color-mix(in srgb, var(--color-yellow) 10%, transparent)',
+                                  color: 'var(--color-yellow)',
+                                  border: '1px solid var(--color-border)',
+                                }}>
+                                {kw}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       {r.capabilitySummary && (
                         <div>
                           <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('signals')}</div>
                           <p className="text-base leading-relaxed" style={{ color: 'var(--color-muted)' }}>{r.capabilitySummary}</p>
+                        </div>
+                      )}
+                      {r.aiSummary && (
+                        <div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('ai summary')}</div>
+                          <p className="text-base leading-relaxed italic" style={{ color: 'var(--color-muted)' }}>{r.aiSummary}</p>
                         </div>
                       )}
                     </div>

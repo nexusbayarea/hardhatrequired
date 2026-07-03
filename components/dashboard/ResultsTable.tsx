@@ -398,10 +398,34 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                 </div>
                               </div>
                             )}
+                            {company.scrapedKeywords && company.scrapedKeywords.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('scraped keywords')}</div>
+                                <div className="flex flex-wrap gap-2">
+                                  {company.scrapedKeywords.map((kw, i) => (
+                                    <span key={i}
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium"
+                                      style={{
+                                        background: 'color-mix(in srgb, var(--color-yellow) 10%, transparent)',
+                                        color: 'var(--color-yellow)',
+                                        border: '1px solid var(--color-border)',
+                                      }}>
+                                      {kw}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                             {company.capabilitySummary && (
                               <div className="space-y-2">
                                 <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('signals')}</div>
                                 <p className="text-sm text-muted leading-relaxed">{company.capabilitySummary}</p>
+                              </div>
+                            )}
+                            {company.aiSummary && (
+                              <div className="space-y-2">
+                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('ai summary')}</div>
+                                <p className="text-sm text-muted leading-relaxed italic">{company.aiSummary}</p>
                               </div>
                             )}
                               </div>
