@@ -15,7 +15,7 @@ const config: Config = {
         border: "#27272A",
         muted: "#A1A1AA",
         text: "#FAFAFA",
-        red: "#FBEC5D",
+        red: "#FDEB60",
         green: "#22C55E",
         yellow: "#F59E0B",
         blue: "#3B82F6",
