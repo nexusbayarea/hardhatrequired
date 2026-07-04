@@ -12,11 +12,11 @@ html:not([data-theme]) {
   --color-border:    #26262C;
   --color-text:      #F5F5F7;
   --color-muted:     #8E8E99;
-  --color-red:       #FFCE44;
+  --color-red:       #fdb813;
   --color-green:     #22C55E;
-  --color-yellow:    #F59E0B;
+  --color-yellow:    #fdb813;
   --color-blue:      #3B82F6;
-  --color-accent:    #FFCE44;
+  --color-accent:    #fdb813;
   --shadow-card:     0 0 0 1px rgba(255,255,255,0.04);
   --shadow-glow:     0 0 60px rgba(255,206,68,0.12);
   --color-indigo:    #6366F1;
@@ -33,11 +33,10 @@ html[data-theme="day"] {
   --color-border:    #D1D1D6;
   --color-text:      #0A0A0E;
   --color-muted:     #4A4A55;
-  --color-red:       #FFCE44;
+  --color-red:       #fdb813;
   --color-green:     #15803D;
   --color-yellow:    #B45309;
-  --color-blue:      #1D4ED8;
-  --color-accent:    #FFCE44;
+  --color-accent:    #fdb813;
   --color-indigo:    #4F46E5;
   --shadow-card:     0 0 0 1px rgba(0,0,0,0.08);
   --shadow-glow:     0 0 60px rgba(255,206,68,0.08);
