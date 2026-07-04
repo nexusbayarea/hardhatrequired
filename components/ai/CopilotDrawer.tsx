@@ -183,7 +183,7 @@ export default function CopilotDrawer() {
       {/* Floating trigger */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
+        className="fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
         style={{ background: 'var(--color-red)', border: 'none', cursor: 'pointer' }}
         data-agent-intent="open-copilot"
       >
@@ -191,11 +191,11 @@ export default function CopilotDrawer() {
       </button>
 
       {/* Overlay */}
-      {open && <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />}
+      {open && <div className="fixed inset-0 z-[55] bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />}
 
       {/* Drawer */}
       <div
-        className="fixed top-0 right-0 z-50 h-full w-full max-w-md transition-transform duration-300 shadow-2xl"
+        className="fixed top-0 right-0 z-[60] h-full w-full max-w-md transition-transform duration-300 shadow-2xl"
         style={{
           transform: open ? 'translateX(0)' : 'translateX(100%)',
           background: 'var(--color-surface)',
