@@ -21,7 +21,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             <Sidebar />
             <main className="flex-1 min-w-0 w-full overflow-x-hidden">
               <Topbar />
-              <div className="p-8 pb-24">{children}</div>
+              <div className="p-8">{children}</div>
             </main>
           </div>
 
@@ -30,7 +30,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             <Sidebar slim />
             <main className="flex-1 min-w-0 w-full overflow-x-hidden">
               <Topbar />
-              <div className="p-6 pb-24">{children}</div>
+              <div className="p-6">{children}</div>
             </main>
           </div>
 

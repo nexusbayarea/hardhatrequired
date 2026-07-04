@@ -220,6 +220,7 @@ export default function DashboardShell() {
           )}
 
           {renderWorkspace()}
+          <div className="h-24" />
         </div>
 
         {/* Right rail */}
