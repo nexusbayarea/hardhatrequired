@@ -227,8 +227,20 @@ function LandingInner() {
 
       {/* ───── HERO ───── */}
       <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        {/* Tape measure background ribbon */}
+        {/* Background — vertical grid lines + red orb + tape measure on left */}
         <div className="absolute inset-0 pointer-events-none">
+          {/* Vertical grid lines */}
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute top-0 bottom-0 w-px"
+              style={{
+                left: `${(i + 1) * (100 / 7)}%`,
+                background: 'var(--color-border)',
+                opacity: 0.4,
+              }}
+            />
+          ))}
           {/* Red glow orb */}
           <div
             className="absolute w-[600px] h-[600px] rounded-full pointer-events-none"
@@ -239,11 +251,11 @@ function LandingInner() {
               filter: 'blur(40px)',
             }}
           />
-          {/* Tape measure at bottom */}
+          {/* Vertical tape measure on left */}
           <div className="tape-measure">
             <div className="tape-measure-ticks" />
             {[1, 2, 3, 4, 5, 6, 7, 8].map((num, i) => (
-              <span key={i} className="tape-measure-num" style={{ left: `${(i + 1) * 12.5}%` }}>
+              <span key={i} className="tape-measure-num" style={{ top: `${(i + 1) * (100 / 9)}%` }}>
                 {num}′
               </span>
             ))}
