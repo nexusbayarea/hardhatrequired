@@ -406,9 +406,9 @@ html[data-theme="day"] .theme-toggle-knob {
   left: 0;
   bottom: 0;
   width: 32px;
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border-right: 1px solid color-mix(in srgb, var(--color-accent) 30%, var(--color-border));
-  opacity: 0.65;
+  background: color-mix(in srgb, var(--color-accent) 28%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  opacity: 0.9;
   pointer-events: none;
   overflow: hidden;
 }
