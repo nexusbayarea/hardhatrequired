@@ -50,16 +50,10 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
         <div key={group.fitType}>
           <div className="flex items-center gap-2 mb-3 px-1">
             <span className="text-lg">{FIT_ICONS[group.fitType] ?? '📌'}</span>
-            <h3
-              className="font-bold uppercase tracking-wider"
-              style={{ fontSize: '0.75rem', color: 'var(--color-muted)' }}
-            >
+            <h3 className="font-bold uppercase tracking-wider text-xs text-muted">
               {group.label}
             </h3>
-            <span
-              className="text-xs font-medium ml-1 px-1.5 py-0.5 rounded"
-              style={{ background: 'var(--color-surface2)', color: 'var(--color-muted)' }}
-            >
+            <span className="text-xs font-medium ml-1 px-1.5 py-0.5 rounded bg-surface2 text-muted">
               {group.results.length}
             </span>
           </div>
@@ -72,17 +66,13 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
               return (
                 <div
                   key={r.id}
-                  className="rounded-xl overflow-hidden"
-                  style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+                  className="rounded-xl overflow-hidden surface-card"
                 >
                   <div className="p-5">
                     {/* Company name + grade row */}
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1 min-w-0 pr-3">
-                        <div
-                          className="font-bold leading-tight truncate"
-                          style={{ fontSize: '1.125rem', color: 'var(--color-text)' }}
-                        >
+                        <div className="font-bold leading-tight truncate text-lg text-text">
                           {r.companyName}
                         </div>
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -95,26 +85,22 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                             </span>
                           )}
                           {r.confidence != null && (
-                            <span className="text-xs font-medium" style={{ color: 'var(--color-muted)' }}>
+                            <span className="text-xs font-medium text-muted">
                               {r.confidence}% confidence
                             </span>
                           )}
                         </div>
                         {!isDisposal && r.distanceMiles != null && (
-                          <div className="text-sm font-medium mt-1" style={{ color: 'var(--color-muted)' }}>
+                          <div className="text-sm font-medium mt-1 text-muted">
                             {r.distanceMiles.toFixed(1)} {t('mi away')}
                           </div>
                         )}
                         {isDisposal && r.permits && r.permits.length > 0 && (
                           <div className="mt-1">
                             <span
-                              className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                              style={{
-                                background: r.permits.some(p => p.status === 'Active')
-                                  ? 'color-mix(in srgb, var(--color-green) 12%, transparent)'
-                                  : 'color-mix(in srgb, var(--color-red) 12%, transparent)',
-                                color: r.permits.some(p => p.status === 'Active') ? 'var(--color-green)' : 'var(--color-red)',
-                              }}
+                              className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                                r.permits.some(p => p.status === 'Active') ? 'tag-green-active' : 'tag-red-active'
+                              }`}
                             >
                               {r.permits.some(p => p.status === 'Active') ? 'ACTIVE PERMIT' : 'PERMIT'}
                             </span>
@@ -123,16 +109,14 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                       </div>
                       <div className="text-right flex-shrink-0">
                         <div
-                          className="font-black leading-none"
+                          className="font-display font-black leading-none text-3xl"
                           style={{
-                            fontFamily: "'Barlow Condensed', sans-serif",
-                            fontSize: '2rem',
                             color: r.grade === 'A' ? 'var(--color-green)' : r.grade === 'B' ? 'var(--color-yellow)' : 'var(--color-muted)',
                           }}
                         >
                           {r.grade}
                         </div>
-                        <div className="text-sm font-bold mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                        <div className="text-sm font-bold mt-0.5 text-muted">
                           {r.leadScore}
                         </div>
                       </div>
@@ -140,7 +124,7 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
 
                     {/* Signals / waste accepted */}
                     {r.capabilitySummary && (
-                      <div className="mb-3 text-sm leading-relaxed" style={{ color: 'var(--color-muted)' }}>
+                      <div className="mb-3 text-sm leading-relaxed text-muted">
                         {r.capabilitySummary}
                       </div>
                     )}
@@ -149,29 +133,14 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                     <div className="flex gap-3">
                       <a
                         href={r.phone ? `tel:${r.phone}` : '#'}
-                        className="flex-1 flex items-center justify-center gap-2 rounded-xl font-bold text-base transition-all"
-                        style={{
-                          height: '56px',
-                          background: 'var(--color-surface2)',
-                          border: '1px solid var(--color-border)',
-                          color: 'var(--color-text)',
-                          textDecoration: 'none',
-                          opacity: r.phone ? 1 : 0.4,
-                          pointerEvents: r.phone ? 'auto' : 'none',
-                        }}
+                        className={`flex-1 flex items-center justify-center gap-2 rounded-xl font-bold text-base transition-all bg-surface2 border border-border text-text no-underline h-14 ${r.phone ? '' : 'opacity-40 pointer-events-none'}`}
                       >
                         <Phone className="w-5 h-5" />
                         {t('call')}
                       </a>
                       <button
                         onClick={() => setExpanded(isExpanded ? null : r.id)}
-                        className="flex-1 flex items-center justify-center gap-2 rounded-xl font-bold text-base text-white transition-all"
-                        style={{
-                          height: '56px',
-                          background: isDisposal ? 'var(--color-green)' : 'var(--color-red)',
-                          border: 'none',
-                          cursor: 'pointer',
-                        }}
+                        className={`flex-1 flex items-center justify-center gap-2 rounded-xl font-bold text-base text-white transition-all h-14 border-none cursor-pointer ${isDisposal ? 'bg-green' : 'bg-red'}`}
                       >
                         {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                         {t('details')}
@@ -182,28 +151,14 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                     <div className="flex gap-3 mt-3">
                       {(['accurate', 'bad'] as const).map((v) => {
                         const isVoted = voted[r.id] === v;
+                        const voteClass = isVoted
+                          ? v === 'accurate' ? 'tag-green-active border border-border' : 'tag-red-active border border-border'
+                          : 'bg-surface2 text-muted border border-border';
                         return (
                           <button
                             key={v}
                             onClick={() => handleVote(r, v)}
-                            style={{
-                              flex: 1,
-                              height: '48px',
-                              borderRadius: '10px',
-                              border: '1px solid var(--color-border)',
-                              background: isVoted
-                                ? v === 'accurate'
-                                  ? 'color-mix(in srgb, var(--color-green) 12%, transparent)'
-                                  : 'color-mix(in srgb, var(--color-red) 12%, transparent)'
-                                : 'var(--color-surface2)',
-                              color: isVoted
-                                ? v === 'accurate' ? 'var(--color-green)' : 'var(--color-red)'
-                                : 'var(--color-muted)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                            }}
+                            className={`flex-1 h-12 rounded-xl flex items-center justify-center cursor-pointer ${voteClass}`}
                           >
                             {v === 'accurate' ? <ThumbsUp className="w-5 h-5" /> : <ThumbsDown className="w-5 h-5" />}
                           </button>
@@ -214,28 +169,24 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
 
                   {/* Expanded detail */}
                   {isExpanded && (
-                    <div
-                      className="px-5 pb-5 pt-4 space-y-4 border-t"
-                      style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface2)' }}
-                    >
+                    <div className="px-5 pb-5 pt-4 space-y-4 border-t surface-divider bg-surface2">
                       {r.address && (
                         <div className="flex items-start gap-3">
-                          <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-blue)' }} />
+                          <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0 text-blue" />
                           <a
                             href={r.coordinates
                               ? `https://www.google.com/maps/search/?api=1&query=${r.coordinates.lat},${r.coordinates.lng}`
                               : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.address)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-base hover:underline"
-                            style={{ color: 'var(--color-blue)', textDecoration: 'none' }}
+                            className="text-base hover:underline text-blue no-underline"
                           >
                             {r.address}
                           </a>
                         </div>
                       )}
                       {r.phone && (
-                        <a href={`tel:${r.phone}`} className="flex items-center gap-3 text-base" style={{ color: 'var(--color-blue)', textDecoration: 'none' }}>
+                        <a href={`tel:${r.phone}`} className="flex items-center gap-3 text-base text-blue no-underline">
                           <Phone className="w-5 h-5 flex-shrink-0" />
                           {r.phone}
                         </a>
@@ -244,35 +195,35 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                         <a
                           href={`https://${r.website.replace(/^https?:\/\//, '')}`}
                           target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-3 text-base" style={{ color: 'var(--color-blue)', textDecoration: 'none' }}
+                          className="flex items-center gap-3 text-base text-blue no-underline"
                         >
                           <Globe className="w-5 h-5 flex-shrink-0" />
                           <span className="truncate">{r.website}</span>
                         </a>
                       )}
                       {r.email && (
-                        <a href={`mailto:${r.email}`} className="flex items-center gap-3 text-base" style={{ color: 'var(--color-blue)', textDecoration: 'none' }}>
+                        <a href={`mailto:${r.email}`} className="flex items-center gap-3 text-base text-blue no-underline">
                           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                           <span className="truncate">{r.email}</span>
                         </a>
                       )}
                       {r.googleRating != null && (
-                        <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--color-muted)' }}>
-                          <span style={{ color: 'var(--color-yellow)' }}>★ {r.googleRating.toFixed(1)} {r.googleReviewCount != null ? `(${r.googleReviewCount})` : ''}</span>
+                        <div className="flex items-center gap-3 text-sm text-muted">
+                          <span className="text-yellow">★ {r.googleRating.toFixed(1)} {r.googleReviewCount != null ? `(${r.googleReviewCount})` : ''}</span>
                         </div>
                       )}
                       {r.relevanceReason && (
-                        <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{r.relevanceReason}</div>
+                        <div className="text-sm text-muted">{r.relevanceReason}</div>
                       )}
                       {r.distanceMiles != null && (
-                        <div className="flex items-center gap-3 text-base" style={{ color: 'var(--color-muted)' }}>
+                        <div className="flex items-center gap-3 text-base text-muted">
                           <MapPin className="w-5 h-5 flex-shrink-0" />
                           <span>{r.distanceMiles.toFixed(1)} mi</span>
                         </div>
                       )}
                       {r.confidence != null && (
                         <div className="flex items-center gap-3">
-                          <span className="text-xs font-black uppercase tracking-widest shrink-0" style={{ color: 'var(--color-muted)' }}>{t('confidence')}</span>
+                          <span className="text-xs font-black uppercase tracking-widest shrink-0 text-muted">{t('confidence')}</span>
                           <div className="flex-1 max-w-[120px] h-2 rounded-full bg-surface2 overflow-hidden">
                             <div className="h-full rounded-full" style={{
                               width: `${r.confidence}%`,
@@ -284,17 +235,12 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                       )}
                       {r.permits && r.permits.length > 0 && (
                         <div>
-                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('permits')}</div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('permits')}</div>
                           <div className="flex flex-wrap gap-2">
                             {r.permits.map((p, i) => (
                               <span
                                 key={i}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium"
-                                style={{
-                                  background: p.status === 'Active' ? 'color-mix(in srgb, var(--color-green) 10%, transparent)' : 'color-mix(in srgb, var(--color-red) 10%, transparent)',
-                                  color: p.status === 'Active' ? 'var(--color-green)' : 'var(--color-red)',
-                                  border: '1px solid var(--color-border)',
-                                }}
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium border border-border ${p.status === 'Active' ? 'tag-green' : 'tag-red'}`}
                               >
                                 {p.agency} · {p.permitType} · {p.permitNumber}
                               </span>
@@ -304,16 +250,10 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                       )}
                       {r.scrapedLicenseNumbers && r.scrapedLicenseNumbers.length > 0 && (
                         <div>
-                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('licenses')}</div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('licenses')}</div>
                           <div className="flex flex-wrap gap-2">
                             {r.scrapedLicenseNumbers.map((lic, i) => (
-                              <span key={i}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium"
-                                style={{
-                                  background: 'color-mix(in srgb, #8b5cf6 10%, transparent)',
-                                  color: '#8b5cf6',
-                                  border: '1px solid var(--color-border)',
-                                }}>
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium tag-purple">
                                 {lic}
                               </span>
                             ))}
@@ -323,27 +263,15 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                       {((r.extractedServices && r.extractedServices.length > 0) ||
                         (r.extractedEquipment && r.extractedEquipment.length > 0)) && (
                         <div>
-                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('detected services & equipment')}</div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('detected services & equipment')}</div>
                           <div className="flex flex-wrap gap-2">
                             {r.extractedServices?.map((s, i) => (
-                              <span key={`s-${i}`}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium"
-                                style={{
-                                  background: 'color-mix(in srgb, #3b82f6 10%, transparent)',
-                                  color: '#3b82f6',
-                                  border: '1px solid var(--color-border)',
-                                }}>
+                              <span key={`s-${i}`} className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium tag-blue">
                                 {s.id}
                               </span>
                             ))}
                             {r.extractedEquipment?.map((e, i) => (
-                              <span key={`e-${i}`}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium"
-                                style={{
-                                  background: 'color-mix(in srgb, #10b981 10%, transparent)',
-                                  color: '#10b981',
-                                  border: '1px solid var(--color-border)',
-                                }}>
+                              <span key={`e-${i}`} className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium tag-emerald">
                                 {e.id}
                               </span>
                             ))}
@@ -352,16 +280,10 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                       )}
                       {r.matchedSignals && r.matchedSignals.length > 0 && (
                         <div>
-                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('matched keywords')}</div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('matched keywords')}</div>
                           <div className="flex flex-wrap gap-2">
                             {r.matchedSignals.map((s, i) => (
-                              <span key={i}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium"
-                                style={{
-                                  background: 'color-mix(in srgb, var(--color-green) 10%, transparent)',
-                                  color: 'var(--color-green)',
-                                  border: '1px solid var(--color-border)',
-                                }}>
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium tag-green">
                                 {s}
                               </span>
                             ))}
@@ -370,16 +292,10 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                       )}
                       {r.scrapedKeywords && r.scrapedKeywords.length > 0 && (
                         <div>
-                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('scraped keywords')}</div>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('scraped keywords')}</div>
                           <div className="flex flex-wrap gap-2">
                             {r.scrapedKeywords.map((kw, i) => (
-                              <span key={i}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium"
-                                style={{
-                                  background: 'color-mix(in srgb, var(--color-yellow) 10%, transparent)',
-                                  color: 'var(--color-yellow)',
-                                  border: '1px solid var(--color-border)',
-                                }}>
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium tag-yellow">
                                 {kw}
                               </span>
                             ))}
@@ -388,14 +304,14 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                       )}
                       {r.capabilitySummary && (
                         <div>
-                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('signals')}</div>
-                          <p className="text-base leading-relaxed" style={{ color: 'var(--color-muted)' }}>{r.capabilitySummary}</p>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('signals')}</div>
+                          <p className="text-base leading-relaxed text-muted">{r.capabilitySummary}</p>
                         </div>
                       )}
                       {r.aiSummary && (
                         <div>
-                          <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('ai summary')}</div>
-                          <p className="text-base leading-relaxed italic" style={{ color: 'var(--color-muted)' }}>{r.aiSummary}</p>
+                          <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('ai summary')}</div>
+                          <p className="text-base leading-relaxed italic text-muted">{r.aiSummary}</p>
                         </div>
                       )}
                       {r.distanceMiles != null && (() => {
@@ -411,30 +327,30 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
 
                         return (
                           <div>
-                            <div className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: 'var(--color-muted)' }}>{t('hauling & disposal estimate')}</div>
+                            <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('hauling & disposal estimate')}</div>
                             <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
                               <div className="flex justify-between">
-                                <span style={{ color: 'var(--color-muted)' }}>{t('trips required')}</span>
+                                <span className="text-muted">{t('trips required')}</span>
                                 <span className="font-medium tabular-nums">{trips} haul{trips > 1 ? 's' : ''}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span style={{ color: 'var(--color-muted)' }}>{t('total cycle')}</span>
+                                <span className="text-muted">{t('total cycle')}</span>
                                 <span className="font-medium tabular-nums">{totalMins} min</span>
                               </div>
                               <div className="flex justify-between">
-                                <span style={{ color: 'var(--color-muted)' }}>{t('hauling cost')}</span>
+                                <span className="text-muted">{t('hauling cost')}</span>
                                 <span className="font-medium tabular-nums">${totalHauling.toLocaleString()}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span style={{ color: 'var(--color-muted)' }}>{t('disposal fee')}</span>
+                                <span className="text-muted">{t('disposal fee')}</span>
                                 <span className="font-medium tabular-nums">${totalDisposal.toLocaleString()}</span>
                               </div>
-                              <div className="flex justify-between col-span-2 border-t pt-1.5 mt-1" style={{ borderColor: 'var(--color-border)' }}>
+                              <div className="flex justify-between col-span-2 border-t surface-divider pt-1.5 mt-1">
                                 <span className="font-semibold">{t('total estimated cost')}</span>
                                 <span className="font-semibold tabular-nums">${total.toLocaleString()}</span>
                               </div>
                               <div className="flex justify-between col-span-2 text-xs">
-                                <span style={{ color: 'var(--color-muted)' }}>{t('cost per gallon')}</span>
+                                <span className="text-muted">{t('cost per gallon')}</span>
                                 <span className="font-medium tabular-nums">${perGal.toFixed(3)}/gal · {config.truckCapacityGallons.toLocaleString()} gal cap</span>
                               </div>
                             </div>
@@ -460,23 +376,22 @@ export default function ResultsView({ results, loading, error, vertical, project
   const [viewMode, setViewMode] = useState<'grouped' | 'compare' | 'graph'>('grouped');
 
   const EmptyState = ({ msg }: { msg: string }) => (
-    <div className="rounded-xl p-12 flex flex-col items-center justify-center text-center"
-      style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-      <Search className="w-10 h-10 mb-4" style={{ color: 'var(--color-muted)' }} />
-      <div className="font-bold mb-2" style={{ fontSize: '1.125rem', color: 'var(--color-text)' }}>{t('no results yet')}</div>
-      <div className="text-base" style={{ color: 'var(--color-muted)' }}>{msg}</div>
+    <div className="rounded-xl p-12 flex flex-col items-center justify-center text-center surface-card">
+      <Search className="w-10 h-10 mb-4 text-muted" />
+      <div className="font-bold mb-2 text-lg text-text">{t('no results yet')}</div>
+      <div className="text-base text-muted">{msg}</div>
     </div>
   );
 
   const LoadingCards = () => (
     <div className="space-y-3">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="rounded-xl p-5 animate-pulse" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-          <div className="h-5 rounded w-2/3 mb-2" style={{ background: 'var(--color-surface2)' }} />
-          <div className="h-4 rounded w-1/4 mb-4" style={{ background: 'var(--color-surface2)' }} />
+        <div key={i} className="rounded-xl p-5 animate-pulse surface-card">
+          <div className="h-5 rounded w-2/3 mb-2 bg-surface2" />
+          <div className="h-4 rounded w-1/4 mb-4 bg-surface2" />
           <div className="flex gap-3">
-            <div className="flex-1 h-14 rounded-xl" style={{ background: 'var(--color-surface2)' }} />
-            <div className="flex-1 h-14 rounded-xl" style={{ background: 'var(--color-surface2)' }} />
+            <div className="flex-1 h-14 rounded-xl bg-surface2" />
+            <div className="flex-1 h-14 rounded-xl bg-surface2" />
           </div>
         </div>
       ))}
@@ -492,43 +407,25 @@ export default function ResultsView({ results, loading, error, vertical, project
         <div className="flex items-center gap-2 mb-4">
           <button
             onClick={() => setViewMode('grouped')}
-            className="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all"
-            style={{
-              background: viewMode === 'grouped' ? 'var(--color-surface2)' : 'transparent',
-              color: viewMode === 'grouped' ? 'var(--color-text)' : 'var(--color-muted)',
-              border: viewMode === 'grouped' ? '1px solid var(--color-border)' : '1px solid transparent',
-              cursor: 'pointer',
-            }}
+            className={`view-toggle ${viewMode === 'grouped' ? 'active' : ''}`}
           >
             {t('grouped')}
           </button>
           <button
             onClick={() => setViewMode('compare')}
-            className="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5"
-            style={{
-              background: viewMode === 'compare' ? 'var(--color-surface2)' : 'transparent',
-              color: viewMode === 'compare' ? 'var(--color-text)' : 'var(--color-muted)',
-              border: viewMode === 'compare' ? '1px solid var(--color-border)' : '1px solid transparent',
-              cursor: 'pointer',
-            }}
+            className={`view-toggle flex items-center gap-1.5 ${viewMode === 'compare' ? 'active' : ''}`}
           >
             <Columns className="w-3 h-3" />
             {t('compare')}
           </button>
           <button
             onClick={() => setViewMode('graph')}
-            className="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5"
-            style={{
-              background: viewMode === 'graph' ? 'var(--color-surface2)' : 'transparent',
-              color: viewMode === 'graph' ? 'var(--color-text)' : 'var(--color-muted)',
-              border: viewMode === 'graph' ? '1px solid var(--color-border)' : '1px solid transparent',
-              cursor: 'pointer',
-            }}
+            className={`view-toggle flex items-center gap-1.5 ${viewMode === 'graph' ? 'active' : ''}`}
           >
             <Share2 className="w-3 h-3" />
             {t('graph')}
           </button>
-          <span className="text-[11px] font-medium ml-auto" style={{ color: 'var(--color-muted)' }}>
+          <span className="text-[11px] font-medium ml-auto text-muted">
             {results!.length} {t('results')}
           </span>
         </div>

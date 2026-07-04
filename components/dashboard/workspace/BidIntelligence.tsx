@@ -77,13 +77,50 @@ export default function BidIntelligence() {
         setExtractProgress(steps[i].p);
         setExtractStep(steps[i].text);
         i++;
-      } else {
+      }
+    }, 600);
+
+    const scopeText = scopeInput || activeProject.draftProposal || '';
+
+    fetch('/api/ai/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-8b-instruct',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a construction bid analyst. Extract work specifications from the scope text and generate a professional bid proposal. Return valid JSON only with fields: spec (string, the work specification summary), proposal (string, the full bid proposal). No markdown wrappers.`,
+          },
+          {
+            role: 'user',
+            content: `Project: ${activeProject.name}
+Vertical: ${activeProject.vertical.replace(/_/g, ' ')}
+Volume: ${activeProject.volume.toLocaleString()} gal
+Scope: ${scopeText || 'General ' + activeProject.vertical.replace(/_/g, ' ') + ' services'}
+
+Extract the work spec and write a bid proposal.`,
+          },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.2,
+        max_tokens: 2048,
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        const content = data.choices?.[0]?.message?.content;
+        if (!content) throw new Error('No response from AI');
+
+        const parsed = JSON.parse(content);
+        const spec = parsed.spec || activeProject.vertical.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const draft = parsed.proposal || `Bid proposal for ${activeProject.name}.`;
+
+        setExtractProgress(100);
+        setExtractStep('AI parameter parsing complete.');
         clearInterval(timer);
         setExtracting(false);
         setExtracted(true);
-
-        const spec = activeProject.vertical.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        const draft = `SLURRYFLOW BID PROPOSAL\nPROJECT: ${activeProject.name}\nVERTICAL: ${spec}\nVOLUME: ${activeProject.volume.toLocaleString()} gal\nEST. DISPOSAL: $${Math.round(disposalCost).toLocaleString()}\n\nWe submit our bid proposal for the associated logistics contract. Clean processing nodes locked.`;
 
         updateProject(activeProject.id, {
           extractedSpec: spec,
@@ -92,9 +129,25 @@ export default function BidIntelligence() {
           laborCost,
           contingency,
         });
-      }
-    }, 500);
-  }, [activeProject, disposalCost, revenue, laborCost, contingency, updateProject]);
+      })
+      .catch(err => {
+        console.error('[AI Extraction] Error:', err);
+        clearInterval(timer);
+        setExtracting(false);
+
+        const spec = activeProject.vertical.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const draft = `BID PROPOSAL\nPROJECT: ${activeProject.name}\nVERTICAL: ${spec}\nVOLUME: ${activeProject.volume.toLocaleString()} gal\nEST. DISPOSAL: $${Math.round(disposalCost).toLocaleString()}\n\nProposal generation unavailable. Please try again.`;
+
+        setExtracted(true);
+        updateProject(activeProject.id, {
+          extractedSpec: spec,
+          draftProposal: draft,
+          contractRevenue: revenue,
+          laborCost,
+          contingency,
+        });
+      });
+  }, [activeProject, disposalCost, revenue, laborCost, contingency, updateProject, scopeInput]);
 
   if (!activeProject) {
     return (

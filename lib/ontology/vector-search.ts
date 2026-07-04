@@ -30,24 +30,23 @@ const SIMILARITY_THRESHOLD = 0.75;
 const MAX_RESULTS = 3;
 
 /**
- * Generate an embedding for arbitrary text.
- * Replace with your embedding API call (OpenAI text-embedding-3-small, etc.).
+ * Generate an embedding for arbitrary text via NVIDIA NIM.
  */
 async function embed(text: string): Promise<number[]> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.NVIDIA_API_KEY;
   if (!apiKey) return [];
 
   try {
-    const res = await fetch('https://api.openai.com/v1/embeddings', {
+    const res = await fetch('https://integrate.api.nvidia.com/v1/embeddings', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'text-embedding-3-small',
+        model: 'nvidia/nv-embed-qa-4',
         input: text,
-        dimensions: 256,
+        input_type: 'query',
       }),
     });
 

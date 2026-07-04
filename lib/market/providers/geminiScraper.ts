@@ -1,3 +1,29 @@
+const API_URL = () => {
+  const base = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  return `${base}/api/ai/chat/completions`;
+};
+
+async function nvidiaChat(messages: { role: string; content: string }[], opts?: { response_format?: any; temperature?: number; max_tokens?: number }) {
+  try {
+    const res = await fetch(API_URL(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-8b-instruct',
+        messages,
+        response_format: opts?.response_format,
+        temperature: opts?.temperature ?? 0.1,
+        max_tokens: opts?.max_tokens ?? 2048,
+      }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || null;
+  } catch {
+    return null;
+  }
+}
+
 export class GeminiScraperAdapter {
   name = 'deepseek_scraper';
 
@@ -5,8 +31,7 @@ export class GeminiScraperAdapter {
     websiteUrl: string | undefined,
     equipmentKeywords: string[]
   ): Promise<{ hasSignals: boolean; capabilitySummary: string }> {
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey || !websiteUrl) {
+    if (!websiteUrl) {
       return { hasSignals: false, capabilitySummary: '' };
     }
 
@@ -16,16 +41,14 @@ export class GeminiScraperAdapter {
         return { hasSignals: false, capabilitySummary: '' };
       }
 
-      const body = {
-        model: 'deepseek-chat',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a business intelligence analyst. Analyze company website content for specific industrial capabilities. Respond in JSON only.'
-          },
-          {
-            role: 'user',
-            content: `Analyze this company website content: ${websiteUrl}
+      const rawContent = await nvidiaChat([
+        {
+          role: 'system',
+          content: 'You are a business intelligence analyst. Analyze company website content for specific industrial capabilities. Respond in JSON only.'
+        },
+        {
+          role: 'user',
+          content: `Analyze this company website content: ${websiteUrl}
 
 Website content:
 ${pageText.slice(0, 3000)}
@@ -46,31 +69,10 @@ Respond with JSON:
   "detectedSignals": string[],
   "summaryNotes": string (2-3 sentence description of their capabilities and relevance)
 }`
-          }
-        ],
-        response_format: { type: 'json_object' },
-        temperature: 0.1,
-      };
+        }
+      ], { response_format: { type: 'json_object' } });
 
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        return { hasSignals: false, capabilitySummary: '' };
-      }
-
-      const result = await response.json();
-      const rawContent = result.choices?.[0]?.message?.content;
-
-      if (!rawContent) {
-        return { hasSignals: false, capabilitySummary: '' };
-      }
+      if (!rawContent) return { hasSignals: false, capabilitySummary: '' };
 
       const parsed = JSON.parse(rawContent);
       return {
@@ -78,7 +80,7 @@ Respond with JSON:
         capabilitySummary: parsed.summaryNotes || parsed.detectedSignals?.join(', ') || '',
       };
     } catch (err) {
-      console.error('DeepSeek scraping failed:', err);
+      console.error('NVIDIA scraping failed:', err);
       return { hasSignals: false, capabilitySummary: '' };
     }
   }
@@ -109,30 +111,12 @@ Respond with JSON:
   }
 
   async synthesizeItinerary(events: any[], accommodations: any[], requirements: string[]): Promise<any> {
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey) return { events, accommodations };
-
     try {
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'system', content: 'You are an itinerary planner. Synthesize events and accommodations into a cohesive travel plan. Respond in JSON only.' },
-            { role: 'user', content: `Events: ${JSON.stringify(events)}\nAccommodations: ${JSON.stringify(accommodations)}\nRequirements: ${requirements.join(', ')}\n\nReturn JSON: { itinerary: { day: string, event: string, accommodation: string, notes: string }[] }` },
-          ],
-          response_format: { type: 'json_object' },
-          temperature: 0.1,
-        }),
-      });
+      const rawContent = await nvidiaChat([
+        { role: 'system', content: 'You are an itinerary planner. Synthesize events and accommodations into a cohesive travel plan. Respond in JSON only.' },
+        { role: 'user', content: `Events: ${JSON.stringify(events)}\nAccommodations: ${JSON.stringify(accommodations)}\nRequirements: ${requirements.join(', ')}\n\nReturn JSON: { itinerary: { day: string, event: string, accommodation: string, notes: string }[] }` },
+      ], { response_format: { type: 'json_object' } });
 
-      if (!response.ok) return { events, accommodations };
-      const result = await response.json();
-      const rawContent = result.choices?.[0]?.message?.content;
       return rawContent ? JSON.parse(rawContent) : { events, accommodations };
     } catch {
       return { events, accommodations };
@@ -140,33 +124,15 @@ Respond with JSON:
   }
 
   async autonomousScrape(url: string, extractionPrompt: string): Promise<any> {
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey) return null;
-
     try {
       const pageText = await this.fetchPageText(url);
       if (!pageText || pageText.length < 50) return null;
 
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'system', content: 'You extract structured data from web content. Return JSON only.' },
-            { role: 'user', content: `URL: ${url}\n\nPage content:\n${pageText.slice(0, 4000)}\n\nMission: ${extractionPrompt}` },
-          ],
-          response_format: { type: 'json_object' },
-          temperature: 0.1,
-        }),
-      });
+      const rawContent = await nvidiaChat([
+        { role: 'system', content: 'You extract structured data from web content. Return JSON only.' },
+        { role: 'user', content: `URL: ${url}\n\nPage content:\n${pageText.slice(0, 4000)}\n\nMission: ${extractionPrompt}` },
+      ], { response_format: { type: 'json_object' } });
 
-      if (!response.ok) return null;
-      const result = await response.json();
-      const rawContent = result.choices?.[0]?.message?.content;
       return rawContent ? JSON.parse(rawContent) : null;
     } catch {
       return null;

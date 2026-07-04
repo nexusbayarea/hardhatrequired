@@ -61,8 +61,8 @@ export async function POST(req: NextRequest) {
     const config = VERTICAL_REGISTRY[vertical];
     const feed = generateFeed(vertical, state, city, config);
 
-    const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
-    if (DEEPSEEK_API_KEY) {
+    const nvidiaKey = process.env.NVIDIA_API_KEY;
+    if (nvidiaKey) {
       const industryName = config?.industryName || vertical.replace(/_/g, ' ');
       const signalTerms = [
         ...(config?.signals?.primary?.map(s => s.term) || []),
@@ -94,14 +94,14 @@ Return exactly 6 bids, 5 news, and 4 compliance items. No markdown, no wrappers 
 
       const userPrompt = `Generate the daily intelligence feed for vertical "${vertical}" (${industryName}) in ${city}, ${state}. Include 6 municipal/commercial bids, 5 industry news items, and 4 compliance/regulatory updates. Each item must be highly realistic and specific to this industry.`;
 
-      fetch('https://api.deepseek.com/v1/chat/completions', {
+      fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+          'Authorization': `Bearer ${nvidiaKey}`,
         },
         body: JSON.stringify({
-          model: 'deepseek-chat',
+          model: 'meta/llama-3.1-8b-instruct',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
@@ -110,7 +110,7 @@ Return exactly 6 bids, 5 news, and 4 compliance items. No markdown, no wrappers 
           temperature: 0.2,
           max_tokens: 4000,
         }),
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(20000),
       })
         .then(res => res.json())
         .then(async raw => {
@@ -121,9 +121,9 @@ Return exactly 6 bids, 5 news, and 4 compliance items. No markdown, no wrappers 
             setCachedFeed(vertical, state, 'news', aiFeed.news),
             setCachedFeed(vertical, state, 'compliance', aiFeed.compliance),
           ]);
-          console.log('[Intelligence] DeepSeek enrichment cached');
+          console.log('[Intelligence] NVIDIA enrichment cached');
         })
-        .catch(err => console.warn('[Intelligence] DeepSeek enrichment failed:', err));
+        .catch(err => console.warn('[Intelligence] NVIDIA enrichment failed:', err));
     }
 
     return NextResponse.json({ success: true, source: 'default', ...feed });

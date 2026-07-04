@@ -479,3 +479,85 @@ html[data-theme="day"] .theme-toggle-knob {
   border: 1px solid color-mix(in srgb, var(--color-indigo) 20%, transparent);
 }
 
+/* ──────────────────────────────────────────────
+   TAG / BADGE MIX CLASSES
+   color-mix() fallback-friendly, used in cards
+   ────────────────────────────────────────────── */
+.tag-green {
+  background: color-mix(in srgb, var(--color-green) 10%, transparent);
+  color: var(--color-green);
+  border: 1px solid var(--color-border);
+}
+.tag-green-active {
+  background: color-mix(in srgb, var(--color-green) 12%, transparent);
+  color: var(--color-green);
+}
+.tag-red {
+  background: color-mix(in srgb, var(--color-red) 10%, transparent);
+  color: var(--color-red);
+  border: 1px solid var(--color-border);
+}
+.tag-red-active {
+  background: color-mix(in srgb, var(--color-red) 12%, transparent);
+  color: var(--color-red);
+}
+.tag-yellow {
+  background: color-mix(in srgb, var(--color-yellow) 10%, transparent);
+  color: var(--color-yellow);
+  border: 1px solid var(--color-border);
+}
+.tag-purple {
+  background: color-mix(in srgb, #8b5cf6 10%, transparent);
+  color: #8b5cf6;
+  border: 1px solid var(--color-border);
+}
+.tag-blue {
+  background: color-mix(in srgb, #3b82f6 10%, transparent);
+  color: #3b82f6;
+  border: 1px solid var(--color-border);
+}
+.tag-emerald {
+  background: color-mix(in srgb, #10b981 10%, transparent);
+  color: #10b981;
+  border: 1px solid var(--color-border);
+}
+
+/* ──────────────────────────────────────────────
+   SIDEBAR & CARD SHARED STYLES
+   ────────────────────────────────────────────── */
+.surface-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+.surface-card2 {
+  background: var(--color-surface2);
+  border: 1px solid var(--color-border);
+}
+.surface-divider {
+  border-color: var(--color-border);
+}
+
+/* ──────────────────────────────────────────────
+   VIEW TOGGLE PILL
+   ────────────────────────────────────────────── */
+.view-toggle {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+.view-toggle.active {
+  background: var(--color-surface2);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.view-toggle:not(.active) {
+  background: transparent;
+  color: var(--color-muted);
+}
+

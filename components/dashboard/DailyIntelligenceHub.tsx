@@ -80,28 +80,45 @@ export default function DailyIntelligenceHub({ vertical = 'slurry_processing', l
     setAiDraft(null);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const response = await fetch('/api/ai/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'meta/llama-3.1-8b-instruct',
+          messages: [
+            {
+              role: 'system',
+              content: `You are a professional bid proposal writer for a ${vertical.replace('_', ' ')} contractor. Write a concise, persuasive bid response letter. Return only the letter text, no markdown wrappers.`,
+            },
+            {
+              role: 'user',
+              content: `Write a bid proposal response for this opportunity:
+Title: ${bid.title}
+Agency: ${bid.agency}
+Value: ${bid.valueEstimate}
+Deadline: ${bid.deadline}
+Difficulty: ${bid.difficulty}
+Description: ${bid.description}
 
-      const proposalText = `SUBJECT: Response to Public Bid: ${bid.title} (${bid.agency})
+Include: introduction, three reasons we are uniquely positioned (certifications, local logistics, regulatory compliance), and a call to discuss next steps. Sign as "HHR Partner".`,
+            },
+          ],
+          temperature: 0.3,
+          max_tokens: 1024,
+        }),
+      });
 
-Dear Contracting Officer,
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to generate proposal');
+      }
 
-In response to the invitation for bid regarding "${bid.title}" posted by ${bid.agency}, our team is submitting our qualification statement.
-
-Why Our Firm is Uniquely Positioned:
-1. Certified & Bonded Environmental Disposal: We maintain active licenses and are fully certified to manage specialized waste handling for ${vertical.replace('_', ' ')}.
-2. Local Logistics Speed: With our dispatch hub nearby, we guarantee 24/7 emergency response and route density to handle high volume without project delays.
-3. Strict Regulatory Accordance: All processed materials receive formal waste manifest tracking matching state compliance codes.
-
-We request a brief introductory call with your project manager to align on budget estimations and timeline deliverables.
-
-Respectfully Submitted,
-[Your Name]
-Index Intelligence Partner`;
-
+      const data = await response.json();
+      const proposalText = data.choices?.[0]?.message?.content || 'No proposal generated.';
       setAiDraft(proposalText);
     } catch (err) {
-      console.error(err);
+      console.error('[AI Pitch Bid] Error:', err);
+      setAiDraft('Failed to generate proposal. Please try again.');
     } finally {
       setDraftingBidId(null);
     }
