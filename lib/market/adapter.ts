@@ -35,7 +35,6 @@
 import { Company, Contact, SearchFilters } from '@/types/company';
 import { VerticalConfig, SignalLayers } from '@/types/config';
 import { VerticalConfigWithProviders, isIrrelevant } from './registry';
-import { getEnterpriseOverlay } from './enterpriseOverlay';
 import { ApolloAdapter } from './providers/apollo';
 import { KeywordSignalExtractor } from './signals';
 import { buildAnalysisText } from './scoring';
@@ -497,63 +496,7 @@ export class IndexIntelligenceEngine {
       if (result) { finalizedCompanies.push(result); scoreBuckets[result.priority]++; }
     }
 
-    // ── Stage 6: Enterprise overlay ───────────────────────────────────────────
-    const enterpriseCompanies = getEnterpriseOverlay(config.id, filters.zip, radiusFilter);
 
-    if (enterpriseCompanies.length > 0 && zipCoords) {
-      // Collect unique ZIPs, geocode all in parallel
-      const uniqueZips = [...new Set(enterpriseCompanies.map(ec => ec.zip).filter(Boolean))] as string[];
-      const zipCoordResults = await Promise.all(uniqueZips.map(zip => geocodeZip(zip)));
-      const zipCache = new Map<string, { lat: number; lng: number } | null>();
-      uniqueZips.forEach((zip, i) => zipCache.set(zip, zipCoordResults[i]));
-
-      for (const ec of enterpriseCompanies) {
-        if (!ec.zip) continue;
-        const branchCoords = zipCache.get(ec.zip);
-        if (branchCoords) {
-          ec.distanceMiles = Math.round(haversineDistance(
-            zipCoords.lat, zipCoords.lng, branchCoords.lat, branchCoords.lng
-          ) * 10) / 10;
-        }
-      }
-    }
-
-    const filteredEnterprise = enterpriseCompanies.filter(ec =>
-      ec.distanceMiles == null || ec.distanceMiles <= radiusFilter
-    );
-
-    for (const ec of filteredEnterprise) {
-      const alreadyIncluded = finalizedCompanies.some(fc =>
-        fc.companyName?.toLowerCase().includes(ec.companyName?.toLowerCase().split(' - ')[0]?.toLowerCase() || '')
-      );
-      if (alreadyIncluded) continue;
-
-      // FIX: use pre-loaded verdictIds.badNames set — no fs.readFileSync in loop
-      const ecBase = (ec.companyName || '').toLowerCase().split(' - ')[0]?.toLowerCase() || '';
-      const verdictSkipped = ecBase
-        ? [...verdictIds.badNames].some(bad => ecBase.includes(bad) || bad.includes(ecBase))
-        : false;
-      if (verdictSkipped) {
-        console.log(`[VERDICT] Enterprise skip ${ec.companyName} — matches bad verdict`);
-        continue;
-      }
-
-      finalizedCompanies.push({
-        ...ec,
-        organizationId: organizationId || '',
-        verticalId: config.id,
-        enrichmentScore: 100,
-        priority: 'A',
-        status: 'NOT_CONTACTED',
-        matchedSignals: ['enterprise_overlay'],
-        confidence: 100,
-        fitType: isDisposalMode ? 'DISPOSAL_NODE' : 'DIRECT_OPERATOR',
-        relevanceReason: `Enterprise market leader — ${ec.notes || 'injected via overlay'}`,
-        createdAt: now,
-        updatedAt: now,
-      } as Company);
-      console.log(`[ENTERPRISE] ${ec.companyName} — injected at 100/A`);
-    }
 
     console.log('[SCORE_DISTRIBUTION]', scoreBuckets);
     console.log('[FINAL_RESULTS]', { companies: finalizedCompanies.length, contacts: allContacts.length, providerFailures });

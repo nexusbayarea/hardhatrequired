@@ -30,15 +30,6 @@ export async function verifyCompany(
   verticalKeywords: string[],
   negativeKeywords: string[]
 ): Promise<Partial<VerdictEntry>> {
-  if (company.source === 'enterprise_overlay') {
-    return {
-      verdict: 'good' as VerdictValue,
-      howReached: 'enterprise_overlay' as HowReached,
-      reason: 'Enterprise market leader — pre-verified seed data',
-      evidence: ['enterprise_overlay'],
-    };
-  }
-
   if (company.source === 'regulatory_permit') {
     return {
       verdict: 'good' as VerdictValue,

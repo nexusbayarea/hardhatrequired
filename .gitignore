@@ -49,7 +49,7 @@ storybook-static
 .agents/
 .claude/
 .gemini/
-CLAUDE.md
+PROCEDURES.md
 GEMINI.md
 
 # generated / build artifacts

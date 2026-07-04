@@ -1,37 +1,92 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { TrendingUp, Gavel, Newspaper, Shield, BarChart3 } from 'lucide-react';
 
+interface FeedItem {
+  title: string;
+  subtitle: string;
+}
+
+interface Section {
+  icon: typeof Gavel;
+  label: string;
+  color: string;
+  items: FeedItem[];
+}
+
 export default function MarketIntelligence() {
   const { t } = useLanguage();
+  const [sections, setSections] = useState<Section[]>([]);
+  const [stats, setStats] = useState<{ icon: typeof Gavel; label: string; value: string; trend: string; color: string }[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const sections = [
-    {
-      icon: Gavel, label: 'bid feed', color: 'var(--color-yellow)',
-      items: [
-        { title: 'I-880 Pavement Grind — Fremont', subtitle: '35k gal slurry · Due Jul 20 · Est. $24,500' },
-        { title: 'Alviso Slough Channel Boring', subtitle: 'Bentonite mud extraction · Due Jul 28 · Est. $18,200' },
-        { title: 'San Leandro Dewatering Ops', subtitle: '15k gal · Due Aug 5 · Est. $31,000' },
-      ],
-    },
-    {
-      icon: Newspaper, label: 'industry news', color: 'var(--color-blue)',
-      items: [
-        { title: 'CARB Tightens Diesel Regulations', subtitle: 'New fleet compliance rules effective Q3 2026' },
-        { title: 'Bay Area Concrete Demand +12% YoY', subtitle: 'Driven by infrastructure spending bill' },
-        { title: 'Slurry Recycling Technology Advances', subtitle: 'New separation tech reduces disposal costs by 30%' },
-      ],
-    },
-    {
-      icon: Shield, label: 'permit activity', color: 'var(--color-purple)',
-      items: [
-        { title: '3 New Disposal Permits Issued', subtitle: 'Alameda County — slurry & wastewater' },
-        { title: 'NPDES Stormwater Audit Underway', subtitle: 'EPA inspecting Alameda county records' },
-        { title: '2 Facilities Nearing Capacity', subtitle: 'San Jose & Hayward — plan alternative routing' },
-      ],
-    },
-  ];
+  useEffect(() => {
+    async function loadMarketData() {
+      try {
+        const res = await fetch('/api/reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: 'Market Intelligence Overview' }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const bidFeed: FeedItem[] = [];
+          const newsFeed: FeedItem[] = [];
+          const permitFeed: FeedItem[] = [];
+
+          const totalCompanies = data.totalCompanies || 0;
+          const priorityA = data.priorityA || 0;
+          const priorityB = data.priorityB || 0;
+          const priorityC = data.priorityC || 0;
+
+          bidFeed.push({
+            title: `${totalCompanies} Companies in Active Pipeline`,
+            subtitle: `${priorityA} priority A · ${priorityB} priority B · ${priorityC} priority C`,
+          });
+
+          if (data.marketTrends?.length) {
+            data.marketTrends.forEach((trend: string) => {
+              newsFeed.push({ title: trend, subtitle: 'Market intelligence update' });
+            });
+          }
+
+          permitFeed.push({
+            title: `${data.activePermits || 0} Active Permits Tracked`,
+            subtitle: 'Regulatory compliance monitoring',
+          });
+
+          const newSections: Section[] = [
+            { icon: Gavel, label: 'bid feed', color: 'var(--color-yellow)', items: bidFeed },
+            { icon: Newspaper, label: 'industry news', color: 'var(--color-blue)', items: newsFeed.length ? newsFeed : [{ title: 'Market data loading...', subtitle: 'Live feed from discovery pipeline' }] },
+            { icon: Shield, label: 'permit activity', color: 'var(--color-purple)', items: permitFeed },
+          ];
+          setSections(newSections);
+
+          setStats([
+            { icon: Gavel, label: 'open leads', value: String(totalCompanies), trend: `${priorityA} priority A`, color: 'var(--color-yellow)' },
+            { icon: Shield, label: 'active permits', value: String(data.activePermits || 0), trend: 'tracked', color: 'var(--color-purple)' },
+            { icon: BarChart3, label: 'market activity', value: `${data.coverage?.phone || 0}%`, trend: 'phone coverage', color: 'var(--color-green)' },
+            { icon: TrendingUp, label: 'web coverage', value: `${data.coverage?.website || 0}%`, trend: 'website coverage', color: 'var(--color-blue)' },
+          ]);
+        } else {
+          throw new Error('API unavailable');
+        }
+      } catch {
+        setStats([
+          { icon: Gavel, label: 'open leads', value: '--', trend: 'connect to live pipeline', color: 'var(--color-yellow)' },
+          { icon: Shield, label: 'active permits', value: '--', trend: 'connect to live pipeline', color: 'var(--color-purple)' },
+          { icon: BarChart3, label: 'market activity', value: '--', trend: 'connect to live pipeline', color: 'var(--color-green)' },
+          { icon: TrendingUp, label: 'web coverage', value: '--', trend: 'connect to live pipeline', color: 'var(--color-blue)' },
+        ]);
+        setSections([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadMarketData();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -46,12 +101,7 @@ export default function MarketIntelligence() {
 
       {/* Trends summary */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { icon: Gavel, label: 'open bids', value: '18', trend: '+3 today', color: 'var(--color-yellow)' },
-          { icon: Shield, label: 'new permits', value: '4', trend: 'this week', color: 'var(--color-purple)' },
-          { icon: BarChart3, label: 'market activity', value: '+12%', trend: 'concrete demand', color: 'var(--color-green)' },
-          { icon: TrendingUp, label: 'avg bid value', value: '$22.4k', trend: '+5% MoM', color: 'var(--color-blue)' },
-        ].map(s => (
+        {stats.map(s => (
           <div key={s.label}
             className="rounded-xl p-4"
             style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
@@ -71,7 +121,7 @@ export default function MarketIntelligence() {
 
       {/* Feed sections */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {sections.map(section => (
+        {sections.length > 0 ? sections.map(section => (
           <div key={section.label}
             className="rounded-xl p-6"
             style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
@@ -95,7 +145,16 @@ export default function MarketIntelligence() {
               ))}
             </div>
           </div>
-        ))}
+        )) : !loading && (
+          <div className="col-span-3 rounded-xl p-12 text-center" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+            <p className="text-sm" style={{ color: 'var(--color-muted)' }}>{t('market data unavailable — check API configuration')}</p>
+          </div>
+        )}
+        {loading && (
+          <div className="col-span-3 rounded-xl p-12 text-center" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+            <p className="text-sm" style={{ color: 'var(--color-muted)' }}>{t('loading market data...')}</p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -120,27 +120,7 @@ export class BidIntelligenceIndex {
     const portalUrl = UTILITY_PORTALS[state];
     if (!portalUrl) return [];
 
-    // Utility portals require auth or JS rendering — return a discoverable stub
-    // that the UI can surface as "manual check required"
-    const stub: BidResult = {
-      id: `utility-${state}-${config.id}-${Date.now()}`,
-      index: 'bid_intelligence',
-      title: `${state} Utility Supplier Opportunities — ${config.industryName}`,
-      agency: `${state} Regional Utilities`,
-      source: 'utility',
-      status: 'open',
-      description: `Check the regional utility portal for ${config.industryName} subcontracting opportunities. Requires supplier registration.`,
-      verticalId: config.id,
-      state,
-      documentUrl: portalUrl,
-      naicsCodes: config.targetNaicsCodes,
-      score: 60,
-      grade: 'C',
-      matchedSignals: ['utility portal'],
-      createdAt: new Date().toISOString(),
-    };
-
-    return [stub];
+    return [];
   }
 
   // ── Score a bid against a vertical config ─────────────────────────────────

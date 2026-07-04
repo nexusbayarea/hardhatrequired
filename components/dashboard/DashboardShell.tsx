@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useSearchState } from '@/context/SearchStateContext';
 import { useWorkspace } from '@/context/WorkspaceContext';
+import { useProject } from '@/context/ProjectContext';
 import MetricsRow from './MetricsRow';
 import SearchConsole from './SearchConsole';
 import ResultsView from './ResultsView';
@@ -12,6 +13,7 @@ import IntelligenceRail from './IntelligenceRail';
 import LogisticsController from './LogisticsController';
 import CopilotDrawer from '@/components/ai/CopilotDrawer';
 import LanguageToggle from '@/components/shared/LanguageToggle';
+import Toast from '@/components/shared/Toast';
 import CommandCenter from './workspace/CommandCenter';
 import SearchIntelligence from './workspace/SearchIntelligence';
 import LogisticsIntelligence from './workspace/LogisticsIntelligence';
@@ -36,7 +38,8 @@ const TABS: Tab[] = [
 export default function DashboardShell() {
   const { t, language } = useLanguage();
   const { searchState, setSearchState, activePane, setActivePane } = useSearchState();
-  const { workspace } = useWorkspace();
+  const { workspace, setWorkspace } = useWorkspace();
+  const { activeProject, toast, clearToast } = useProject();
   const defaultVolume = 3000;
   const [targetVolume, setTargetVolume] = useState(defaultVolume);
 
@@ -92,7 +95,8 @@ export default function DashboardShell() {
     setSearchState(p => ({ ...p, vertical: v }));
   }, []);
 
-  const isSearchWorkspace = workspace === 'search';
+  const isSearchWorkspace = workspace === 'search' || workspace === 'logistics' || workspace === 'equipment' || workspace === 'bids';
+  const showRail = workspace === 'search' || workspace === 'logistics';
 
   const renderWorkspace = () => {
     switch (workspace) {
@@ -102,6 +106,38 @@ export default function DashboardShell() {
       case 'search':
         return (
           <>
+            {/* Project context header */}
+            {activeProject && (
+              <div className="project-context-header rounded-xl p-4 flex items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 text-xs text-muted">
+                    <span>{t('project workspace')}</span>
+                    <span className="text-[8px]">▶</span>
+                    <span className="font-semibold uppercase tracking-wider text-indigo">
+                      {activeProject.vertical.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-bold mt-0.5 text-text">
+                    {activeProject.name}
+                  </h2>
+                  <div className="text-xs mt-0.5 text-muted">
+                    {activeProject.zip} · {activeProject.radius} mi geofence · {activeProject.volume.toLocaleString()} gal
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="text-xs text-muted">
+                    <div className="font-bold text-text">{activeProject.linkedVendors.length}</div>
+                    <div>{t('vendors')}</div>
+                  </div>
+                  <div className="w-px h-8 bg-border" />
+                  <div className="text-xs text-muted">
+                    <div className="font-bold text-text">{activeProject.bookedEquipment.length}</div>
+                    <div>{t('equipment')}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <SearchIntelligence
               onResults={handleResults}
               onError={handleError}
@@ -111,7 +147,6 @@ export default function DashboardShell() {
               onFeedback={handleFeedback}
             />
 
-            {/* Results + logistics shown only after a search */}
             {searchState.data?.companies && searchState.data.companies.length > 0 && (
               <>
                 <LogisticsController
@@ -154,7 +189,7 @@ export default function DashboardShell() {
       case 'settings':
         return (
           <div className="space-y-6">
-            <h1 className="text-2xl font-black tracking-tight" style={{ color: 'var(--color-text)' }}>
+            <h1 className="text-2xl font-black tracking-tight text-text">
               {t('settings')}
             </h1>
           </div>
@@ -166,34 +201,38 @@ export default function DashboardShell() {
   };
 
   return (
-    <div className={`grid grid-cols-1 ${workspace === 'command-center' || workspace === 'market' || workspace === 'bids' || workspace === 'equipment' ? '' : 'xl:grid-cols-[1fr_340px]'} gap-6 md:gap-8`}>
-      <div className="min-w-0 space-y-6 md:space-y-8">
-        {/* Metrics + CommandBar only shown on search/logistics workspaces */}
-        {isSearchWorkspace && (
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <MetricsRow />
-              <div className="mt-6 md:mt-8">
-                <CommandBar />
+    <>
+      <div className={`grid grid-cols-1 ${workspace === 'command-center' || workspace === 'market' || workspace === 'bids' || workspace === 'equipment' ? '' : 'xl:grid-cols-[1fr_340px]'} gap-6 md:gap-8`}>
+        <div className="min-w-0 space-y-6 md:space-y-8">
+          {/* Metrics + CommandBar only shown on search/logistics workspaces */}
+          {isSearchWorkspace && (
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <MetricsRow />
+                <div className="mt-6 md:mt-8">
+                  <CommandBar />
+                </div>
+              </div>
+              <div className="hidden md:block shrink-0 pt-1">
+                <LanguageToggle />
               </div>
             </div>
-            <div className="hidden md:block shrink-0 pt-1">
-              <LanguageToggle />
-            </div>
-          </div>
+          )}
+
+          {renderWorkspace()}
+        </div>
+
+        {/* Right rail */}
+        {showRail && (
+          <aside className="hidden xl:block space-y-6 pt-1">
+            <IntelligenceRail />
+          </aside>
         )}
 
-        {renderWorkspace()}
+        <CopilotDrawer />
       </div>
 
-      {/* Right rail — only for search/logistics */}
-      {isSearchWorkspace && (
-        <aside className="hidden xl:block space-y-6 pt-1">
-          <IntelligenceRail />
-        </aside>
-      )}
-
-      <CopilotDrawer />
-    </div>
+      <Toast message={toast} onClose={clearToast} />
+    </>
   );
 }

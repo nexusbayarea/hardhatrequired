@@ -1,12 +1,119 @@
 'use client';
 
-import { useState } from 'react';
-import { Gavel, FileText, Upload, AlertTriangle, DollarSign, TrendingUp } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import {
+  Gavel, FileText, Upload, AlertTriangle, DollarSign,
+  TrendingUp, Shield, Wand2, Loader2, Download, Folder,
+} from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useProject } from '@/context/ProjectContext';
+import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
+import { VERTICAL_LOGISTICS_OVERRIDES, LOGISTICS_BASE_DEFAULTS } from '@/lib/logistics/vertical-configs';
 
 export default function BidIntelligence() {
   const { t } = useLanguage();
+  const { activeProject, updateProject, projects, bookEquipment, releaseEquipment } = useProject();
+
   const [scopeInput, setScopeInput] = useState('');
+  const [extracting, setExtracting] = useState(false);
+  const [extractProgress, setExtractProgress] = useState(0);
+  const [extractStep, setExtractStep] = useState('');
+  const [extracted, setExtracted] = useState(false);
+
+  // Profitability inputs
+  const [revenue, setRevenue] = useState(activeProject?.contractRevenue ?? 12000);
+  const [laborCost, setLaborCost] = useState(activeProject?.laborCost ?? 1500);
+  const [contingency, setContingency] = useState(activeProject?.contingency ?? 10);
+
+  const verticalConfig = activeProject
+    ? getVerticalEstimatorConfig(activeProject.vertical)
+    : null;
+
+  const disposalCost = activeProject && verticalConfig
+    ? activeProject.volume * verticalConfig.disposalFeePerGallon
+    : 2500;
+
+  const totalEquipmentCost = activeProject
+    ? activeProject.bookedEquipment.reduce((sum, eqId) => {
+        const type = eqId.split('-')[0];
+        const override = VERTICAL_LOGISTICS_OVERRIDES[type];
+        const dailyRate = override?.truckHourlyRate ? override.truckHourlyRate * 8 : LOGISTICS_BASE_DEFAULTS.truckHourlyRate * 8;
+        const delivery = 0;
+        return sum + dailyRate + delivery;
+      }, 0)
+    : 1450;
+
+  const baseCosts = laborCost + disposalCost + totalEquipmentCost;
+  const contingencyAmt = baseCosts * (contingency / 100);
+  const totalProjectCost = baseCosts + contingencyAmt;
+  const grossProfit = revenue - totalProjectCost;
+  const margin = revenue > 0 ? (grossProfit / revenue) * 100 : 0;
+
+  const getRiskLevel = () => {
+    if (margin < 10) return { label: 'critical', color: 'var(--color-red)', bg: 'color-mix(in srgb, var(--color-red) 12%, transparent)' };
+    if (margin < 30) return { label: 'medium', color: 'var(--color-yellow)', bg: 'color-mix(in srgb, var(--color-yellow) 12%, transparent)' };
+    return { label: 'optimal', color: 'var(--color-green)', bg: 'color-mix(in srgb, var(--color-green) 12%, transparent)' };
+  };
+
+  const risk = getRiskLevel();
+
+  const handleExtract = useCallback(() => {
+    if (!activeProject) return;
+    setExtracting(true);
+    setExtractProgress(0);
+    setExtracted(false);
+
+    const steps = [
+      { p: 20, text: 'Scanning project specification headers...' },
+      { p: 45, text: 'Extracting work spec requirements & waste definitions...' },
+      { p: 70, text: 'Resolving environmental compliance codes...' },
+      { p: 90, text: 'Generating bid proposal draft...' },
+      { p: 100, text: 'AI parameter parsing complete.' },
+    ];
+
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < steps.length) {
+        setExtractProgress(steps[i].p);
+        setExtractStep(steps[i].text);
+        i++;
+      } else {
+        clearInterval(timer);
+        setExtracting(false);
+        setExtracted(true);
+
+        const spec = activeProject.vertical.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const draft = `SLURRYFLOW BID PROPOSAL\nPROJECT: ${activeProject.name}\nVERTICAL: ${spec}\nVOLUME: ${activeProject.volume.toLocaleString()} gal\nEST. DISPOSAL: $${Math.round(disposalCost).toLocaleString()}\n\nWe submit our bid proposal for the associated logistics contract. Clean processing nodes locked.`;
+
+        updateProject(activeProject.id, {
+          extractedSpec: spec,
+          draftProposal: draft,
+          contractRevenue: revenue,
+          laborCost,
+          contingency,
+        });
+      }
+    }, 500);
+  }, [activeProject, disposalCost, revenue, laborCost, contingency, updateProject]);
+
+  if (!activeProject) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight" style={{ color: 'var(--color-text)' }}>{t('bid intelligence')}</h1>
+          <p className="text-sm font-medium mt-1" style={{ color: 'var(--color-muted)' }}>
+            {t('select or create a project workspace to enable bid analysis.')}
+          </p>
+        </div>
+        <div className="rounded-xl p-12 flex flex-col items-center justify-center text-center"
+          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+          <Folder className="w-10 h-10 mb-4" style={{ color: 'var(--color-muted)' }} />
+          <div className="font-bold mb-2" style={{ color: 'var(--color-text)' }}>{t('no active project')}</div>
+          <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{t('create a project from the sidebar to analyze bids.')}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -19,25 +126,42 @@ export default function BidIntelligence() {
         </p>
       </div>
 
+      {/* Project context bar */}
+      <div
+        className="rounded-xl p-4 flex items-center gap-4"
+        style={{ background: 'color-mix(in srgb, var(--color-indigo) 8%, var(--color-surface))', border: '1px solid color-mix(in srgb, var(--color-indigo) 20%, transparent)' }}
+      >
+        <div className="flex-1">
+          <div className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
+            {t('active project')}
+          </div>
+          <div className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>{activeProject.name}</div>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>
+            {activeProject.vertical.replace(/_/g, ' ')} · {activeProject.volume.toLocaleString()} gal · ZIP {activeProject.zip} · {activeProject.linkedVendors.length} vendors · {activeProject.bookedEquipment.length} equipment
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Scope input */}
+        {/* AI Extraction */}
         <div
           className="rounded-xl p-6 space-y-4"
           style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
         >
-          <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--color-text)' }}>
-            <FileText className="w-4 h-4 inline mr-2" />{t('scope input')}
+          <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+            <Wand2 className="w-4 h-4" style={{ color: 'var(--color-pink)' }} />
+            {t('scope analysis')}
           </h3>
 
           <div className="space-y-3">
             <textarea
-              value={scopeInput}
+              value={scopeInput || activeProject.draftProposal}
               onChange={e => setScopeInput(e.target.value)}
               placeholder={t('paste scope description, upload PDF, or describe the project...')}
-              className="w-full h-32 bg-slate-950 border border-slate-800 rounded-lg p-4 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              className="w-full h-28 bg-slate-950 border border-slate-800 rounded-lg p-4 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
             />
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors"
                 style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
                 <Upload className="w-4 h-4" /> {t('upload PDF')}
@@ -53,66 +177,150 @@ export default function BidIntelligence() {
           </div>
 
           <button
-            disabled={!scopeInput.trim()}
+            onClick={handleExtract}
+            disabled={extracting}
             className="btn-primary w-full"
-            style={{ opacity: scopeInput.trim() ? 1 : 0.4 }}
+            style={{ opacity: extracting ? 0.6 : 1 }}
           >
-            <Gavel className="w-5 h-5" /> {t('analyze scope')}
+            {extracting ? (
+              <><Loader2 className="w-5 h-5 animate-spin" /> {t('extracting...')}</>
+            ) : (
+              <><Wand2 className="w-5 h-5" /> {t('analyze scope')}</>
+            )}
           </button>
+
+          {/* Progress bar */}
+          {extracting && (
+            <div className="p-4 rounded-xl space-y-2"
+              style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
+              <div className="flex items-center justify-between text-xs font-bold" style={{ color: 'var(--color-indigo)' }}>
+                <span>{t('ai parser scanning')}</span>
+                <Loader2 className="w-3 h-3 animate-spin" />
+              </div>
+              <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-border)' }}>
+                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${extractProgress}%`, background: 'var(--color-indigo)' }} />
+              </div>
+              <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{extractStep}</div>
+            </div>
+          )}
+
+          {/* Extracted params */}
+          {extracted && activeProject.extractedSpec && (
+            <div
+              className="p-4 rounded-xl space-y-3"
+              style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
+            >
+              <h4 className="text-xs font-bold flex items-center gap-1" style={{ color: 'var(--color-green)' }}>
+                <Shield className="w-3 h-3" /> {t('extracted parameters')}
+              </h4>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="p-2 rounded" style={{ background: 'var(--color-surface)' }}>
+                  <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('work spec')}</div>
+                  <div className="font-bold mt-0.5" style={{ color: 'var(--color-text)' }}>{activeProject.extractedSpec}</div>
+                </div>
+                <div className="p-2 rounded" style={{ background: 'var(--color-surface)' }}>
+                  <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('volume')}</div>
+                  <div className="font-bold mt-0.5" style={{ color: 'var(--color-text)' }}>{activeProject.volume.toLocaleString()} gal</div>
+                </div>
+              </div>
+              <textarea
+                readOnly
+                value={activeProject.draftProposal}
+                className="w-full h-24 bg-slate-950 border border-slate-800 rounded text-xs font-mono p-2 text-slate-300 focus:outline-none"
+              />
+              <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
+                <Download className="w-3 h-3" /> {t('download proposal')}
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* AI analysis output */}
+        {/* Profitability Engine */}
         <div
           className="rounded-xl p-6 space-y-4"
           style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
         >
-          <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--color-text)' }}>
-            <TrendingUp className="w-4 h-4 inline mr-2" />{t('ai estimate')}
+          <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+            <DollarSign className="w-4 h-4" style={{ color: 'var(--color-green)' }} />
+            {t('profitability engine')}
           </h3>
 
-          <div
-            className="p-5 rounded-xl space-y-3"
-            style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
-          >
-            <div className="flex items-center gap-2 text-xs font-semibold" style={{ color: 'var(--color-muted)' }}>
-              <AlertTriangle className="w-3.5 h-3.5" />
-              {t('enter a scope description above to generate an AI estimate.')}
+          <div className="space-y-3 text-xs">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="font-semibold uppercase" style={{ color: 'var(--color-muted)' }}>{t('contract revenue ($)')}</label>
+                <input type="number" value={revenue} onChange={e => setRevenue(parseInt(e.target.value) || 0)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white font-mono focus:outline-none" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="font-semibold uppercase" style={{ color: 'var(--color-muted)' }}>{t('labor cost ($)')}</label>
+                <input type="number" value={laborCost} onChange={e => setLaborCost(parseInt(e.target.value) || 0)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white font-mono focus:outline-none" />
+              </div>
             </div>
 
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between py-1">
-                <span style={{ color: 'var(--color-muted)' }}>{t('detected vertical')}</span>
-                <span className="font-bold" style={{ color: 'var(--color-text)' }}>—</span>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="font-semibold uppercase" style={{ color: 'var(--color-muted)' }}>{t('disposal fee')}</label>
+                <input type="number" value={Math.round(disposalCost)} readOnly
+                  className="w-full bg-slate-950/60 border border-slate-800/80 rounded-lg p-2 text-slate-400 font-mono" />
               </div>
-              <div className="flex justify-between py-1">
-                <span style={{ color: 'var(--color-muted)' }}>{t('estimated cost')}</span>
-                <span className="font-bold font-mono" style={{ color: 'var(--color-yellow)' }}>—</span>
+              <div className="space-y-1.5">
+                <label className="font-semibold uppercase" style={{ color: 'var(--color-muted)' }}>{t('equipment rent')}</label>
+                <input type="number" value={Math.round(totalEquipmentCost)} readOnly
+                  className="w-full bg-slate-950/60 border border-slate-800/80 rounded-lg p-2 text-slate-400 font-mono" />
               </div>
-              <div className="flex justify-between py-1">
-                <span style={{ color: 'var(--color-muted)' }}>{t('suggested bid range')}</span>
-                <span className="font-bold font-mono" style={{ color: 'var(--color-green)' }}>—</span>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between">
+                <label className="font-semibold uppercase" style={{ color: 'var(--color-muted)' }}>{t('contingency buffer')}</label>
+                <span className="font-bold" style={{ color: 'var(--color-indigo)' }}>{contingency}%</span>
               </div>
-              <div className="flex justify-between py-1">
-                <span style={{ color: 'var(--color-muted)' }}>{t('risk score')}</span>
-                <span className="font-bold" style={{ color: 'var(--color-text)' }}>—</span>
-              </div>
+              <input
+                type="range" min="0" max="30" step="5" value={contingency}
+                onChange={e => setContingency(parseInt(e.target.value))}
+                className="w-full accent-indigo-500 h-1 rounded-lg cursor-pointer"
+                style={{ background: 'var(--color-border)' }}
+              />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div
-              className="p-4 rounded-lg text-center"
-              style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
-            >
-              <DollarSign className="w-5 h-5 mx-auto mb-1" style={{ color: 'var(--color-green)' }} />
-              <div className="text-xs font-bold" style={{ color: 'var(--color-text)' }}>{t('cost breakdown')}</div>
+          {/* Outputs */}
+          <div
+            className="p-4 rounded-xl space-y-4"
+            style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
+          >
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('gross profit')}</div>
+                <div className="text-lg font-bold font-mono" style={{ color: 'var(--color-text)' }}>
+                  ${Math.round(grossProfit).toLocaleString()}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('margin')}</div>
+                <div className="text-lg font-bold font-mono" style={{ color: margin > 30 ? 'var(--color-green)' : margin > 10 ? 'var(--color-yellow)' : 'var(--color-red)' }}>
+                  {margin.toFixed(1)}%
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('risk score')}</div>
+                <span className="text-xs font-bold uppercase px-2 py-0.5 rounded inline-block mt-1"
+                  style={{ background: risk.bg, color: risk.color, border: `1px solid color-mix(in srgb, ${risk.color} 25%, transparent)` }}>
+                  {risk.label}
+                </span>
+              </div>
             </div>
-            <div
-              className="p-4 rounded-lg text-center"
-              style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
-            >
-              <Gavel className="w-5 h-5 mx-auto mb-1" style={{ color: 'var(--color-yellow)' }} />
-              <div className="text-xs font-bold" style={{ color: 'var(--color-text)' }}>{t('vendor recs')}</div>
+
+            <div className="text-[10px] pt-2 border-t flex items-center gap-2" style={{ borderColor: 'var(--color-border)', color: 'var(--color-muted)' }}>
+              <AlertTriangle className="w-3 h-3" style={{ color: risk.color }} />
+              {margin < 10
+                ? t('margin critical — zero contingency safety net')
+                : margin < 30
+                ? t('margin within standard variance — keep contingency above 10%')
+                : t('highly profitable — auto-lock bidding targets')}
             </div>
           </div>
         </div>

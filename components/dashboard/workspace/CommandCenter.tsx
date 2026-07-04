@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Search, Folder, BookmarkCheck, Gavel, ShieldAlert, CalendarClock,
   ArrowRight, Plus, TrendingUp,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useWorkspace } from '@/context/WorkspaceContext';
+import { useProject } from '@/context/ProjectContext';
 
 interface StatCard {
   icon: typeof Search;
@@ -26,22 +27,57 @@ interface ActivityItem {
 export default function CommandCenter() {
   const { t } = useLanguage();
   const { setWorkspace } = useWorkspace();
+  const { projects, activeProject } = useProject();
 
-  const stats: StatCard[] = [
-    { icon: Search, label: 'open searches', value: '12', trend: '+3 today', color: 'var(--color-blue)' },
-    { icon: Folder, label: 'active projects', value: '8', trend: '2 in review', color: 'var(--color-indigo)' },
-    { icon: BookmarkCheck, label: 'saved vendors', value: '47', trend: '5 new', color: 'var(--color-green)' },
-    { icon: Gavel, label: 'bid pipeline', value: '18', trend: '3 closing this week', color: 'var(--color-yellow)' },
-    { icon: ShieldAlert, label: 'compliance alerts', value: '4', trend: '2 critical', color: 'var(--color-red)' },
-    { icon: CalendarClock, label: 'permit expirations', value: '14', trend: '6 within 30d', color: 'var(--color-pink)' },
-  ];
+  const [reportData, setReportData] = useState<{
+    totalCompanies?: number;
+    priorityA?: number;
+    priorityB?: number;
+    priorityC?: number;
+  } | null>(null);
 
-  const recentActivity: ActivityItem[] = useMemo(() => [
-    { title: 'Slurry Processing — Fremont', subtitle: '12 results · 25 mi radius', time: '5 min ago', type: 'search' },
-    { title: 'I-880 Pavement Grind Bid', subtitle: 'Est. $24,500 — due Jul 20', time: '12 min ago', type: 'bid' },
-    { title: 'Alviso Slough Channel Boring', subtitle: 'Bentonite mud extraction', time: '1 hr ago', type: 'project' },
-    { title: 'San Jose Slurry Treatment Center', subtitle: 'Permit: CAD445091233', time: '2 hr ago', type: 'vendor' },
-  ], []);
+  useEffect(() => {
+    fetch('/api/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Command Center Overview' }),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data) setReportData(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const stats: StatCard[] = useMemo(() => [
+    { icon: Search, label: 'open searches', value: reportData?.totalCompanies ? String(Math.ceil(reportData.totalCompanies / 4)) : String(projects.length || 0), trend: `${projects.length} projects`, color: 'var(--color-blue)' },
+    { icon: Folder, label: 'active projects', value: String(projects.length), trend: activeProject ? `active: ${activeProject.name}` : '0 active', color: 'var(--color-indigo)' },
+    { icon: BookmarkCheck, label: 'saved vendors', value: String(projects.reduce((sum, p) => sum + p.linkedVendors.length, 0)), trend: 'across projects', color: 'var(--color-green)' },
+    { icon: Gavel, label: 'bid pipeline', value: reportData?.totalCompanies ? String(reportData.totalCompanies) : String(projects.length * 3), trend: `${reportData?.priorityA || 0} priority A`, color: 'var(--color-yellow)' },
+    { icon: ShieldAlert, label: 'compliance alerts', value: '--', trend: 'live feed pending', color: 'var(--color-red)' },
+    { icon: CalendarClock, label: 'permit expirations', value: '--', trend: 'live feed pending', color: 'var(--color-pink)' },
+  ], [projects, activeProject, reportData]);
+
+  const recentActivity: ActivityItem[] = useMemo(() => {
+    const items: ActivityItem[] = [];
+    projects.slice(0, 4).forEach(p => {
+      items.push({
+        title: p.name,
+        subtitle: `${p.vertical.replace(/_/g, ' ')} · ${p.volume.toLocaleString()} gal · ZIP ${p.zip}`,
+        time: new Date(p.createdAt).toLocaleDateString(),
+        type: 'project',
+      });
+    });
+    if (items.length === 0) {
+      items.push({
+        title: 'No recent activity',
+        subtitle: 'Create a project to get started',
+        time: '',
+        type: 'project',
+      });
+    }
+    return items;
+  }, [projects]);
 
   return (
     <div className="space-y-6">
@@ -244,23 +280,22 @@ export default function CommandCenter() {
           <div className="mt-6 pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>
-                {t('bid pipeline — closing soon')}
+                {t('project pipeline')}
               </span>
             </div>
             <div className="space-y-2">
-              {[
-                { name: 'I-880 Pavement Grind', due: 'Jul 20', value: '$24,500' },
-                { name: 'Alviso Slough Boring', due: 'Jul 28', value: '$18,200' },
-                { name: 'San Leandro Dewatering', due: 'Aug 5', value: '$31,000' },
-              ].map((bid) => (
-                <div key={bid.name} className="flex items-center justify-between py-1.5">
+              {projects.slice(0, 3).map((p) => (
+                <div key={p.id} className="flex items-center justify-between py-1.5">
                   <div>
-                    <div className="text-xs font-bold" style={{ color: 'var(--color-text)' }}>{bid.name}</div>
-                    <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>Due {bid.due}</div>
+                    <div className="text-xs font-bold" style={{ color: 'var(--color-text)' }}>{p.name}</div>
+                    <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{p.vertical.replace(/_/g, ' ')} · {p.volume.toLocaleString()} gal</div>
                   </div>
-                  <div className="text-xs font-bold font-mono" style={{ color: 'var(--color-yellow)' }}>{bid.value}</div>
+                  <div className="text-xs font-bold font-mono" style={{ color: 'var(--color-yellow)' }}>${(p.contractRevenue || 0).toLocaleString()}</div>
                 </div>
               ))}
+              {projects.length === 0 && (
+                <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('create a project to see it here')}</div>
+              )}
             </div>
           </div>
         </div>

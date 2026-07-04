@@ -1,45 +1,33 @@
 import { SearchProvider } from '../types';
 import { Listing, SearchRequest } from '../../schemas/listing';
+import { GooglePlacesProvider } from '../../lib/market/providers/google';
 
 export class GooglePlacesConnector implements SearchProvider {
     name = 'google_places';
+    private provider = new GooglePlacesProvider();
 
     async search(filters: SearchRequest): Promise<Partial<Listing>[]> {
-        // Simulated network call to Google Places API Text Search / Nearby Search
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        const companies = await this.provider.search({
+            vertical: filters.industry || 'slurry_processing',
+            zip: filters.zip || '94538',
+            radius: filters.radius || 50,
+        });
 
-        const mockGoogleResults = [
-            {
-                name: 'Bay Area Concrete Crushing & Recycling',
-                address: '24900 Mission Blvd',
-                city: 'Hayward',
-                state: 'CA',
-                zip: '94544',
-                latitude: 37.6688,
-                longitude: -122.0808,
-                phone: '(510) 555-0192',
-                website: 'https://www.bayareaconcreterecycling.com'
-            },
-            {
-                name: 'Pacific Aggregates & Eco-Waste',
-                address: '3000 Winton Ave',
-                city: 'Hayward',
-                state: 'CA',
-                zip: '94545',
-                latitude: 37.6622,
-                longitude: -122.1241,
-                phone: '(510) 555-0143',
-                website: 'https://www.pacificaggregates.com'
-            }
-        ];
-
-        return mockGoogleResults.map((item, idx) => ({
-            ...item,
-            id: `goog-${Math.random().toString(36).substring(2, 9)}`,
+        return companies.map((c, idx) => ({
+            id: c.id || `goog-${Math.random().toString(36).substring(2, 9)}`,
+            name: c.companyName,
+            address: c.address,
+            city: c.city,
+            state: c.state,
+            zip: c.zip,
+            latitude: c.latitude,
+            longitude: c.longitude,
+            phone: c.phone,
+            website: c.website,
             industry: filters.industry,
-            distanceMiles: idx === 0 ? 3.4 : 12.1,
+            distanceMiles: c.distanceMiles || (idx === 0 ? 3.4 : 12.1),
             source: this.name,
-            status: 'not_contacted' as const
+            status: 'not_contacted' as const,
         }));
     }
 }

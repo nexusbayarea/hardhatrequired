@@ -106,14 +106,11 @@ export function classifyFitType(
   company: Partial<Company>,
   verticalId: string
 ): FitType {
-  if (company.source === 'regulatory_permit' || company.source === 'enterprise_overlay') {
+  if (company.source === 'regulatory_permit') {
     return 'REGULATORY_NODE';
   }
   if (company.isDisposalFacilityByCategory || verticalId.includes('disposal')) {
     return 'DISPOSAL_NODE';
-  }
-  if (company.source === 'enterprise_overlay') {
-    return 'REGULATORY_NODE';
   }
   if (company.hasRegulatoryPermit) {
     return 'REGULATORY_NODE';

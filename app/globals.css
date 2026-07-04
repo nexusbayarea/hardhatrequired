@@ -12,13 +12,14 @@ html:not([data-theme]) {
   --color-border:    #26262C;
   --color-text:      #F5F5F7;
   --color-muted:     #8E8E99;
-  --color-red:       #F87431;
+  --color-red:       #FFFF00;
   --color-green:     #22C55E;
   --color-yellow:    #F59E0B;
   --color-blue:      #3B82F6;
-  --color-accent:    #F87431;
+  --color-accent:    #FFFF00;
   --shadow-card:     0 0 0 1px rgba(255,255,255,0.04);
-  --shadow-glow:     0 0 60px rgba(248,116,49,0.12);
+  --shadow-glow:     0 0 60px rgba(255,255,0,0.12);
+  --color-indigo:    #6366F1;
 }
 
 /* ──────────────────────────────────────────────
@@ -32,13 +33,14 @@ html[data-theme="day"] {
   --color-border:    #D1D1D6;
   --color-text:      #0A0A0E;
   --color-muted:     #4A4A55;
-  --color-red:       #D46528;
+  --color-red:       #FFFF00;
   --color-green:     #15803D;
   --color-yellow:    #B45309;
   --color-blue:      #1D4ED8;
-  --color-accent:    #D46528;
+  --color-accent:    #FFFF00;
+  --color-indigo:    #4F46E5;
   --shadow-card:     0 0 0 1px rgba(0,0,0,0.08);
-  --shadow-glow:     0 0 60px rgba(212,101,40,0.08);
+  --shadow-glow:     0 0 60px rgba(255,255,0,0.08);
 }
 
 /* ──────────────────────────────────────────────
@@ -55,6 +57,7 @@ html[data-theme="day"] {
   --color-green:   var(--color-green);
   --color-yellow:  var(--color-yellow);
   --color-blue:    var(--color-blue);
+  --color-indigo:  var(--color-indigo);
 }
 
 /* ──────────────────────────────────────────────
@@ -444,3 +447,35 @@ html[data-theme="day"] .theme-toggle-knob {
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+/* ──────────────────────────────────────────────
+   DASHBOARD / SEARCH HELPER CLASSES
+   ────────────────────────────────────────────── */
+.search-console-header-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.25rem;
+  color: var(--color-text);
+  letter-spacing: 0.04em;
+}
+
+.bg-disposal-mix {
+  background: color-mix(in srgb, var(--color-green) 12%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-green) 25%, var(--color-border));
+}
+
+.bg-labor-mix {
+  background: color-mix(in srgb, var(--color-red) 12%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-red) 25%, var(--color-border));
+}
+
+.error-box {
+  background: color-mix(in srgb, var(--color-red) 10%, var(--color-surface2));
+  border: 1px solid color-mix(in srgb, var(--color-red) 30%, transparent);
+  color: var(--color-red);
+}
+
+.project-context-header {
+  background: color-mix(in srgb, var(--color-indigo) 8%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-indigo) 20%, transparent);
+}
+
