@@ -67,9 +67,9 @@ export default function Topbar({ mobile = false }: TopbarProps) {
       }}
     >
       {/* Page title — injected by route context in future, generic for now */}
-      <div>
+      <div className="min-w-0 flex-1 overflow-hidden">
         <h1
-          className="font-black leading-none"
+          className="font-black leading-none truncate"
           style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontSize: '1.75rem',
@@ -79,7 +79,7 @@ export default function Topbar({ mobile = false }: TopbarProps) {
         >
           {(WORKSPACE_LABELS[workspace] || t('dashboard')).toUpperCase()}
         </h1>
-        <p className="text-sm font-medium mt-0.5" style={{ color: 'var(--color-muted)' }}>
+        <p className="text-sm font-medium mt-0.5 truncate" style={{ color: 'var(--color-muted)' }}>
           {workspace === 'command-center' ? t('construction market intelligence dashboard') :
            workspace === 'search' ? t('find operators, facilities, equipment, and regulatory records') :
            workspace === 'logistics' ? t('route analysis, cost modeling, and crew planning') :

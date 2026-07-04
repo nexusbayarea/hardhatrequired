@@ -96,6 +96,7 @@ export default function Sidebar({ slim = false }: SidebarProps) {
                   />
                   {!slim && (
                     <span
+                      className="truncate"
                       style={{
                         fontSize: '1rem',
                         fontWeight: 600,
