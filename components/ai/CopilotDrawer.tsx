@@ -183,7 +183,7 @@ export default function CopilotDrawer() {
       {/* Floating trigger */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
+        className="fixed bottom-20 right-6 z-[60] w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
         style={{ background: 'var(--color-red)', border: 'none', cursor: 'pointer' }}
         data-agent-intent="open-copilot"
       >
