@@ -83,7 +83,7 @@ import LanguageToggle from '@/components/shared/LanguageToggle';
 function LandingInner() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -226,7 +226,7 @@ function LandingInner() {
       </nav>
 
       {/* ───── HERO ───── */}
-      <section className="relative min-h-screen flex items-start pt-20 overflow-hidden">
+      <section className="relative min-h-screen pt-20 overflow-hidden">
         {/* Background — vertical grid lines + red orb + tape measure on left */}
         <div className="absolute inset-0 pointer-events-none">
           {/* Vertical grid lines */}
