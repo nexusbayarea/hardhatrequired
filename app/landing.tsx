@@ -226,7 +226,7 @@ function LandingInner() {
       </nav>
 
       {/* ───── HERO ───── */}
-      <section className="relative min-h-screen flex flex-col overflow-x-hidden">
+      <section className="relative min-h-screen flex items-start pt-20 overflow-hidden">
         {/* Background — vertical grid lines + red orb + tape measure on left */}
         <div className="absolute inset-0 pointer-events-none">
           {/* Vertical grid lines */}
@@ -262,7 +262,7 @@ function LandingInner() {
           </div>
         </div>
 
-        <div className="max-w-[1400px] mx-auto px-5 md:px-8 w-full py-36 md:py-48 relative z-10">
+        <div className="max-w-[1400px] mx-auto px-5 md:px-8 w-full py-20 md:py-32 relative z-10">
           <div className="max-w-5xl">
             {/* Eyebrow */}
             <div className="flex items-center gap-3 mb-8">
