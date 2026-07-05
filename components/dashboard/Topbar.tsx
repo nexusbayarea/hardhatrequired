@@ -31,6 +31,7 @@ export default function Topbar({ mobile = false }: TopbarProps) {
   if (mobile) {
     return (
       <div className="flex items-center gap-3">
+        <LanguageToggle />
         <ThemeToggle />
         <button
           className="relative p-2.5 rounded-xl transition-all"
