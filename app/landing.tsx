@@ -226,7 +226,7 @@ function LandingInner() {
       </nav>
 
       {/* ───── HERO ───── */}
-      <section className={`relative min-h-screen overflow-x-hidden ${language === 'en' ? 'pt-24' : 'pt-32'}`}>
+      <section className={`relative min-h-screen flex items-center overflow-x-hidden ${language === 'en' ? 'pt-20' : 'pt-28'}`}>
         {/* Background — vertical grid lines + red orb + tape measure on left */}
         <div className="absolute inset-0 pointer-events-none">
           {/* Vertical grid lines */}
