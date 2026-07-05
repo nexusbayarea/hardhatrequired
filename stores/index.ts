@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useSyncExternalStore, useRef } from 'react';
 
 export type Listener = () => void;
 
@@ -31,5 +31,5 @@ export function createStore<T extends Record<string, any>>(initial: T): Store<T>
 }
 
 export function useStore<T, S>(store: Store<T>, selector: (state: T) => S): S {
-  return useSyncExternalStore(store.subscribe, () => selector(store.getState()));
+  return useSyncExternalStore(store.subscribe, () => selector(store.getState()), () => selector(store.getState()));
 }

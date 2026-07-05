@@ -40,6 +40,7 @@ export function SearchStateProvider({ children }: { children: ReactNode }) {
       const unsub2 = searchStore.subscribe(cb);
       return () => { unsub1(); unsub2(); };
     },
+    toSearchPaneData,
     toSearchPaneData
   );
 
