@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useCallback, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useCallback, useState, ReactNode } from 'react';
 import { projectsStore, useProjectsStore, type Project } from '@/stores/projects.store';
 
 export type { Project };
@@ -33,21 +33,6 @@ function useProjectsStoreSync() {
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const store = useProjectsStoreSync();
   const [toast, setToast] = useState<string | null>(null);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    if (hydrated) return;
-    setHydrated(true);
-    let saved: Project[] = [];
-    try {
-      const raw = localStorage.getItem('hhr_projects_db');
-      saved = raw ? JSON.parse(raw) : [];
-    } catch {}
-
-    if (saved.length > 0) {
-      projectsStore.setState({ list: saved });
-    }
-  }, [hydrated]);
 
   const showToast = useCallback((msg: string) => setToast(msg), []);
   const clearToast = useCallback(() => setToast(null), []);

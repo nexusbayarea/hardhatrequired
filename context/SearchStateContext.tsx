@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useSyncExternalStore, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { searchStore, type SearchPane } from '@/stores/search.store';
 import { resultsStore } from '@/stores/results.store';
 import type { SearchResult } from '@/types/search';
@@ -34,15 +34,13 @@ function toSearchPaneData(): SearchPaneData {
 }
 
 export function SearchStateProvider({ children }: { children: ReactNode }) {
-  const searchState = useSyncExternalStore(
-    (cb) => {
-      const unsub1 = resultsStore.subscribe(cb);
-      const unsub2 = searchStore.subscribe(cb);
-      return () => { unsub1(); unsub2(); };
-    },
-    toSearchPaneData,
-    toSearchPaneData
-  );
+  const [searchState, setSearchState] = useState<SearchPaneData>(() => toSearchPaneData());
+  useEffect(() => {
+    const update = () => setSearchState(toSearchPaneData());
+    const unsub1 = resultsStore.subscribe(update);
+    const unsub2 = searchStore.subscribe(update);
+    return () => { unsub1(); unsub2(); };
+  }, []);
 
   return (
     <SearchStateContext.Provider
