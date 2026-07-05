@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useSearchState } from '@/context/SearchStateContext';
 import { useWorkspace } from '@/context/WorkspaceContext';
@@ -22,6 +23,9 @@ import BidIntelligence from './workspace/BidIntelligence';
 import MarketIntelligence from './workspace/MarketIntelligence';
 import SavedItems from './workspace/SavedItems';
 import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
+import { pageAgent } from '@/lib/page-agent';
+import { frontendOrchestrator } from '@/lib/api/orchestrator/FrontendOrchestrator';
+import type { PageAction } from '@/types/copilot';
 import type { SearchPane } from './SearchConsole';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
@@ -39,7 +43,7 @@ export default function DashboardShell() {
   const { t, language } = useLanguage();
   const { searchState, setSearchState, activePane, setActivePane } = useSearchState();
   const { workspace, setWorkspace } = useWorkspace();
-  const { activeProject, toast, clearToast } = useProject();
+  const { activeProject, toast, showToast, clearToast } = useProject();
   const defaultVolume = 3000;
   const [targetVolume, setTargetVolume] = useState(defaultVolume);
 
@@ -94,6 +98,76 @@ export default function DashboardShell() {
   const setVertical = useCallback((v: string) => {
     setSearchState(p => ({ ...p, vertical: v }));
   }, []);
+
+  const router = useRouter();
+
+  const handlePageAction = useCallback(async (action: PageAction) => {
+    await frontendOrchestrator.executePageActions([action]);
+
+    switch (action.type) {
+      case 'setZip': {
+        const el = document.querySelector('[data-agent-intent="set-zip"]') as HTMLInputElement;
+        if (el) window.triggerAgentInputChange?.(el, action.value);
+        break;
+      }
+      case 'setRadius': {
+        const el = document.querySelector('[data-agent-intent="set-radius"]') as HTMLSelectElement;
+        if (el) window.triggerAgentInputChange?.(el, String(action.value));
+        break;
+      }
+      case 'setGallons': {
+        const el = document.querySelector('[data-agent-intent="set-gallons"]') as HTMLInputElement;
+        if (el) window.triggerAgentInputChange?.(el, String(action.value));
+        break;
+      }
+      case 'navigate':
+        router.push(action.route);
+        break;
+      case 'showNotification':
+        showToast(action.message);
+        break;
+      case 'click': {
+        const el = document.querySelector(`[data-agent-intent="${action.target}"]`) as HTMLElement;
+        el?.click();
+        break;
+      }
+      case 'openDrawer': {
+        const el = document.querySelector(`[data-agent-intent="open-${action.drawer}"]`) as HTMLElement;
+        el?.click();
+        break;
+      }
+      case 'closeDrawer': {
+        const el = document.querySelector(`[data-agent-intent="close-${action.drawer}"]`) as HTMLElement;
+        el?.click();
+        break;
+      }
+      case 'expandCard': {
+        const el = document.querySelector(action.selector) as HTMLElement;
+        const toggle = el?.querySelector('[data-agent-intent="expand-card"]') as HTMLElement;
+        toggle?.click();
+        break;
+      }
+      case 'highlight': {
+        const el = document.querySelector(action.selector) as HTMLElement;
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (el) {
+          el.style.outline = '3px solid var(--color-red)';
+          el.style.outlineOffset = '2px';
+          setTimeout(() => { el.style.outline = ''; el.style.outlineOffset = ''; }, 3000);
+        }
+        break;
+      }
+      case 'fillForm': {
+        const el = document.querySelector(action.selector) as HTMLElement;
+        if (el) window.triggerAgentInputChange?.(el, action.value);
+        break;
+      }
+    }
+  }, [router, showToast]);
+
+  useEffect(() => {
+    pageAgent.setActionHandler(handlePageAction);
+  }, [handlePageAction]);
 
   const isSearchWorkspace = workspace === 'search' || workspace === 'logistics' || workspace === 'equipment' || workspace === 'bids';
   const showRail = workspace === 'search' || workspace === 'logistics';

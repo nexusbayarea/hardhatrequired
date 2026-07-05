@@ -1,7 +1,8 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
-import type { SearchPane } from '@/components/dashboard/SearchConsole';
+import { createContext, useContext, useSyncExternalStore, ReactNode } from 'react';
+import { searchStore, type SearchPane } from '@/stores/search.store';
+import { resultsStore } from '@/stores/results.store';
 import type { SearchResult } from '@/types/search';
 
 export interface SearchPaneData {
@@ -19,20 +20,49 @@ interface SearchStateContextValue {
   resetSearch: () => void;
 }
 
-function emptyPane(): SearchPaneData {
-  return { data: null, loading: false, error: null, vertical: '' };
-}
-
 const SearchStateContext = createContext<SearchStateContextValue | null>(null);
 
-export function SearchStateProvider({ children }: { children: ReactNode }) {
-  const [searchState, setSearchState] = useState<SearchPaneData>(emptyPane);
-  const [activePane, setActivePane] = useState<SearchPane>('labor');
+function toSearchPaneData(): SearchPaneData {
+  const r = resultsStore.getState();
+  const s = searchStore.getState();
+  return {
+    data: r.items.length > 0 ? { companies: r.items, count: r.count } : null,
+    loading: r.loading,
+    error: r.error,
+    vertical: s.vertical,
+  };
+}
 
-  const resetSearch = () => setSearchState(emptyPane());
+export function SearchStateProvider({ children }: { children: ReactNode }) {
+  const searchState = useSyncExternalStore(
+    (cb) => {
+      const unsub1 = resultsStore.subscribe(cb);
+      const unsub2 = searchStore.subscribe(cb);
+      return () => { unsub1(); unsub2(); };
+    },
+    toSearchPaneData
+  );
 
   return (
-    <SearchStateContext.Provider value={{ searchState, setSearchState, activePane, setActivePane, resetSearch }}>
+    <SearchStateContext.Provider
+      value={{
+        searchState,
+        activePane: searchStore.getState().activePane,
+        setSearchState: (updater) => {
+          if (typeof updater === 'function') {
+            const prev = toSearchPaneData();
+            const next = updater(prev);
+            resultsStore.setState({ items: next.data?.companies ?? [], count: next.data?.count ?? 0, loading: next.loading, error: next.error });
+            if (next.vertical !== undefined) searchStore.setState({ vertical: next.vertical });
+          } else {
+            resultsStore.setState({ items: updater.data?.companies ?? [], count: updater.data?.count ?? 0, loading: updater.loading, error: updater.error });
+            if (updater.vertical !== undefined) searchStore.setState({ vertical: updater.vertical });
+          }
+        },
+        setActivePane: (pane) => searchStore.setState({ activePane: pane }),
+        resetSearch: () => { resultsStore.reset(); },
+      }}
+    >
       {children}
     </SearchStateContext.Provider>
   );

@@ -61,9 +61,10 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-      results,
+      ...results,
       meta: {
-        total: results.length,
+        total: results.bids.length,
+        providers: results.providers.map(p => ({ provider: p.provider, status: p.status, message: p.message })),
         verticalId,
         state,
         zip,
