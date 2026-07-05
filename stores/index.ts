@@ -1,4 +1,4 @@
-import { useSyncExternalStore, useRef } from 'react';
+import { useSyncExternalStore } from 'react';
 
 export type Listener = () => void;
 

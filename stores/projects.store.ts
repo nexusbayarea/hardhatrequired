@@ -38,7 +38,7 @@ function saveProjects(projects: Project[]) {
 }
 
 export const projectsStore = createStore<ProjectsState>({
-  list: loadProjects(),
+  list: [],
   activeId: null,
 });
 
