@@ -226,7 +226,7 @@ function LandingInner() {
       </nav>
 
       {/* ───── HERO ───── */}
-      <section className="relative min-h-screen flex flex-col overflow-x-hidden" style={{ paddingTop: language === 'en' || language === 'zh' ? '7rem' : '12rem' }}>
+      <section className="relative min-h-screen flex flex-col overflow-x-hidden" style={{ paddingTop: '5.75rem' }}>
         {/* Background — vertical grid lines + red orb + tape measure on left */}
         <div className="absolute inset-0 pointer-events-none">
           {/* Vertical grid lines */}
