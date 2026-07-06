@@ -1,59 +1,45 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Truck, Wrench, Fuel, Zap, ArrowRight, Container, Drill, Gauge } from 'lucide-react';
+import { Truck, Container, Fuel, Zap, Drill, Gauge, ArrowRight, Loader } from 'lucide-react';
 
 interface EquipmentItem {
   id: string;
   name: string;
-  type: string;
-  rate: string;
-  available: boolean;
-  partner: string;
-  distance: string;
+  company: string;
+  city: string;
+  availability: string;
   icon: any;
 }
 
-const FALLBACK_EQUIPMENT: EquipmentItem[] = [
-  { id: 'e1', name: 'Vacuum Truck 3000 GAL', type: 'vacuum_truck', rate: '$850/day', available: true, partner: 'Apex Environmental', distance: '12 mi', icon: Truck },
-  { id: 'e2', name: 'Roll-Off Container 40yd', type: 'roll_off', rate: '$120/day', available: true, partner: 'Waste Management Solutions', distance: '8 mi', icon: Container },
-  { id: 'e3', name: 'Frac Tank 21000 GAL', type: 'frac_tank', rate: '$450/day', available: true, partner: 'Tank Solutions Inc', distance: '22 mi', icon: Fuel },
-  { id: 'e4', name: 'Generator 150kW', type: 'generator', rate: '$320/day', available: true, partner: 'Power Equipment Co', distance: '15 mi', icon: Zap },
-  { id: 'e5', name: 'Hydro-Excavation Unit', type: 'hydro_excavation', rate: '$1,200/day', available: true, partner: 'SafeDig Services', distance: '18 mi', icon: Drill },
-  { id: 'e6', name: 'Portable Pump 6"', type: 'pump', rate: '$280/day', available: true, partner: 'Dewatering Pro', distance: '10 mi', icon: Gauge },
-];
+const ICONS = [Truck, Container, Fuel, Zap, Drill, Gauge];
 
 export default function EquipmentStrip() {
   const [equipment, setEquipment] = useState<EquipmentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasData, setHasData] = useState(false);
 
   useEffect(() => {
-    fetch('/api/equipment-rental', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ verticalId: 'slurry_processing', zip: '94538', radiusMiles: 50 }),
-    })
+    fetch('/api/public/equipment', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data?.results?.length) {
-          const items: EquipmentItem[] = data.results.slice(0, 6).map((r: any, i: number) => ({
-            id: r.id || `eq-${i}`,
-            name: r.name || 'Unknown Equipment',
-            type: r.equipmentTypes?.[0] || 'other',
-            rate: r.dailyRate ? `$${r.dailyRate}/day` : 'Contact for rate',
-            available: r.availableUnits == null || r.availableUnits > 0,
-            partner: r.name || 'Unknown Vendor',
-            distance: r.distanceMiles ? `${r.distanceMiles} mi` : 'Local',
-            icon: [Truck, Container, Fuel, Zap, Drill, Gauge][i % 6],
-          }));
-          setEquipment(items);
-        } else {
-          setEquipment(FALLBACK_EQUIPMENT);
+        if (data?.featured?.length) {
+          setEquipment(data.featured.map((f: any, i: number) => ({
+            id: `eq-${i}`,
+            name: f.equipment,
+            company: f.company,
+            city: f.city,
+            availability: f.availability,
+            icon: ICONS[i % ICONS.length],
+          })));
+          setHasData(true);
         }
       })
-      .catch(() => setEquipment(FALLBACK_EQUIPMENT))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  if (!hasData && !loading) return null;
 
   return (
     <section className="py-24 md:py-36">
@@ -77,16 +63,16 @@ export default function EquipmentStrip() {
             <span className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>
               Available near you
             </span>
-            <span className="text-[10px] font-semibold" style={{ color: 'var(--color-muted)' }}>
-              {equipment.length} assets found
-            </span>
+            {hasData && (
+              <span className="text-[10px] font-semibold" style={{ color: 'var(--color-muted)' }}>
+                {equipment.length} assets found
+              </span>
+            )}
           </div>
 
           {loading ? (
-            <div className="p-8 space-y-3">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-14 rounded-lg animate-pulse" style={{ background: 'var(--color-surface2)' }} />
-              ))}
+            <div className="p-8 flex items-center justify-center">
+              <Loader className="w-5 h-5 animate-spin" style={{ color: 'var(--color-red)' }} />
             </div>
           ) : (
             <div className="divide-y" style={{ borderColor: 'var(--color-border)' }}>
@@ -108,18 +94,15 @@ export default function EquipmentStrip() {
                         {item.name}
                       </div>
                       <div className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
-                        {item.partner} · {item.distance}
+                        {item.company} · {item.city}
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <div className="text-sm font-bold" style={{ color: 'var(--color-green)' }}>
-                        {item.rate}
-                      </div>
                       <div
-                        className="text-[10px] font-semibold"
-                        style={{ color: item.available ? 'var(--color-green)' : 'var(--color-red)' }}
+                        className="text-[11px] font-semibold"
+                        style={{ color: 'var(--color-green)' }}
                       >
-                        {item.available ? 'In Stock' : 'Unavailable'}
+                        {item.availability}
                       </div>
                     </div>
                   </div>
@@ -128,15 +111,17 @@ export default function EquipmentStrip() {
             </div>
           )}
 
-          <div
-            className="px-6 py-3 border-t flex items-center justify-center gap-2 transition-colors"
-            style={{ borderColor: 'var(--color-border)' }}
-          >
-            <span className="text-xs font-semibold" style={{ color: 'var(--color-muted)' }}>
-              View full equipment catalog
-            </span>
-            <ArrowRight className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
-          </div>
+          {hasData && (
+            <div
+              className="px-6 py-3 border-t flex items-center justify-center gap-2 transition-colors"
+              style={{ borderColor: 'var(--color-border)' }}
+            >
+              <span className="text-xs font-semibold" style={{ color: 'var(--color-muted)' }}>
+                View full equipment catalog
+              </span>
+              <ArrowRight className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
+            </div>
+          )}
         </div>
       </div>
     </section>

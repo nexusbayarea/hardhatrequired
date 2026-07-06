@@ -1,34 +1,34 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Briefcase, Calendar, Building2, MapPin, ArrowRight, DollarSign, Loader, Sparkles } from 'lucide-react';
+import { Briefcase, Calendar, ArrowRight, DollarSign, Loader, Sparkles } from 'lucide-react';
 
 interface Bid {
   id: string;
   title: string;
   agency: string;
-  valueEstimate: string;
-  deadline: string;
+  estimated_value: number;
+  due_at: string;
   description: string;
-  location: string;
-  difficulty: 'Easy' | 'Medium' | 'Complex';
+  state: string;
+  city: string;
+  bid_source: string;
+  status: string;
 }
 
 export default function LatestBidCard() {
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [hasData, setHasData] = useState(false);
 
   useEffect(() => {
-    fetch('/api/intelligence', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: 'CA' }),
-    })
+    fetch('/api/public/bids', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data?.success && data?.bids?.length) {
-          setBids(data.bids.map((b: any) => ({ ...b, location: 'California' })));
+        if (data?.bids?.length) {
+          setBids(data.bids);
+          setHasData(true);
         }
       })
       .catch(() => {})
@@ -43,6 +43,18 @@ export default function LatestBidCard() {
     return () => clearInterval(timer);
   }, [bids.length]);
 
+  if (!hasData && !loading) return null;
+
+  const formatValue = (v: number | null) => {
+    if (!v) return 'Value undisclosed';
+    return `$${v.toLocaleString()}`;
+  };
+
+  const formatDate = (d: string) => {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
   if (loading) {
     return (
       <section className="py-24 md:py-36">
@@ -52,8 +64,6 @@ export default function LatestBidCard() {
       </section>
     );
   }
-
-  if (bids.length === 0) return null;
 
   const bid = bids[activeIndex];
 
@@ -70,10 +80,7 @@ export default function LatestBidCard() {
 
         <div
           className="rounded-xl overflow-hidden transition-all duration-300"
-          style={{
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
-          }}
+          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
         >
           <div
             className="px-6 py-4 border-b flex items-center justify-between"
@@ -104,27 +111,20 @@ export default function LatestBidCard() {
             <div className="flex flex-col lg:flex-row lg:items-start gap-6">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-3">
-                  <span
-                    className="px-2.5 py-1 rounded text-[10px] font-bold"
-                    style={{
-                      background: bid.difficulty === 'Easy'
-                        ? 'color-mix(in srgb, var(--color-green) 12%, transparent)'
-                        : bid.difficulty === 'Medium'
-                        ? 'color-mix(in srgb, var(--color-yellow) 12%, transparent)'
-                        : 'color-mix(in srgb, var(--color-blue) 12%, transparent)',
-                      color: bid.difficulty === 'Easy' ? 'var(--color-green)'
-                        : bid.difficulty === 'Medium' ? 'var(--color-yellow)'
-                        : 'var(--color-blue)',
-                    }}
-                  >
-                    {bid.difficulty} RFP
+                  <span className="text-[10px] font-bold px-2 py-1 rounded" style={{
+                    background: bid.status === 'closing_soon'
+                      ? 'color-mix(in srgb, var(--color-red) 12%, transparent)'
+                      : 'color-mix(in srgb, var(--color-green) 12%, transparent)',
+                    color: bid.status === 'closing_soon' ? 'var(--color-red)' : 'var(--color-green)',
+                  }}>
+                    {bid.status === 'closing_soon' ? 'Closing Soon' : 'Open'}
                   </span>
                   <span className="text-[10px] font-bold px-2 py-1 rounded" style={{
                     background: 'var(--color-surface2)',
                     color: 'var(--color-muted)',
                     border: '1px solid var(--color-border)',
                   }}>
-                    {bid.agency}
+                    {bid.bid_source || bid.agency}
                   </span>
                 </div>
 
@@ -132,18 +132,22 @@ export default function LatestBidCard() {
                   {bid.title}
                 </h3>
 
-                <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--color-muted)' }}>
-                  {bid.description}
-                </p>
+                {bid.description && (
+                  <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--color-muted)' }}>
+                    {bid.description}
+                  </p>
+                )}
 
                 <div className="flex flex-wrap items-center gap-4 text-xs" style={{ color: 'var(--color-muted)' }}>
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {bid.deadline}
-                  </span>
+                  {bid.due_at && (
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {formatDate(bid.due_at)}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1.5 font-semibold" style={{ color: 'var(--color-green)' }}>
                     <DollarSign className="w-3.5 h-3.5" />
-                    {bid.valueEstimate}
+                    {formatValue(bid.estimated_value)}
                   </span>
                 </div>
               </div>

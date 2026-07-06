@@ -9,51 +9,22 @@ interface Activity {
   time: string;
 }
 
-const FALLBACK_ACTIVITIES: Activity[] = [
-  { id: 'a1', icon: '🔍', text: 'New slurry contractor indexed in Sacramento', time: '2 min ago' },
-  { id: 'a2', icon: '📋', text: '4 new Caltrans bids published today', time: '15 min ago' },
-  { id: 'a3', icon: '📝', text: '12 permits updated this morning', time: '32 min ago' },
-  { id: 'a4', icon: '🚛', text: '3 new vacuum truck rentals added near Fresno', time: '1 hr ago' },
-  { id: 'a5', icon: '🔎', text: '18 searches performed in the last hour', time: '1 hr ago' },
-  { id: 'a6', icon: '🏗️', text: 'Vacuum truck operator discovered in Stockton', time: '2 hr ago' },
-  { id: 'a7', icon: '📊', text: 'Concrete washout facility permits renewed in Oakland', time: '2 hr ago' },
-  { id: 'a8', icon: '⚖️', text: 'New OSHA silica exposure rules effective next month', time: '3 hr ago' },
-];
-
 export default function LiveActivityTicker() {
   const [items, setItems] = useState<Activity[]>([]);
   const [current, setCurrent] = useState(0);
+  const [hasData, setHasData] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
 
   useEffect(() => {
-    fetch('/api/intelligence', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-iie-client-context': 'slurry_processing' },
-      body: JSON.stringify({ state: 'CA' }),
-    })
+    fetch('/api/public/activity', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data?.success && data?.news?.length) {
-          const fromNews: Activity[] = data.news.slice(0, 6).map((n: any, i: number) => ({
-            id: `act-${i}`,
-            icon: n.impact === 'High' ? '🔴' : n.impact === 'Medium' ? '🟡' : '🟢',
-            text: n.title,
-            time: n.publishedAt,
-          }));
-          if (data.bids?.length) {
-            fromNews.push(...data.bids.slice(0, 2).map((b: any, i: number) => ({
-              id: `bid-act-${i}`,
-              icon: '📋',
-              text: b.title,
-              time: b.deadline,
-            })));
-          }
-          setItems(fromNews);
-        } else {
-          setItems(FALLBACK_ACTIVITIES);
+        if (data?.items?.length) {
+          setItems(data.items);
+          setHasData(true);
         }
       })
-      .catch(() => setItems(FALLBACK_ACTIVITIES));
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -64,7 +35,7 @@ export default function LiveActivityTicker() {
     return () => clearInterval(timerRef.current);
   }, [items.length]);
 
-  if (items.length === 0) return null;
+  if (!hasData || items.length === 0) return null;
 
   const active = items[current];
 

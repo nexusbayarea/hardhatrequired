@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { Database, Truck, Wrench, FileCheck, Briefcase, Users } from 'lucide-react';
 
 interface CoverageData {
-  vendorsIndexed: number;
-  disposalFacilities: number;
-  equipmentAssets: number;
-  activePermits: number;
-  activeBids: number;
+  companies: number;
+  permits: number;
+  equipment: number;
+  bids: number;
   deepProfiles: number;
+  states: number;
 }
 
 function formatCount(n: number): string {
@@ -23,51 +23,25 @@ export default function CoverageStatistics() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchCoverage() {
-      try {
-        const [overviewRes, reportRes] = await Promise.all([
-          fetch('/api/dashboard/overview', { method: 'POST', headers: { 'Content-Type': 'application/json' } }),
-          fetch('/api/reports', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Coverage Stats' }) }),
-        ]);
-        const overview = overviewRes.ok ? await overviewRes.json() : null;
-        const report = reportRes.ok ? await reportRes.json() : null;
-
-        const metrics = overview?.metrics;
-        const r = report || {};
-
-        const baseCompanies = metrics?.totalCompanies || r.totalCompanies || 2847;
-        const basePermits = metrics?.activePermits || r.activePermits || 156;
-
-        setData({
-          vendorsIndexed: baseCompanies,
-          disposalFacilities: Math.round(baseCompanies * 0.18),
-          equipmentAssets: Math.round(baseCompanies * 0.35 * 4),
-          activePermits: basePermits,
-          activeBids: Math.round(baseCompanies * 0.12),
-          deepProfiles: Math.round(baseCompanies * 0.42),
-        });
-      } catch {
-        setData({
-          vendorsIndexed: 2847,
-          disposalFacilities: 512,
-          equipmentAssets: 3986,
-          activePermits: 156,
-          activeBids: 342,
-          deepProfiles: 1196,
-        });
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCoverage();
+    fetch('/api/public/coverage', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d && typeof d.companies === 'number') {
+          setData(d as CoverageData);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
+  if (!data && !loading) return null;
+
   const stats = data ? [
-    { icon: Database, label: 'Vendors Indexed', value: formatCount(data.vendorsIndexed), color: 'var(--color-red)' },
-    { icon: Truck, label: 'Disposal Facilities', value: formatCount(data.disposalFacilities), color: 'var(--color-green)' },
-    { icon: Wrench, label: 'Equipment Assets', value: formatCount(data.equipmentAssets), color: 'var(--color-blue)' },
-    { icon: FileCheck, label: 'Active Permits', value: formatCount(data.activePermits), color: 'var(--color-yellow)' },
-    { icon: Briefcase, label: 'Active Bids', value: formatCount(data.activeBids), color: 'var(--color-indigo)' },
+    { icon: Database, label: 'Companies Indexed', value: formatCount(data.companies), color: 'var(--color-red)' },
+    { icon: FileCheck, label: 'Active Permits', value: formatCount(data.permits), color: 'var(--color-green)' },
+    { icon: Wrench, label: 'Equipment Assets', value: formatCount(data.equipment), color: 'var(--color-blue)' },
+    { icon: Truck, label: 'Disposal Facilities', value: formatCount(data.companies), color: 'var(--color-yellow)' },
+    { icon: Briefcase, label: 'Open Bids', value: formatCount(data.bids), color: 'var(--color-indigo)' },
     { icon: Users, label: 'Deep Profiles', value: formatCount(data.deepProfiles), color: 'var(--color-green)' },
   ] : [];
 
