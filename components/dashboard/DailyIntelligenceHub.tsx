@@ -228,7 +228,7 @@ export default function DailyIntelligenceHub({
         style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
       >
         <Loader className="w-8 h-8 animate-spin mb-3" style={{ color: 'var(--color-red)' }} />
-        <p className="text-sm font-medium" style={{ color: 'var(--color-muted)' }}>Scanning regional public bids & compliance updates...</p>
+        <p className="text-lg font-medium" style={{ color: 'var(--color-muted)' }}>Scanning regional public bids & compliance updates...</p>
       </div>
     );
   }
@@ -245,11 +245,11 @@ export default function DailyIntelligenceHub({
       >
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--color-red)' }} />
-          <h2 className="font-bold" style={{ fontSize: landing ? 'clamp(1.5rem, 3vw, 2rem)' : '1.125rem', color: landing ? 'var(--color-red)' : 'var(--color-text)' }}>
+          <h2 className="font-bold" style={{ fontSize: landing ? 'clamp(1.5rem, 3vw, 2rem)' : '1.75rem', color: landing ? 'var(--color-red)' : 'var(--color-text)' }}>
             Intelligence Feed
           </h2>
         </div>
-        <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--color-muted)' }}>
+        <div className="flex items-center gap-2 text-base" style={{ color: 'var(--color-muted)' }}>
           {updatedAt && (
             <span>Updated {Math.round((Date.now() - updatedAt.getTime()) / 60000)}m ago</span>
           )}
@@ -268,11 +268,11 @@ export default function DailyIntelligenceHub({
         className="px-5 py-3 border-b flex items-center gap-4 flex-wrap"
         style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg)' }}
       >
-        <span className="text-[10px] font-black uppercase tracking-widest shrink-0" style={{ color: 'var(--color-text)' }}>
+        <span className="text-[15px] font-black uppercase tracking-widest shrink-0" style={{ color: 'var(--color-text)' }}>
           TODAY
         </span>
         {todaySummary.map(s => (
-          <span key={s.type} className="text-[11px] font-semibold flex items-center gap-1.5">
+          <span key={s.type} className="text-[16px] font-semibold flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: s.dot }} />
             <span style={{ color: 'var(--color-text)' }}>+{s.count}</span>
             <span style={{ color: 'var(--color-muted)' }}>{s.label}</span>
@@ -283,7 +283,7 @@ export default function DailyIntelligenceHub({
             <button
               key={t}
               onClick={() => setTypeFilter(t)}
-              className="text-[10px] font-bold px-2 py-1 rounded transition-colors uppercase tracking-wider"
+              className="text-[15px] font-bold px-2 py-1 rounded transition-colors uppercase tracking-wider"
               style={{
                 background: typeFilter === t ? 'var(--color-surface)' : 'transparent',
                 color: typeFilter === t ? 'var(--color-text)' : 'var(--color-muted)',
@@ -306,10 +306,10 @@ export default function DailyIntelligenceHub({
           <div className="flex items-start gap-3">
             <Sparkles className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--color-red)' }} />
             <div className="min-w-0">
-              <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--color-red)' }}>
+              <span className="text-[15px] font-black uppercase tracking-widest" style={{ color: 'var(--color-red)' }}>
                 Today&apos;s AI Briefing
               </span>
-              <p className="text-sm mt-1 font-medium" style={{ color: 'var(--color-text)' }}>
+              <p className="text-lg mt-1 font-medium" style={{ color: 'var(--color-text)' }}>
                 {feed[0].type === 'bid' ? `${feed[0].subtitle} published a new bid. ` : ''}
                 {data.compliance.length > 0 ? `${data.compliance.length} compliance update${data.compliance.length > 1 ? 's' : ''} to review. ` : ''}
                 {data.news.filter(n => n.impact === 'High').length > 0 ? 'High-impact market changes detected. ' : ''}
@@ -318,14 +318,14 @@ export default function DailyIntelligenceHub({
               {briefingExpanded && (
                 <div className="mt-3 space-y-1.5">
                   {feed.slice(0, 5).map(f => (
-                    <div key={f.id} className="flex items-center gap-2 text-xs" style={{ color: 'var(--color-muted)' }}>
+                    <div key={f.id} className="flex items-center gap-2 text-base" style={{ color: 'var(--color-muted)' }}>
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: TYPE_META[f.type].dot }} />
                       <span className="truncate">{f.title}</span>
                     </div>
                   ))}
                 </div>
               )}
-              <span className="text-[10px] mt-2 inline-block font-semibold" style={{ color: 'var(--color-muted)' }}>
+              <span className="text-[15px] mt-2 inline-block font-semibold" style={{ color: 'var(--color-muted)' }}>
                 {briefingExpanded ? 'Collapse ↑' : 'Expand ↓'}
               </span>
             </div>
@@ -338,7 +338,7 @@ export default function DailyIntelligenceHub({
         {/* Feed */}
         <div className={`${showAIPanel && aiDraft ? 'lg:w-1/2' : 'lg:w-full'} divide-y max-h-[600px] overflow-y-auto`} style={{ borderColor: 'var(--color-border)' }}>
           {filtered.length === 0 ? (
-            <div className="p-8 text-center text-sm" style={{ color: 'var(--color-muted)' }}>
+            <div className="p-8 text-center text-lg" style={{ color: 'var(--color-muted)' }}>
               No {typeFilter !== 'all' ? TYPE_META[typeFilter].label.toLowerCase() : ''} items found.
             </div>
           ) : filtered.map(item => {
@@ -367,19 +367,19 @@ export default function DailyIntelligenceHub({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: meta.dot }} />
-                      <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: meta.dot }}>
+                      <span className="text-[15px] font-black uppercase tracking-widest" style={{ color: meta.dot }}>
                         {meta.label}
                       </span>
                       {item.opportunityScore >= 80 && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: opp.bg, color: opp.color }}>
+                        <span className="text-[15px] font-bold px-1.5 py-0.5 rounded" style={{ background: opp.bg, color: opp.color }}>
                           🔥 High Value
                         </span>
                       )}
                     </div>
-                    <h3 className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>
+                    <h3 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
                       {item.title}
                     </h3>
-                    <span className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                    <span className="text-[16px]" style={{ color: 'var(--color-muted)' }}>
                       {item.subtitle}
                     </span>
                   </div>
@@ -393,10 +393,10 @@ export default function DailyIntelligenceHub({
                       style={{ width: `${item.opportunityScore}%`, background: opp.color }}
                     />
                   </div>
-                  <span className="text-xs font-black tabular-nums shrink-0" style={{ color: opp.color }}>
+                  <span className="text-base font-black tabular-nums shrink-0" style={{ color: opp.color }}>
                     {item.opportunityScore}
                   </span>
-                  <span className="text-[10px] font-semibold shrink-0" style={{ color: 'var(--color-muted)' }}>
+                  <span className="text-[15px] font-semibold shrink-0" style={{ color: 'var(--color-muted)' }}>
                     {opp.label}
                   </span>
                 </div>
@@ -406,7 +406,7 @@ export default function DailyIntelligenceHub({
                   {Object.entries(item.detail).map(([key, val]) => (
                     <div
                       key={key}
-                      className="px-2.5 py-1.5 rounded text-[11px]"
+                      className="px-2.5 py-1.5 rounded text-[16px]"
                       style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
                     >
                       <span className="block font-bold capitalize" style={{ color: 'var(--color-text)' }}>{val}</span>
@@ -423,7 +423,7 @@ export default function DailyIntelligenceHub({
                   >
                     <Network className="w-4 h-4 shrink-0" style={{ color: 'var(--color-red)' }} />
                     {GRAPH_EXAMPLES.default.map((g, i) => (
-                      <div key={g.label} className="flex items-center gap-1.5 text-[11px]">
+                      <div key={g.label} className="flex items-center gap-1.5 text-[16px]">
                         <g.icon className="w-3 h-3" style={{ color: 'var(--color-muted)' }} />
                         <span style={{ color: 'var(--color-muted)' }}>{g.label}:</span>
                         <span className="font-semibold" style={{ color: 'var(--color-text)' }}>{g.count}</span>
@@ -442,7 +442,7 @@ export default function DailyIntelligenceHub({
                     style={{ background: 'color-mix(in srgb, var(--color-red) 6%, var(--color-surface2))', border: '1px solid color-mix(in srgb, var(--color-red) 15%, var(--color-border))' }}
                   >
                     <DollarSign className="w-4 h-4 shrink-0" style={{ color: 'var(--color-red)' }} />
-                    <span className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                    <span className="text-[16px]" style={{ color: 'var(--color-muted)' }}>
                       Impacts <strong style={{ color: 'var(--color-text)' }}>{item.detail['impacted'] || 'N/A'}</strong> ·
                       Avg penalty <strong style={{ color: 'var(--color-red)' }}>{item.detail['avg penalty'] || item.detail.penalty}</strong> ·
                       Est. <strong style={{ color: 'var(--color-text)' }}>{item.detail['est. compliance'] || 'N/A'}</strong> compliance work
@@ -461,7 +461,7 @@ export default function DailyIntelligenceHub({
                       setSelectedId(item.id);
                     }
                   }}
-                  className="w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+                  className="w-full py-2.5 rounded-lg text-base font-bold uppercase tracking-wider transition-all"
                   style={{
                     background: item.opportunityScore >= 80 ? 'var(--color-red)' : 'var(--color-surface2)',
                     color: item.opportunityScore >= 80 ? 'white' : 'var(--color-text)',
@@ -488,7 +488,7 @@ export default function DailyIntelligenceHub({
           >
             <div className="p-5">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'var(--color-red)' }}>
+                <span className="text-base font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'var(--color-red)' }}>
                   <Sparkles className="w-3.5 h-3.5 animate-spin" />
                   AI Proposal Draft
                 </span>
@@ -513,7 +513,7 @@ export default function DailyIntelligenceHub({
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider transition-colors"
+                  className="px-3 py-1.5 rounded text-[15px] font-bold uppercase tracking-wider transition-colors"
                   style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
                 >
                   {copied ? <><Check className="w-3 h-3 inline mr-1" />Copied</> : <><Copy className="w-3 h-3 inline mr-1" />Copy Draft</>}
@@ -521,7 +521,7 @@ export default function DailyIntelligenceHub({
               </div>
 
               <pre
-                className="text-xs leading-relaxed whitespace-pre-wrap rounded-lg p-4 overflow-y-auto max-h-[400px] font-mono"
+                className="text-base leading-relaxed whitespace-pre-wrap rounded-lg p-4 overflow-y-auto max-h-[400px] font-mono"
                 style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)', color: 'var(--color-muted)' }}
               >
                 {aiDraft}
@@ -537,7 +537,7 @@ export default function DailyIntelligenceHub({
           className="mx-5 mb-4 p-4 rounded-xl"
           style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
         >
-          <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 mb-2" style={{ color: 'var(--color-muted)' }}>
+          <span className="text-[15px] font-black uppercase tracking-widest flex items-center gap-1.5 mb-2" style={{ color: 'var(--color-muted)' }}>
             <ArrowUpRight className="w-3 h-3" />
             Because you searched {vertical.replace(/_/g, ' ')}
           </span>
@@ -555,7 +555,7 @@ export default function DailyIntelligenceHub({
                 { label: 'regulations', count: counts.regulations },
                 { label: 'facilities', count: Math.max(1, Math.round(Math.random() * 2)) },
               ].filter(c => c.count > 0).map(c => (
-                <span key={c.label} className="text-xs flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
+                <span key={c.label} className="text-base flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
                   <span className="font-bold" style={{ color: 'var(--color-red)' }}>+{c.count}</span>
                   {c.label}
                 </span>
