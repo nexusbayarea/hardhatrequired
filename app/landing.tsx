@@ -10,6 +10,14 @@ import Link from 'next/link';
 import { ThemeProvider } from '@/components/shared/ThemeProvider';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import DailyIntelligenceHub from '@/components/dashboard/DailyIntelligenceHub';
+import LiveActivityTicker from '@/components/landing/LiveActivityTicker';
+import LiveSearchProgress from '@/components/landing/LiveSearchProgress';
+import CoverageStatistics from '@/components/landing/CoverageStatistics';
+import LogisticsSnapshot from '@/components/landing/LogisticsSnapshot';
+import EquipmentStrip from '@/components/landing/EquipmentStrip';
+import LatestBidCard from '@/components/landing/LatestBidCard';
+import ComplianceAlertStrip from '@/components/landing/ComplianceAlertStrip';
+import IndustryFeed from '@/components/landing/IndustryFeed';
 
 /* ─── nav ─────────────────────────────────────────────────────── */
 const navLinks = [
@@ -354,7 +362,33 @@ function LandingInner() {
         </div>
       </section>
 
+      {/* ───── LIVE ACTIVITY TICKER ───── */}
+      <LiveActivityTicker />
+
       {/* ───── PALANTIR-STYLE DIVIDER ───── */}
+      <div className="palantir-rule" />
+
+      {/* ───── COVERAGE STATISTICS ───── */}
+      <CoverageStatistics />
+
+      <div className="palantir-rule" />
+
+      {/* ───── LIVE SEARCH PREVIEW ───── */}
+      <section className="py-24 md:py-36">
+        <div className="max-w-[1400px] mx-auto px-5 md:px-8">
+          <div className="mb-12">
+            <p className="section-label mb-4">live search demo</p>
+            <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
+              see how it works.<br />
+              <span style={{ color: 'var(--color-muted)' }}>watch the pipeline in action.</span>
+            </h2>
+          </div>
+          <div className="max-w-md mx-auto">
+            <LiveSearchProgress />
+          </div>
+        </div>
+      </section>
+
       <div className="palantir-rule" />
 
       {/* ───── DAILY INTELLIGENCE HUB ───── */}
@@ -363,6 +397,13 @@ function LandingInner() {
           <DailyIntelligenceHub landing />
         </div>
       </section>
+
+      <div className="palantir-rule" />
+
+      <div className="h-16" />
+
+      {/* ───── LIVE LOGISTICS SNAPSHOT ───── */}
+      <LogisticsSnapshot />
 
       <div className="palantir-rule" />
 
@@ -424,6 +465,13 @@ function LandingInner() {
           </div>
         </div>
       </section>
+
+      <div className="palantir-rule" />
+
+      <div className="h-16" />
+
+      {/* ───── EQUIPMENT STRIP ───── */}
+      <EquipmentStrip />
 
       <div className="palantir-rule" />
 
@@ -499,6 +547,20 @@ function LandingInner() {
 
       <div className="palantir-rule" />
 
+      {/* ───── LATEST BID CARD ───── */}
+      <LatestBidCard />
+
+      <div className="palantir-rule" />
+
+      <div className="h-16" />
+
+      {/* ───── COMPLIANCE ALERT STRIP ───── */}
+      <ComplianceAlertStrip />
+
+      <div className="palantir-rule" />
+
+      <div className="h-16" />
+
       {/* ───── VERTICALS ───── */}
       <section id="verticals" className="py-24 md:py-36">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
@@ -559,6 +621,13 @@ function LandingInner() {
           </div>
         </div>
       </section>
+
+      <div className="palantir-rule" />
+
+      <div className="h-16" />
+
+      {/* ───── INDUSTRY FEED ───── */}
+      <IndustryFeed />
 
       <div className="palantir-rule" />
 
