@@ -376,7 +376,7 @@ function LandingInner() {
       <section className="py-24 md:py-36">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
           <div className="mb-12">
-            <p className="section-label mb-4">live search demo</p>
+            <p className="section-label mb-4">live search</p>
             <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
               see how it works.<br />
               <span style={{ color: 'var(--color-muted)' }}>watch the pipeline in action.</span>
