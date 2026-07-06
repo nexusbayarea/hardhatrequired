@@ -43,12 +43,11 @@ const gradeColor = (g: string) => {
   }
 };
 
-function formatDistance(d: number | null): string {
-  if (d == null) return '—';
-  return `${d.toFixed(1)} mi`;
-}
-
 export default function ResultsTable({ companies, contacts: allContacts, loading, vertical, projectVolume, onFeedback, activePane }: ResultsTableProps) {
+  const formatDistance = (d: number | null): string => {
+    if (d == null) return '—';
+    return `${d.toFixed(1)} ${t('mi')}`;
+  };
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [voted, setVoted] = useState<Record<string, VoteType>>({});

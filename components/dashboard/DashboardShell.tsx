@@ -13,7 +13,6 @@ import CommandBar from './CommandBar';
 import IntelligenceRail from './IntelligenceRail';
 import LogisticsController from './LogisticsController';
 import CopilotDrawer from '@/components/ai/CopilotDrawer';
-import LanguageToggle from '@/components/shared/LanguageToggle';
 import Toast from '@/components/shared/Toast';
 import CommandCenter from './workspace/CommandCenter';
 import SearchIntelligence from './workspace/SearchIntelligence';
@@ -67,19 +66,29 @@ export default function DashboardShell() {
     let companies = data.companies.filter(c => c.grade !== 'D');
 
     if (language !== 'en' && companies.length > 0) {
-      const summaries = companies.map(c => c.capabilitySummary || '');
+      const texts: string[] = [];
+      for (const c of companies) {
+        texts.push(c.capabilitySummary || '');
+        texts.push(c.aiSummary || '');
+        texts.push(c.relevanceReason || '');
+      }
       try {
         const res = await fetch('/api/translate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: summaries, target: language }),
+          body: JSON.stringify({ text: texts, target: language }),
         });
         const td = await res.json();
         if (td.success && Array.isArray(td.translatedText)) {
-          companies = companies.map((c, i) => ({
-            ...c,
-            capabilitySummary: td.translatedText[i] || c.capabilitySummary,
-          }));
+          companies = companies.map((c, i) => {
+            const idx = i * 3;
+            return {
+              ...c,
+              capabilitySummary: td.translatedText[idx] || c.capabilitySummary,
+              aiSummary: td.translatedText[idx + 1] || c.aiSummary,
+              relevanceReason: td.translatedText[idx + 2] || c.relevanceReason,
+            };
+          });
         }
       } catch {}
     }
@@ -280,15 +289,10 @@ export default function DashboardShell() {
         <div className="min-w-0 space-y-6 md:space-y-8">
           {/* Metrics + CommandBar only shown on search/logistics workspaces */}
           {isSearchWorkspace && (
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <MetricsRow />
-                <div className="mt-6 md:mt-8">
-                  <CommandBar />
-                </div>
-              </div>
-              <div className="hidden md:block shrink-0 pt-1">
-                <LanguageToggle />
+            <div>
+              <MetricsRow />
+              <div className="mt-6 md:mt-8">
+                <CommandBar />
               </div>
             </div>
           )}

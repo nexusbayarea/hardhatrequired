@@ -195,7 +195,7 @@ export default function EquipmentExchange() {
                       <div className="font-bold text-white">{eq.name}</div>
                       <div className="text-[10px] text-slate-500">{eq.partner}</div>
                     </td>
-                    <td className="p-3.5 text-center font-mono text-slate-400">{eq.distance} mi</td>
+                    <td className="p-3.5 text-center font-mono text-slate-400">{eq.distance} {t('mi')}</td>
                     <td className="p-3.5 text-center">
                       {eq.available ? (
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase"

@@ -86,7 +86,7 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                           )}
                           {r.confidence != null && (
                             <span className="text-xs font-medium text-muted">
-                              {r.confidence}% confidence
+                              {r.confidence}% {t('confidence')}
                             </span>
                           )}
                         </div>
@@ -102,7 +102,7 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                                 r.permits.some(p => p.status === 'Active') ? 'tag-green-active' : 'tag-red-active'
                               }`}
                             >
-                              {r.permits.some(p => p.status === 'Active') ? 'ACTIVE PERMIT' : 'PERMIT'}
+                              {r.permits.some(p => p.status === 'Active') ? t('active permit') : t('permit')}
                             </span>
                           </div>
                         )}

@@ -70,8 +70,8 @@ export default function CommandCenter() {
     });
     if (items.length === 0) {
       items.push({
-        title: 'No recent activity',
-        subtitle: 'Create a project to get started',
+        title: t('no recent activity'),
+        subtitle: t('create a project to get started'),
         time: '',
         type: 'project',
       });

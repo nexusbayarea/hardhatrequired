@@ -51,7 +51,7 @@ export default function VendorComparison({ companies, onFeedback }: Props) {
                 </div>
               </td>
               <td className="px-4 py-3 tabular-nums" style={{ color: 'var(--color-muted)' }}>
-                {c.distanceMiles != null ? `${c.distanceMiles.toFixed(1)} mi` : '—'}
+                {c.distanceMiles != null ? `${c.distanceMiles.toFixed(1)} ${t('mi')}` : '—'}
               </td>
               <td className="px-4 py-3">
                 <span className="font-black" style={{

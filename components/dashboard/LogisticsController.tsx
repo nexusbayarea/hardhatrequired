@@ -137,32 +137,32 @@ export default function LogisticsController({ targetVolume, onVolumeChange, vert
                     border: traffic === key ? '1px solid var(--color-border)' : '1px solid transparent',
                     cursor: 'pointer',
                   }}
-                >
-                  {cfg.label}
-                </button>
-              ))}
+                  >
+                    {t(cfg.label)}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: 'var(--color-muted)' }}>
-              {t('crew size')}
-            </label>
-            <div className="flex gap-1.5">
-              {(Object.entries(CREW_RATES) as [CrewSize, typeof crewCfg][]).map(([key, cfg]) => (
-                <button
-                  key={key}
-                  onClick={() => setCrew(key)}
-                  className="flex-1 px-3 py-2 rounded-lg text-xs font-bold transition-all"
-                  style={{
-                    background: crew === key ? 'var(--color-surface)' : 'var(--color-surface2)',
-                    color: crew === key ? 'var(--color-text)' : 'var(--color-muted)',
-                    border: crew === key ? '1px solid var(--color-border)' : '1px solid transparent',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {cfg.label.split(' ')[0]}
-                </button>
-              ))}
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: 'var(--color-muted)' }}>
+                {t('crew size')}
+              </label>
+              <div className="flex gap-1.5">
+                {(Object.entries(CREW_RATES) as [CrewSize, typeof crewCfg][]).map(([key, cfg]) => (
+                  <button
+                    key={key}
+                    onClick={() => setCrew(key)}
+                    className="flex-1 px-3 py-2 rounded-lg text-xs font-bold transition-all"
+                    style={{
+                      background: crew === key ? 'var(--color-surface)' : 'var(--color-surface2)',
+                      color: crew === key ? 'var(--color-text)' : 'var(--color-muted)',
+                      border: crew === key ? '1px solid var(--color-border)' : '1px solid transparent',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {t(cfg.label)}
+                  </button>
+                ))}
             </div>
           </div>
         </div>
@@ -228,8 +228,8 @@ export default function LogisticsController({ targetVolume, onVolumeChange, vert
 
         {/* Status summary */}
         <div className="flex items-center justify-between text-[11px] px-1" style={{ color: 'var(--color-muted)' }}>
-          <span>{t('traffic')}: {trafficCfg.label} ({trafficCfg.multiplier}x)</span>
-          <span>{t('crew')}: {crewCfg.label}</span>
+          <span>{t('traffic')}: {t(trafficCfg.label)} ({trafficCfg.multiplier}x)</span>
+          <span>{t('crew')}: {t(crewCfg.label)}</span>
           <span>{t('effective speed')}: {Math.round(metrics.effectiveSpeed)} mph</span>
         </div>
       </div>

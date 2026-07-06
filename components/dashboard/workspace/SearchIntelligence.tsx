@@ -134,7 +134,7 @@ export default function SearchIntelligence({
                 }}
               >
                 <m.icon className="w-4 h-4" />
-                {m.title}
+                {t(m.title)}
               </button>
             );
           })}

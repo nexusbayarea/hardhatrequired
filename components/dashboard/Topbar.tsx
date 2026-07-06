@@ -31,8 +31,6 @@ export default function Topbar({ mobile = false }: TopbarProps) {
   if (mobile) {
     return (
       <div className="flex items-center gap-3">
-        <LanguageToggle />
-        <ThemeToggle />
         <button
           className="relative p-2.5 rounded-xl transition-all"
           style={{ background: 'var(--color-surface2)' }}
@@ -53,6 +51,8 @@ export default function Topbar({ mobile = false }: TopbarProps) {
         >
           U
         </div>
+        <ThemeToggle />
+        <LanguageToggle />
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function Topbar({ mobile = false }: TopbarProps) {
             color: 'var(--color-text)',
           }}
         >
-          {(WORKSPACE_LABELS[workspace] || t('dashboard')).toUpperCase()}
+          {t(WORKSPACE_LABELS[workspace] || 'dashboard').toUpperCase()}
         </h1>
         <p className="text-sm font-medium mt-0.5 truncate" style={{ color: 'var(--color-muted)' }}>
           {workspace === 'command-center' ? t('construction market intelligence dashboard') :

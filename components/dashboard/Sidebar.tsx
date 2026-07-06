@@ -202,7 +202,7 @@ export default function Sidebar({ slim = false }: SidebarProps) {
 
           <div className="px-4">
             <span className="text-xs" style={{ color: 'var(--color-muted)' }}>
-              © 2026 Hard Hat Required. All rights reserved.
+              {t('© 2026 hard hat required. all rights reserved.')}
             </span>
           </div>
         </div>

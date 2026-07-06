@@ -50,9 +50,9 @@ export default function BidIntelligence() {
   const margin = revenue > 0 ? (grossProfit / revenue) * 100 : 0;
 
   const getRiskLevel = () => {
-    if (margin < 10) return { label: 'critical', color: 'var(--color-red)', bg: 'color-mix(in srgb, var(--color-red) 12%, transparent)' };
-    if (margin < 30) return { label: 'medium', color: 'var(--color-yellow)', bg: 'color-mix(in srgb, var(--color-yellow) 12%, transparent)' };
-    return { label: 'optimal', color: 'var(--color-green)', bg: 'color-mix(in srgb, var(--color-green) 12%, transparent)' };
+    if (margin < 10) return { label: t('critical'), color: 'var(--color-red)', bg: 'color-mix(in srgb, var(--color-red) 12%, transparent)' };
+    if (margin < 30) return { label: t('medium'), color: 'var(--color-yellow)', bg: 'color-mix(in srgb, var(--color-yellow) 12%, transparent)' };
+    return { label: t('optimal'), color: 'var(--color-green)', bg: 'color-mix(in srgb, var(--color-green) 12%, transparent)' };
   };
 
   const risk = getRiskLevel();
@@ -64,11 +64,11 @@ export default function BidIntelligence() {
     setExtracted(false);
 
     const steps = [
-      { p: 20, text: 'Scanning project specification headers...' },
-      { p: 45, text: 'Extracting work spec requirements & waste definitions...' },
-      { p: 70, text: 'Resolving environmental compliance codes...' },
-      { p: 90, text: 'Generating bid proposal draft...' },
-      { p: 100, text: 'AI parameter parsing complete.' },
+      { p: 20, text: t('scanning project specification headers...') },
+      { p: 45, text: t('extracting work spec requirements & waste definitions...') },
+      { p: 70, text: t('resolving environmental compliance codes...') },
+      { p: 90, text: t('generating bid proposal draft...') },
+      { p: 100, text: t('ai parameter parsing complete.') },
     ];
 
     let i = 0;

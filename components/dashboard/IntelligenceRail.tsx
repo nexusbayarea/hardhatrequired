@@ -94,14 +94,14 @@ export default function IntelligenceRail() {
             {t('market summary')}
           </span>
           <div className="space-y-2">
-            <div className="flex items-start gap-2">
+             <div className="flex items-start gap-2">
               <span className="text-[10px] mt-0.5 shrink-0">📈</span>
               <div className="min-w-0">
                 <div className="text-xs font-medium truncate" style={{ color: 'var(--color-text)' }}>
-                  {totalCompanies} Companies in Pipeline
+                  {totalCompanies} {t('companies in pipeline')}
                 </div>
                 <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>
-                  From market discovery engine
+                  {t('from market discovery engine')}
                 </div>
               </div>
             </div>
@@ -109,10 +109,10 @@ export default function IntelligenceRail() {
               <span className="text-[10px] mt-0.5 shrink-0">⚖️</span>
               <div className="min-w-0">
                 <div className="text-xs font-medium truncate" style={{ color: 'var(--color-text)' }}>
-                  {activePermits} Active Permits Tracked
+                  {activePermits} {t('active permits tracked')}
                 </div>
                 <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>
-                  Regulatory compliance monitoring
+                  {t('regulatory compliance monitoring')}
                 </div>
               </div>
             </div>

@@ -117,11 +117,11 @@ export default function SearchConsole({
         </div>
         <div>
           <div className="font-black uppercase search-console-header-title">
-            {meta.title}
+            {t(meta.title)}
           </div>
           {meta.desc && (
             <div className="text-sm font-medium mt-0.5 text-muted">
-              {meta.desc}
+              {t(meta.desc)}
             </div>
           )}
         </div>
@@ -242,11 +242,11 @@ export default function SearchConsole({
             }`}
             data-agent-intent="execute-search"
           >
-            {loading ? (
-              <><Loader2 className="w-5 h-5 animate-spin" /> {t('searching...')}</>
-            ) : (
-              <><Search className="w-5 h-5" /> {activePane === 'disposal' ? 'Search Disposal' : 'Search Labor'}</>
-            )}
+{loading ? (
+  <><Loader2 className="w-5 h-5 animate-spin" /> {t('searching...')}</>
+) : (
+  <><Search className="w-5 h-5" /> {activePane === 'disposal' ? t('search disposal') : t('search labor')}</>
+)}
           </button>
         </div>
       </div>
