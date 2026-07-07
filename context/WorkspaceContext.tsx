@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { workspaceStore, type WorkspaceId } from '@/stores/workspace.store';
 
 export type { WorkspaceId };
@@ -13,17 +13,19 @@ interface WorkspaceContextValue {
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
-  const state = workspaceStore.getState();
+  const [active, setActive] = useState(() => workspaceStore.getState().active);
 
   useEffect(() => {
-    const unsub = workspaceStore.subscribe(() => {});
+    const unsub = workspaceStore.subscribe(() => {
+      setActive(workspaceStore.getState().active);
+    });
     return unsub;
   }, []);
 
   return (
     <WorkspaceContext.Provider
       value={{
-        workspace: state.active,
+        workspace: active,
         setWorkspace: (id: WorkspaceId) => workspaceStore.setState({ active: id }),
       }}
     >

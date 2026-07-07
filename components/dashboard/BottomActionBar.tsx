@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchState } from '@/context/SearchStateContext';
+import { useWorkspace } from '@/context/WorkspaceContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { Users, Truck, Route, Bot } from 'lucide-react';
 import type { SearchPane } from './SearchConsole';
@@ -14,6 +15,7 @@ const ACTIONS: { id: SearchPane | 'route' | 'copilot'; label: string; icon: type
 
 export default function BottomActionBar() {
   const { activePane, setActivePane } = useSearchState();
+  const { setWorkspace } = useWorkspace();
   const { t } = useLanguage();
 
   return (
@@ -33,8 +35,14 @@ export default function BottomActionBar() {
                 window.dispatchEvent(new CustomEvent('open-logistics'));
                 return;
               }
-              if (isSearchAction) {
-                setActivePane(id);
+              if (id === 'labor') {
+                setWorkspace('search');
+                setActivePane('labor');
+                return;
+              }
+              if (id === 'equipment') {
+                setWorkspace('equipment');
+                return;
               }
             }}
             className={`bottom-action-bar-item ${active ? 'active' : ''}`}

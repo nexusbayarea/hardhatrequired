@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   HardHat, LayoutDashboard, Search, Truck, Repeat, Gavel, TrendingUp,
@@ -30,6 +30,26 @@ export default function Sidebar({ slim = false }: SidebarProps) {
   const { workspace, setWorkspace } = useWorkspace();
   const { projects, activeProjectId, setActiveProject, createProject } = useProject();
   const [showNewModal, setShowNewModal] = useState(false);
+
+  const [planTier, setPlanTier] = useState('Growth');
+  const [creditsUsed, setCreditsUsed] = useState<number | null>(null);
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/billing/current', { method: 'POST' }).then(r => r.json()),
+      fetch('/api/billing/usage', { method: 'POST', body: '{}' }).then(r => r.json()),
+    ]).then(([current, usage]) => {
+      if (current.subscription) {
+        setPlanTier(
+          current.subscription.planTier.charAt(0).toUpperCase() +
+          current.subscription.planTier.slice(1)
+        );
+      }
+      if (usage.usage) {
+        setCreditsUsed(usage.usage.total);
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleNav = useCallback((id: string) => {
     setWorkspace(id as any);
@@ -195,8 +215,13 @@ export default function Sidebar({ slim = false }: SidebarProps) {
                 className="font-bold"
                 style={{ fontSize: '1.0625rem', color: 'var(--color-text)' }}
               >
-                {t('credits')}
+                {planTier} {t('plan')}
               </div>
+              {creditsUsed !== null && (
+                <div className="text-[10px] mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                  {creditsUsed.toLocaleString()} {t('credits')} {t('used')}
+                </div>
+              )}
             </div>
           )}
 

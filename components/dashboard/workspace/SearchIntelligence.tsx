@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Search, MapPin, Crosshair, Droplets, Loader2, ChevronDown, ChevronUp,
   Filter, SlidersHorizontal, Shield, Star, ToggleLeft,
@@ -37,6 +37,11 @@ export default function SearchIntelligence({
   const { activePane } = useSearchState();
 
   const [searchMode, setSearchMode] = useState<SearchMode>('disposal');
+  useEffect(() => {
+    if (activePane === 'labor' || activePane === 'disposal' || activePane === 'equipment') {
+      setSearchMode(activePane);
+    }
+  }, [activePane]);
   const [internalVertical, setInternalVertical] = useState('');
   const [zip, setZip] = useState('94538');
   const [radius, setRadius] = useState('25');
