@@ -176,7 +176,7 @@ function LandingInner() {
 
           {/* Mobile: lang toggle + theme toggle + hamburger */}
           <div className="md:hidden flex items-center gap-2">
-            <LanguageToggle />
+            <LanguageToggle mobile />
             <ThemeToggle />
             <button
               onClick={() => setMobileOpen(v => !v)}
