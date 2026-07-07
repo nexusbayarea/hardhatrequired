@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'edge';
-
-const MAX_RETRIES = 5;
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const NVIDIA_API_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +17,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, translatedText: text });
     }
 
-    const payloadText = Array.isArray(text) ? JSON.stringify(text) : text;
+    const isArray = Array.isArray(text);
+    const payloadText = isArray ? JSON.stringify(text) : text;
+
+    const apiKey = process.env.NVIDIA_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'NVIDIA_API_KEY not configured' }, { status: 500 });
+    }
 
     const systemPrompt = `You are an expert industrial construction translator.
 Translate the provided text or JSON array of texts into the target language code: "${target}".
@@ -29,62 +31,58 @@ Translate the provided text or JSON array of texts into the target language code
 - Keep formatting, line breaks, and HTML tags completely intact.
 - Return ONLY the translation. If input was a JSON array, return a valid JSON array of translated strings with matching indices. Do not write any markdown codeblock wraps or introductory explanations.`;
 
-    const apiKey = process.env.GEMINI_API_KEY || '';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    const res = await fetch(NVIDIA_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-8b-instruct',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: payloadText },
+        ],
+        temperature: 0.1,
+        max_tokens: 4096,
+      }),
+      signal: AbortSignal.timeout(30000),
+    });
 
-    let lastError: any;
-    let attempt = 0;
+    if (!res.ok) {
+      const errText = await res.text();
+      return NextResponse.json(
+        { success: false, error: `NVIDIA API error ${res.status}: ${errText}` },
+        { status: res.status }
+      );
+    }
 
-    while (attempt < MAX_RETRIES) {
+    const data = await res.json();
+    const translatedContent = data.choices?.[0]?.message?.content;
+
+    if (!translatedContent) {
+      return NextResponse.json(
+        { success: false, error: 'Empty translation output received from NVIDIA API.' },
+        { status: 502 }
+      );
+    }
+
+    let result: any = translatedContent.trim();
+    if (isArray) {
       try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: payloadText }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] }
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`Gemini translation gateway returned HTTP ${response.status}`);
+        if (result.startsWith('```json')) {
+          result = result.substring(7, result.length - 3);
+        } else if (result.startsWith('```')) {
+          result = result.substring(3, result.length - 3);
         }
-
-        const data = await response.json();
-        const translatedContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!translatedContent) {
-          throw new Error('Empty translation output received from gateway.');
-        }
-
-        let result: any = translatedContent.trim();
-        if (Array.isArray(text)) {
-          try {
-            if (result.startsWith('```json')) {
-              result = result.substring(7, result.length - 3);
-            } else if (result.startsWith('```')) {
-              result = result.substring(3, result.length - 3);
-            }
-            result = JSON.parse(result.trim());
-          } catch (e) {
-            console.warn('Failed to parse translated array, falling back to raw output splits', e);
-            result = [result];
-          }
-        }
-
-        return NextResponse.json({ success: true, translatedText: result });
-
-      } catch (err) {
-        lastError = err;
-        attempt++;
-        if (attempt < MAX_RETRIES) {
-          const delay = Math.pow(2, attempt) * 1000;
-          await sleep(delay);
-        }
+        result = JSON.parse(result.trim());
+      } catch (e) {
+        console.warn('Failed to parse translated array, falling back to raw output splits', e);
+        result = [result];
       }
     }
 
-    throw lastError;
+    return NextResponse.json({ success: true, translatedText: result });
 
   } catch (error: any) {
     return NextResponse.json(
