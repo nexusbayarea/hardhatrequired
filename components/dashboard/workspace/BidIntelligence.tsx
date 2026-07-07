@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Gavel, FileText, Upload, AlertTriangle, DollarSign,
-  TrendingUp, Shield, Wand2, Loader2, Download, Folder,
+  TrendingUp, Shield, Wand2, Loader2, Download, Folder, Globe,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useProject } from '@/context/ProjectContext';
 import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
 import { VERTICAL_LOGISTICS_OVERRIDES, LOGISTICS_BASE_DEFAULTS } from '@/lib/logistics/vertical-configs';
+import { translateBidsList, TranslatableBid } from '@/lib/translation/bid-translator';
 
 export default function BidIntelligence() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { activeProject, updateProject, projects, bookEquipment, releaseEquipment } = useProject();
 
   const [scopeInput, setScopeInput] = useState('');
@@ -24,6 +25,10 @@ export default function BidIntelligence() {
   const [revenue, setRevenue] = useState(activeProject?.contractRevenue ?? 12000);
   const [laborCost, setLaborCost] = useState(activeProject?.laborCost ?? 1500);
   const [contingency, setContingency] = useState(activeProject?.contingency ?? 10);
+
+  const [bidListings, setBidListings] = useState<TranslatableBid[]>([]);
+  const [translatedBids, setTranslatedBids] = useState<TranslatableBid[]>([]);
+  const [bidsLoading, setBidsLoading] = useState(false);
 
   const verticalConfig = activeProject
     ? getVerticalEstimatorConfig(activeProject.vertical)
@@ -56,6 +61,40 @@ export default function BidIntelligence() {
   };
 
   const risk = getRiskLevel();
+
+  useEffect(() => {
+    if (!activeProject?.vertical) return;
+    setBidsLoading(true);
+
+    fetch('/api/bid-intelligence', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        verticalId: activeProject.vertical,
+        zip: activeProject.zip,
+        activeOnly: true,
+      }),
+    })
+      .then(res => res.json())
+      .then(async (data) => {
+        const raw: TranslatableBid[] = (data.bids || []).map((b: any) => ({
+          id: b.id || b._id || Math.random().toString(36).slice(2),
+          title: b.title || b.projectName || '',
+          agencyOrClient: b.agencyOrClient || b.agency || b.client || '',
+          extractedScope: b.extractedScope || b.scope || b.description || '',
+          locationCity: b.locationCity || b.city || '',
+        }));
+
+        setBidListings(raw);
+        setBidsLoading(false);
+      })
+      .catch(() => setBidsLoading(false));
+  }, [activeProject?.vertical]);
+
+  useEffect(() => {
+    if (bidListings.length === 0) return;
+    translateBidsList(bidListings, language).then(setTranslatedBids);
+  }, [bidListings, language]);
 
   const handleExtract = useCallback(() => {
     if (!activeProject) return;
@@ -377,6 +416,49 @@ Extract the work spec and write a bid proposal.`,
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Related Bids */}
+      <div
+        className="rounded-xl p-6 space-y-4"
+        style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+      >
+        <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: 'var(--color-text)' }}>
+          <Gavel className="w-4 h-4" style={{ color: 'var(--color-yellow)' }} />
+          {t('related bid listings')}
+          {language !== 'en' && <Globe className="w-3 h-3" style={{ color: 'var(--color-muted)' }} />}
+        </h3>
+
+        {bidsLoading ? (
+          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--color-muted)' }}>
+            <Loader2 className="w-3 h-3 animate-spin" /> {t('loading bids...')}
+          </div>
+        ) : translatedBids.length === 0 ? (
+          <div className="text-xs" style={{ color: 'var(--color-muted)' }}>
+            {t('no related bids found for this vertical.')}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {translatedBids.map((bid) => (
+              <div key={bid.id}
+                className="p-3 rounded-lg flex items-start gap-3"
+                style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold truncate" style={{ color: 'var(--color-text)' }}>
+                    {bid.title}
+                  </div>
+                  <div className="text-[10px] mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                    {bid.agencyOrClient}{bid.locationCity ? ` · ${bid.locationCity}` : ''}
+                  </div>
+                  <div className="text-[10px] mt-1 leading-relaxed line-clamp-2" style={{ color: 'var(--color-muted2)' }}>
+                    {bid.extractedScope}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
