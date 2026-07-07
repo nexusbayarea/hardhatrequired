@@ -14,7 +14,7 @@ function getClient(): InfisicalSDK {
 
 export async function getSecret(secretName: string): Promise<string> {
   const c = getClient();
-  const secret = await c.secrets().getSecret({ secretName });
+  const secret = await (c.secrets().getSecret as any)({ secretName });
   return secret.secretValue;
 }
 

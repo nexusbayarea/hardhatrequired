@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       provider: 'search',
       action: 'market_discovery',
       orgId: verticalConfig.id,
-      metadata: { zip: body.zip, radius: body.radius, vertical: clientHeader, companyCount: companies?.length || 0, providerFailures: providerFailures?.join(',') || '' },
+      details: { zip: body.zip, radius: body.radius, vertical: clientHeader, companyCount: companies?.length || 0, providerFailures: providerFailures?.join(',') || '' },
     });
 
     const normalized: SearchResult[] = companies.map((c: any) => {
@@ -129,14 +129,14 @@ export async function POST(req: NextRequest) {
       (async () => {
         const canQStash = qstashAvailable();
         const enqueued = canQStash
-          ? await enqueueBatch(companies, verticalConfig.id, body.zip)
+          ? await enqueueBatch(companies as { id: string; website: string | null }[], verticalConfig.id, body.zip)
           : 0;
 
         if (!canQStash) {
-          const withWebsites = companies.filter(c => c.website).slice(0, 10);
+          const withWebsites = companies.filter((c): c is typeof c & { website: string } => !!c.website).slice(0, 10);
           await Promise.allSettled(
             withWebsites.map(c =>
-              scrapeDirect(c.id, c.website!, verticalConfig.id, body.zip)
+              scrapeDirect(c.id, c.website, verticalConfig.id, body.zip)
             )
           );
         }

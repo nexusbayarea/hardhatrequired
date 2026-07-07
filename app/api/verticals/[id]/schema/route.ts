@@ -3,11 +3,11 @@ import { supabaseFetch } from '@/lib/db';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { routing_strategy, extraction_rules } = await request.json();
-    const { id } = params;
+    const { id } = await params;
 
     const res = await supabaseFetch(`/rest/v1/vertical_registries?id=eq.${id}`, {
       method: 'PATCH',

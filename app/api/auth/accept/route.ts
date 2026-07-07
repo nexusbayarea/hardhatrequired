@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify({ accepted: true, accepted_at: new Date().toISOString() })
           });
-          logger.info('Invitation accepted via Supabase', { token });
+          logger.info('Invitation accepted via Supabase', { data: { token } });
           return NextResponse.json({ success: true, message: 'Invitation accepted' });
         }
         return NextResponse.json({ error: 'Invalid or expired invitation token.' }, { status: 404 });
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     }
 
     globalThis.__invitations[inviteIdx].accepted = true;
-    logger.info('Invitation accepted in memory', { token });
+    logger.info('Invitation accepted in memory', { data: { token } });
     return NextResponse.json({ success: true, message: 'Invitation accepted' });
   } catch (err: any) {
     logger.error('Invitation acceptance failed', { error: err.message });

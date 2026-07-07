@@ -42,7 +42,7 @@ export async function saveSearch(params: {
     if (!res.ok) {
       logger.warn('Failed to persist search to DB, using in-memory', {
         route: 'search/persistence',
-        status: res.status
+        data: { status: res.status }
       });
       inMemoryStore.unshift(search);
       return search;

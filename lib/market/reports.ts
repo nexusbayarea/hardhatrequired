@@ -9,8 +9,9 @@ export function generateMarketReport(name: string, companies: Company[]): Market
   // Map Company to Listing
   const listings: Listing[] = companies.map(c => ({
     ...c,
-    name: c.companyName || (c as any).name || 'Unknown'
-  } as Listing));
+    name: c.companyName || (c as any).name || 'Unknown',
+    industry: (c as any).industry || '',
+  } as unknown as Listing));
 
   return engine.generate(name, listings);
 }

@@ -53,13 +53,13 @@ export const authInviteSchema = z.object({
 export const usageEventSchema = z.object({
   eventType: z.enum(['search', 'enrichment', 'export', 'campaign']),
   units: z.number().int().min(1).default(1),
-  metadata: z.record(z.unknown()).optional()
+  metadata: z.record(z.string(), z.unknown()).optional()
 });
 
 export function validate<T>(schema: z.ZodSchema<T>, data: unknown): { data?: T; error?: string } {
   const result = schema.safeParse(data);
   if (!result.success) {
-    const firstError = result.error.errors[0];
+    const firstError = result.error.issues[0];
     return { error: `${firstError.path.join('.')}: ${firstError.message}` };
   }
   return { data: result.data };

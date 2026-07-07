@@ -93,7 +93,7 @@ export async function withGoogleRateLimit<T>(
   bucket.tokens--
 
   try {
-    const result = await withTimeout(fn, 10000, null)
+    const result = await withTimeout(fn(), 10000, null)
     if (result === null) throw new Error('Google Places timeout')
     recordSuccess('google_places')
     return result
@@ -131,11 +131,11 @@ export async function checkApolloCredits(orgId: string, operation: keyof typeof 
 
   if (ledger.used + cost > ledger.limit) {
     await writeAudit({
-      provider: 'apollo',
+      provider: 'apollo' as any,
       action: 'CREDIT_EXHAUSTED',
-      orgId,
+      orgId: orgId || '',
       details: { operation, cost, used: ledger.used, limit: ledger.limit }
-    })
+    } as any)
     return false
   }
 
@@ -159,7 +159,7 @@ export async function withApolloCreditControl<T>(
   }
 
   try {
-    const result = await withTimeout(fn, 15000, null)
+    const result = await withTimeout(fn(), 15000, null)
     if (result === null) throw new Error('Apollo timeout')
     recordSuccess('apollo')
     return result

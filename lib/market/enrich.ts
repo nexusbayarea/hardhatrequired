@@ -5,10 +5,11 @@ import { Listing } from '../../schemas/listing';
 export async function enrichCompanyData(company: Company): Promise<Partial<Company>> {
   const engine = new EnrichmentEngine();
 
-  const listing: Listing = {
+  const listing = {
     ...company,
-    name: company.companyName || (company as any).name || 'Unknown'
-  } as Listing;
+    name: company.companyName || (company as any).name || 'Unknown',
+    industry: (company as any).industry || '',
+  } as unknown as Listing;
 
   const result = await engine.enrich(listing);
 

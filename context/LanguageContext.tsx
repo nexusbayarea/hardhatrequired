@@ -98,7 +98,6 @@ const esDictionary: Record<string, string> = {
   'high intent demand alerts': 'Alertas de Demanda de Alta Intención',
   'search radius': 'Radio de Búsqueda',
   'select index type': 'Seleccionar Tipo de Índice',
-  'enter zip code': 'Ingrese el Código Postal',
   'compliance': 'Cumplimiento Normativo',
 
   // ─── Landing page ───
@@ -200,7 +199,6 @@ const esDictionary: Record<string, string> = {
   'logistics intelligence': 'Inteligencia Logística',
   'equipment exchange': 'Intercambio de Equipos',
   'bid intelligence': 'Inteligencia de Licitaciones',
-  'market intelligence': 'Inteligencia de Mercado',
   'global exploration hub': 'Centro de Exploración Global',
   'new': 'Nuevo',
   'construction market intelligence dashboard': 'Panel de Inteligencia de Mercado para la Construcción',
@@ -546,7 +544,6 @@ const zhDictionary: Record<string, string> = {
   'logistics intelligence': '物流智能',
   'equipment exchange': '设备交换',
   'bid intelligence': '投标智能',
-  'market intelligence': '市场智能',
   'global exploration hub': '全球探索中心',
   'new': '新建',
   'construction market intelligence dashboard': '建筑市场智能面板',
@@ -892,7 +889,6 @@ const viDictionary: Record<string, string> = {
   'logistics intelligence': 'Thông tin hậu cần',
   'equipment exchange': 'Trao đổi thiết bị',
   'bid intelligence': 'Thông tin đấu thầu',
-  'market intelligence': 'Thông tin thị trường',
   'global exploration hub': 'Trung tâm khám phá toàn cầu',
   'new': 'Mới',
   'construction market intelligence dashboard': 'Bảng điều khiển thông tin thị trường xây dựng',

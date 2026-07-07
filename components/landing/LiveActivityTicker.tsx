@@ -13,7 +13,7 @@ export default function LiveActivityTicker() {
   const [items, setItems] = useState<Activity[]>([]);
   const [current, setCurrent] = useState(0);
   const [hasData, setHasData] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   useEffect(() => {
     fetch('/api/public/activity', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
@@ -32,7 +32,7 @@ export default function LiveActivityTicker() {
     timerRef.current = setInterval(() => {
       setCurrent(prev => (prev + 1) % items.length);
     }, 4000);
-    return () => clearInterval(timerRef.current);
+    return () => window.clearInterval(timerRef.current!);
   }, [items.length]);
 
   if (!hasData || items.length === 0) return null;

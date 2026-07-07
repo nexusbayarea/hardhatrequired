@@ -21,6 +21,9 @@ export async function POST(req: NextRequest) {
     if (error) {
       return NextResponse.json({ error }, { status: 400 });
     }
+    if (!data) {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    }
 
     const tenantRes = await resolveTenant(req);
     if (tenantRes instanceof NextResponse) return tenantRes;

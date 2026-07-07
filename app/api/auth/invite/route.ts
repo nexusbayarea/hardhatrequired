@@ -19,7 +19,11 @@ globalThis.__invitations ??= [];
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { data, error } = validate(authInviteSchema, body);
+    if (!body || !body.email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+    const data = body as { email: string; role: string };
+    const { error } = validate(authInviteSchema, data);
     if (error) {
       return NextResponse.json({ error }, { status: 400 });
     }
@@ -52,7 +56,7 @@ export async function POST(req: NextRequest) {
 
       if (res.ok) {
         const inviteResult = await res.json();
-        logger.info('User invited via Supabase Auth admin API', { email: data.email, tenant: tenant.organizationId });
+        logger.info('User invited via Supabase Auth admin API', { data: { email: data.email, tenant: tenant.organizationId } });
 
         await supabaseFetch('/rest/v1/org_invitations', {
           method: 'POST',
@@ -72,7 +76,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, invited: data.email });
       }
     } catch {
-      logger.warn('Supabase Auth admin API failed, falling back to in-memory', { email: data.email });
+      logger.warn('Supabase Auth admin API failed, falling back to in-memory', { data: { email: data.email } });
     }
 
     globalThis.__invitations.push({
@@ -84,7 +88,7 @@ export async function POST(req: NextRequest) {
       accepted: false
     });
 
-    logger.info('User invite stored in memory', { email: data.email, tenant: tenant.organizationId });
+    logger.info('User invite stored in memory', { data: { email: data.email, tenant: tenant.organizationId } });
     return NextResponse.json({ success: true, invited: data.email });
   } catch (err: any) {
     logger.error('User invitation failed', { error: err.message });

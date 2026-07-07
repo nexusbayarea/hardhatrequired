@@ -17,7 +17,7 @@ const SECTION_CONFIG: { fitType: FitType | 'OTHER'; label: string; icon: string;
   { fitType: 'OTHER', label: 'Other', icon: '📌', order: 4 },
 ];
 
-export function groupResults(results: SearchResult[], pane?: SectionPane): FitTypeGroup[] {
+export function groupResults(results: SearchResult[], pane?: string): FitTypeGroup[] {
   const groups = new Map<FitType | 'OTHER', FitTypeGroup>();
 
   for (const config of SECTION_CONFIG) {

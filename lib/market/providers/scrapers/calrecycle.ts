@@ -1,6 +1,6 @@
 import { StateScraper, ScraperResult } from './types';
 import { DiscoveryParams } from '../base';
-import { Company } from '@/types/company';
+import { Company, PermitStatus } from '@/types/company';
 import { haversineDistance } from '@/lib/geo';
 import { searchRegulatoryFacilities, getAvailableVerticals } from '@/lib/regulatory/provider';
 
@@ -42,7 +42,7 @@ export class CalRecycleScraper implements StateScraper {
           agency: 'CalRecycle',
           permitType: 'SWIS',
           permitNumber: f.swisNumber || 'UNKNOWN',
-          status: f.permitStatus || 'Active',
+          status: (f.permitStatus || 'Active') as PermitStatus,
         }],
         notes: `CalRecycle SWIS Permit #${f.swisNumber}. ${f.activities?.slice(0, 3).join(', ') || ''}`,
         distanceMiles: lat && lng && f.latitude && f.longitude

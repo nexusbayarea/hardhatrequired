@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { getSecret } from '@/lib/infisical'
 
 let supabaseClient: ReturnType<typeof createClient> | null = null
-let initPromise: Promise<typeof supabaseClient> | null = null
+let initPromise: Promise<ReturnType<typeof createClient> | null> | null = null
 
 async function getSupabase(): Promise<ReturnType<typeof createClient> | null> {
   if (supabaseClient) return supabaseClient
@@ -24,10 +24,10 @@ async function getSupabase(): Promise<ReturnType<typeof createClient> | null> {
   return initPromise
 }
 
-export { getSupabase as supabase }
+export { getSupabase }
 
 export const invokeEngine = async (functionName: string, payload: object) => {
-  const client = await supabase()
+  const client = await getSupabase()
   if (!client) {
     throw new Error('Supabase client not initialized. Check environment variables.')
   }

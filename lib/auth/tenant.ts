@@ -48,5 +48,5 @@ export async function resolveTenant(req: NextRequest): Promise<TenantContext | N
  * Middleware-style guard. Returns the context if valid, or a JSON error response.
  */
 export async function requireTenant(req: NextRequest): Promise<TenantContext | NextResponse<{ error: string }>> {
-  return resolveTenant(req);
+  return resolveTenant(req) as Promise<TenantContext | NextResponse<{ error: string }>>;
 }
