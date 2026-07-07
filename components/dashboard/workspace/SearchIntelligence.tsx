@@ -23,8 +23,8 @@ interface SearchIntelligenceProps {
 }
 
 const MODE_META: Record<SearchMode, { title: string; desc: string; color: string; icon: typeof Search }> = {
-  labor: { title: 'Labor / Operators', desc: 'Find certified crews, operators, and specialty contractors.', color: 'var(--color-red)', icon: Search },
   disposal: { title: 'Disposal Facilities', desc: 'Search permitted disposal sites, reclamation yards, and treatment facilities.', color: 'var(--color-green)', icon: Droplets },
+  labor: { title: 'Labor / Operators', desc: 'Find certified crews, operators, and specialty contractors.', color: 'var(--color-red)', icon: Search },
   equipment: { title: 'Equipment Rentals', desc: 'Browse heavy equipment, vac trucks, and specialty tools by type and capacity.', color: 'var(--color-blue)', icon: Search },
   regulatory: { title: 'Regulatory / Permits', desc: 'Search regulated facilities with active permits, waste profiles, and compliance records.', color: 'var(--color-purple)', icon: Shield },
   'deep-profiles': { title: 'Deep Profiles', desc: 'View enriched company profiles with scraped services, equipment, license numbers, and AI summary.', color: 'var(--color-pink)', icon: Search },
