@@ -23,7 +23,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 <Sidebar />
                 <main className="flex-1 min-w-0 w-full overflow-x-hidden">
                   <Topbar />
-                  <div className="p-8">{children}</div>
+                  <div className="p-8" style={{ zoom: 1.25 }}>{children}</div>
                 </main>
               </div>
 
@@ -32,7 +32,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 <Sidebar slim />
                 <main className="flex-1 min-w-0 w-full overflow-x-hidden">
                   <Topbar />
-                  <div className="p-6">{children}</div>
+                  <div className="p-6" style={{ zoom: 1.25 }}>{children}</div>
                 </main>
               </div>
 
@@ -60,7 +60,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 </header>
 
                 <main className="flex-1 overflow-x-hidden pb-20">
-                  <div className="p-4">{children}</div>
+                  <div className="p-4" style={{ zoom: 1.25 }}>{children}</div>
                 </main>
 
                 <MobileBottomNav />
