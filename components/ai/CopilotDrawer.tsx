@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Bot, X, Truck, FileText, Search, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { copilotStore, useCopilotStore } from '@/stores/copilot.store';
@@ -33,6 +33,12 @@ export default function CopilotDrawer() {
   const { messages, isExecuting, open } = useCopilotStore();
   const [mode, setMode] = useState<CopilotMode>('search');
   const [input, setInput] = useState('');
+
+  useEffect(() => {
+    const onOpenCopilot = () => copilotStore.setState({ open: true });
+    window.addEventListener('open-copilot', onOpenCopilot);
+    return () => window.removeEventListener('open-copilot', onOpenCopilot);
+  }, []);
 
   const modeMeta = MODE_META[mode];
   const AccentIcon = modeMeta.icon;

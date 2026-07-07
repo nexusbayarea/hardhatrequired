@@ -3,7 +3,7 @@
 import { ThemeProvider } from '@/components/shared/ThemeProvider';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Topbar from '@/components/dashboard/Topbar';
-import MobileBottomNav from '@/components/dashboard/MobileBottomNav';
+import BottomActionBar from '@/components/dashboard/BottomActionBar';
 import Link from 'next/link';
 import { HardHat } from 'lucide-react';
 import { SearchStateProvider } from '@/context/SearchStateContext';
@@ -36,7 +36,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 </main>
               </div>
 
-              {/* Mobile: top mini-bar + bottom nav */}
+              {/* Mobile: top mini-bar + bottom action bar */}
               <div className="md:hidden flex flex-col min-h-screen">
                 <header
                   className="h-16 px-4 border-b flex items-center justify-between shrink-0"
@@ -63,7 +63,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   <div className="p-4" style={{ zoom: 1.25 }}>{children}</div>
                 </main>
 
-                <MobileBottomNav />
+                <BottomActionBar />
               </div>
             </div>
         </ProjectProvider>

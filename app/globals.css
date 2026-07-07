@@ -644,3 +644,185 @@ html[data-theme="day"] .theme-toggle-knob {
   color: var(--color-muted);
 }
 
+/* ──────────────────────────────────────────────
+   BOTTOM ACTION BAR
+   ────────────────────────────────────────────── */
+.bottom-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: stretch;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.bottom-action-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 64px;
+  min-width: 56px;
+  padding: 8px 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color 0.15s ease, background 0.15s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-action-bar-item:hover,
+.bottom-action-bar-item.active {
+  color: var(--color-red);
+  background: color-mix(in srgb, var(--color-red) 8%, transparent);
+}
+
+/* ──────────────────────────────────────────────
+   QUICK ACTIONS
+   ────────────────────────────────────────────── */
+.quick-actions {
+  margin-bottom: 24px;
+}
+
+.quick-actions-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--color-text);
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 100px;
+  padding: 20px 16px;
+  border-radius: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.quick-action-btn:hover {
+  border-color: var(--color-text);
+  background: var(--color-surface2);
+  transform: translateY(-1px);
+}
+
+.quick-action-btn:active {
+  transform: translateY(0);
+}
+
+.quick-action-btn.primary {
+  background: var(--color-red);
+  border-color: var(--color-red);
+  color: white;
+}
+
+.quick-action-btn.primary:hover {
+  background: color-mix(in srgb, var(--color-red) 85%, black);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-red) 35%, transparent);
+}
+
+.quick-action-label {
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.quick-action-desc {
+  font-size: 0.8125rem;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.quick-action-btn.primary .quick-action-desc {
+  opacity: 0.85;
+}
+
+@media (max-width: 639px) {
+  .quick-action-btn {
+    flex-direction: row;
+    justify-content: flex-start;
+    min-height: 72px;
+    padding: 16px 20px;
+    gap: 16px;
+  }
+
+  .quick-action-label {
+    font-size: 1rem;
+  }
+
+  .quick-action-desc {
+    display: none;
+  }
+}
+
+/* ──────────────────────────────────────────────
+   MOBILE OPTIMIZATION — touch targets & font sizes
+   ────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    min-height: 52px;
+    height: auto;
+    padding: 14px 24px;
+  }
+
+  .nav-item {
+    min-height: 48px;
+  }
+
+  .mobile-nav-item,
+  .bottom-action-bar-item {
+    min-height: 56px;
+  }
+}
+

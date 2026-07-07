@@ -14,6 +14,7 @@ import IntelligenceRail from './IntelligenceRail';
 import LogisticsController from './LogisticsController';
 import CopilotDrawer from '@/components/ai/CopilotDrawer';
 import Toast from '@/components/shared/Toast';
+import QuickActions from './QuickActions';
 import CommandCenter from './workspace/CommandCenter';
 import SearchIntelligence from './workspace/SearchIntelligence';
 import LogisticsIntelligence from './workspace/LogisticsIntelligence';
@@ -178,6 +179,12 @@ export default function DashboardShell() {
     pageAgent.setActionHandler(handlePageAction);
   }, [handlePageAction]);
 
+  useEffect(() => {
+    const onLogistics = () => setWorkspace('logistics');
+    window.addEventListener('open-logistics', onLogistics);
+    return () => window.removeEventListener('open-logistics', onLogistics);
+  }, [setWorkspace]);
+
   const isSearchWorkspace = workspace === 'search' || workspace === 'logistics' || workspace === 'equipment' || workspace === 'bids';
   const showRail = workspace === 'search' || workspace === 'logistics';
 
@@ -287,6 +294,9 @@ export default function DashboardShell() {
     <>
       <div className={`grid grid-cols-1 ${workspace === 'command-center' || workspace === 'market' || workspace === 'bids' || workspace === 'equipment' ? '' : 'xl:grid-cols-[1fr_340px]'} gap-6 md:gap-8`}>
         <div className="min-w-0 space-y-6 md:space-y-8">
+          {/* Quick Actions — always visible at top */}
+          <QuickActions />
+
           {/* Metrics + CommandBar only shown on search/logistics workspaces */}
           {isSearchWorkspace && (
             <div>
@@ -301,7 +311,7 @@ export default function DashboardShell() {
           <div className="h-24" />
         </div>
 
-        {/* Right rail */}
+        {/* Right rail — hidden on mobile, visible on desktop */}
         {showRail && (
           <aside className="hidden xl:block space-y-6 pt-1">
             <IntelligenceRail />
