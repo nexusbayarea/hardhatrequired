@@ -6,6 +6,7 @@ import {
   ArrowUpRight, Loader, Sparkles, Copy, Check, X, Users, Truck, MapPin, Network,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useTranslatableContent } from '@/hooks/useTranslatableContent';
 
 /* ─── types ──────────────────────────────────────────────────── */
 
@@ -85,6 +86,10 @@ export default function DailyIntelligenceHub({
   const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{ bids: any[]; news: any[]; compliance: any[] }>({ bids: [], news: [], compliance: [] });
+
+  const { translatedItems: translatedBids } = useTranslatableContent(data.bids.length > 0 ? data.bids : null, ['title', 'agency']);
+  const { translatedItems: translatedCompliance } = useTranslatableContent(data.compliance.length > 0 ? data.compliance : null, ['title', 'authority']);
+  const { translatedItems: translatedNews } = useTranslatableContent(data.news.length > 0 ? data.news : null, ['title', 'source']);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [draftingBidId, setDraftingBidId] = useState<string | null>(null);
@@ -115,10 +120,14 @@ export default function DailyIntelligenceHub({
   useEffect(() => { fetchFeed(); }, [vertical, locationState]);
 
   /* ─── transform to unified feed ────────────────────────────── */
+  const sourceBids = translatedBids || data.bids;
+  const sourceCompliance = translatedCompliance || data.compliance;
+  const sourceNews = translatedNews || data.news;
+
   const feed = useMemo((): FeedItem[] => {
     const items: FeedItem[] = [];
 
-    (data.bids || []).forEach((b: any) => {
+    (sourceBids || []).forEach((b: any) => {
       items.push({
         id: `bid-${b.id}`,
         type: 'bid',
@@ -136,7 +145,7 @@ export default function DailyIntelligenceHub({
       });
     });
 
-    (data.compliance || []).forEach((c: any) => {
+    (sourceCompliance || []).forEach((c: any) => {
       const penaltyNum = parseInt((c.penaltyRisk || '').replace(/[^0-9]/g, '') || '0');
       items.push({
         id: `comp-${c.id}`,
@@ -157,7 +166,7 @@ export default function DailyIntelligenceHub({
       });
     });
 
-    (data.news || []).forEach((n: any) => {
+    (sourceNews || []).forEach((n: any) => {
       items.push({
         id: `news-${n.id}`,
         type: n.impact === 'High' ? 'alert' : 'news',
@@ -176,7 +185,7 @@ export default function DailyIntelligenceHub({
 
     items.sort((a, b) => b.opportunityScore - a.opportunityScore);
     return items;
-  }, [data]);
+  }, [data, translatedBids, translatedCompliance, translatedNews]);
 
   const filtered = typeFilter === 'all' ? feed : feed.filter(f => f.type === typeFilter);
 
@@ -313,8 +322,8 @@ export default function DailyIntelligenceHub({
               </span>
               <p className="text-lg mt-1 font-medium" style={{ color: 'var(--color-text)' }}>
                 {feed[0].type === 'bid' ? `${feed[0].subtitle} ${t('published a new bid.')} ` : ''}
-                {data.compliance.length > 0 ? `${data.compliance.length} ${t('compliance update')}${data.compliance.length > 1 ? 's' : ''} ${t('to review.')} ` : ''}
-                {data.news.filter(n => n.impact === 'High').length > 0 ? `${t('High-impact market changes detected.')} ` : ''}
+                {sourceCompliance.length > 0 ? `${sourceCompliance.length} ${t('compliance update')}${sourceCompliance.length > 1 ? 's' : ''} ${t('to review.')} ` : ''}
+                {sourceNews.filter((n: any) => n.impact === 'High').length > 0 ? `${t('High-impact market changes detected.')} ` : ''}
                 {feed.filter(f => f.opportunityScore >= 80).length} {t('high-opportunity items need your attention.')}
               </p>
               {briefingExpanded && (

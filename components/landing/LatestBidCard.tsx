@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Briefcase, Calendar, ArrowRight, DollarSign, Loader, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useTranslatableContent } from '@/hooks/useTranslatableContent';
 
 interface Bid {
   id: string;
@@ -20,6 +21,7 @@ interface Bid {
 export default function LatestBidCard() {
   const { t } = useLanguage();
   const [bids, setBids] = useState<Bid[]>([]);
+  const { translatedItems: translatedBids, translating } = useTranslatableContent(bids.length > 0 ? bids : null, ['title', 'agency', 'description', 'bid_source']);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
   const [hasData, setHasData] = useState(false);
@@ -67,7 +69,8 @@ export default function LatestBidCard() {
     );
   }
 
-  const bid = bids[activeIndex];
+  const displayBids = translatedBids || bids;
+  const bid = displayBids[activeIndex];
 
   return (
     <section className="py-24 md:py-36">
@@ -95,7 +98,7 @@ export default function LatestBidCard() {
               </span>
             </div>
             <div className="flex gap-1">
-              {bids.map((_, i) => (
+              {displayBids.map((_, i) => (
                 <span
                   key={i}
                   className="block rounded-full transition-all duration-300"
@@ -174,7 +177,7 @@ export default function LatestBidCard() {
             style={{ borderColor: 'var(--color-border)' }}
           >
             <span className="text-xs font-semibold" style={{ color: 'var(--color-muted)' }}>
-              {t('View all')} {bids.length} {t('open bids')}
+              {t('View all')} {displayBids.length} {t('open bids')}
             </span>
             <ArrowRight className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
           </div>
