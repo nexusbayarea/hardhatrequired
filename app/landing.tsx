@@ -20,10 +20,7 @@ import ComplianceAlertStrip from '@/components/landing/ComplianceAlertStrip';
 
 /* ─── nav ─────────────────────────────────────────────────────── */
 const navLinks = [
-  { label: 'Daily Intelligence', href: '#daily' },
-  { label: 'Active Bids', href: '#daily' },
-  { label: 'Compliance', href: '#daily' },
-  { label: 'Lead Generation', href: '#engines' },
+  { label: 'Intelligence Feed', href: '/dashboard' },
 ];
 
 /* ─── steps ───────────────────────────────────────────────────── */
@@ -141,7 +138,7 @@ function LandingInner() {
             {navLinks.map((l, i) => (
               <Fragment key={l.label}>
                 {i > 0 && <span className="text-sm shrink-0" style={{ color: 'var(--color-muted)' }}>|</span>}
-                <a
+                <Link
                   href={l.href}
                   className="px-2 py-2.5 text-sm font-semibold uppercase tracking-wider rounded-lg transition-colors truncate min-w-0"
                   style={{ color: 'var(--color-muted)' }}
@@ -149,7 +146,7 @@ function LandingInner() {
                   onMouseLeave={e => (e.currentTarget.style.color = 'var(--color-muted)')}
                 >
                   {t(l.label)}
-                </a>
+                </Link>
               </Fragment>
             ))}
           </div>
@@ -196,7 +193,7 @@ function LandingInner() {
             style={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
           >
             {navLinks.map(l => (
-              <a
+              <Link
                 key={l.label}
                 href={l.href}
                 onClick={() => setMobileOpen(false)}
@@ -204,7 +201,7 @@ function LandingInner() {
                 style={{ color: 'var(--color-muted)' }}
               >
                 {t(l.label)}
-              </a>
+              </Link>
             ))}
             <div
               className="pt-4 mt-4 border-t flex flex-col gap-3"
