@@ -15,18 +15,19 @@ export default function LanguageToggle({ mobile = false }: Props) {
   const inactive = { color: 'var(--color-muted)' };
 
   const langDisplay: { code: 'en' | 'es' | 'zh' | 'vi'; label: string }[] = [
-    { code: 'en', label: 'English' },
-    { code: 'es', label: 'Español' },
+    { code: 'en', label: 'EN' },
+    { code: 'es', label: 'ES' },
     { code: 'zh', label: '中文' },
-    { code: 'vi', label: 'Tiếng Việt' },
+    { code: 'vi', label: 'VI' },
   ];
 
   return (
-    <div className={`flex items-center flex-wrap ${mobile ? 'gap-1' : 'gap-0'}`}>
+    <div className={`flex items-center flex-wrap ${mobile ? 'gap-0.5' : 'gap-0'}`}>
       {langDisplay.map((lang, i) => (
         <span key={lang.code} className="flex items-center">
-          {i > 0 && <span className="text-xs" style={{ color: 'var(--color-muted)' }}>|</span>}
+          {i > 0 && <span className="text-xs shrink-0" style={{ color: 'var(--color-muted)' }}>|</span>}
           <button
+            type="button"
             onClick={() => setLanguage(lang.code)}
             className={base}
             style={language === lang.code ? active : inactive}
