@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, MapPin, FileCheck, Network, BarChart3, CheckCircle2, Loader, ArrowRight } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const STAGES = [
   { id: 'google', label: 'Google Places', icon: MapPin },
@@ -12,6 +13,7 @@ const STAGES = [
 ];
 
 export default function LiveSearchProgress() {
+  const { t } = useLanguage();
   const [activeStage, setActiveStage] = useState(-1);
   const [completed, setCompleted] = useState(false);
 
@@ -43,7 +45,7 @@ export default function LiveSearchProgress() {
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--color-red)' }} />
         )}
         <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>
-          {completed ? 'search complete' : 'searching in progress...'}
+          {completed ? t('search complete') : t('searching in progress...')}
         </span>
       </div>
 
@@ -81,16 +83,16 @@ export default function LiveSearchProgress() {
                     color: isDone ? 'var(--color-green)' : isActive ? 'var(--color-text)' : 'var(--color-muted)',
                   }}
                 >
-                  {stage.label}
+                  {t(stage.label)}
                 </span>
                 {isActive && (
                   <span className="text-[10px] ml-auto animate-pulse" style={{ color: 'var(--color-muted)' }}>
-                    Searching...
+                    {t('Searching...')}
                   </span>
                 )}
                 {isDone && !isActive && (
                   <span className="text-[10px] ml-auto" style={{ color: 'var(--color-green)' }}>
-                    ✓ Done
+                    ✓ {t('Done')}
                   </span>
                 )}
               </div>
@@ -108,10 +110,10 @@ export default function LiveSearchProgress() {
           >
             <div>
               <span className="text-xs font-bold" style={{ color: 'var(--color-green)' }}>
-                12 vendors discovered
+                {t('12 vendors discovered')}
               </span>
               <span className="text-[10px] ml-2" style={{ color: 'var(--color-muted)' }}>
-                within 50 mi radius
+                {t('within 50 mi radius')}
               </span>
             </div>
             <ArrowRight className="w-4 h-4" style={{ color: 'var(--color-green)' }} />

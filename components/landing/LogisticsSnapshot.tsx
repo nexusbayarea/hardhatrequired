@@ -3,10 +3,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Truck, Gauge, Route, DollarSign, TrendingDown, Droplets } from 'lucide-react';
 import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
+import { useLanguage } from '@/context/LanguageContext';
 
 const GALLONS_PRESETS = [2000, 5000, 10000, 20000];
 
 export default function LogisticsSnapshot() {
+  const { t } = useLanguage();
   const [gallons, setGallons] = useState(10000);
   const [vertical, setVertical] = useState('slurry_processing');
 
@@ -30,10 +32,10 @@ export default function LogisticsSnapshot() {
     <section className="py-24 md:py-36">
       <div className="max-w-[1400px] mx-auto px-5 md:px-8">
         <div className="mb-12">
-          <p className="section-label mb-4">live logistics estimator</p>
+          <p className="section-label mb-4">{t('live logistics estimator')}</p>
           <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
-            know your costs<br />
-            <span style={{ color: 'var(--color-muted)' }}>before you quote.</span>
+            {t('know your costs')}<br />
+            <span style={{ color: 'var(--color-muted)' }}>{t('before you quote.')}</span>
           </h2>
         </div>
 
@@ -48,21 +50,21 @@ export default function LogisticsSnapshot() {
             <div className="flex items-center gap-3">
               <Truck className="w-5 h-5" style={{ color: 'var(--color-red)' }} />
               <span className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>
-                How much will it cost to haul?
+                {t('How much will it cost to haul?')}
               </span>
             </div>
             <span className="text-[10px] font-bold px-2 py-1 rounded" style={{
               background: 'color-mix(in srgb, var(--color-green) 12%, transparent)',
               color: 'var(--color-green)',
             }}>
-              ${metrics.total.toLocaleString()} total estimate
+              ${metrics.total.toLocaleString()} {t('total estimate')}
             </span>
           </div>
 
           <div className="p-6 space-y-6">
             <div>
               <label className="text-[10px] font-bold uppercase tracking-widest mb-3 block" style={{ color: 'var(--color-muted)' }}>
-                target volume
+                {t('target volume')}
               </label>
               <div className="flex gap-2 mb-3">
                 {GALLONS_PRESETS.map((g) => (
@@ -96,26 +98,26 @@ export default function LogisticsSnapshot() {
               <div className="p-4 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <Route className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>trips</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('trips')}</span>
                 </div>
                 <div className="text-2xl font-black tabular-nums" style={{ color: 'var(--color-text)' }}>{metrics.trips}</div>
-                <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{config.truckCapacityGallons.toLocaleString()} GAL capacity</div>
+                <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{config.truckCapacityGallons.toLocaleString()} {t('GAL capacity')}</div>
               </div>
               <div className="p-4 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <Gauge className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>transit</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('transit')}</span>
                 </div>
                 <div className="text-2xl font-black tabular-nums" style={{ color: 'var(--color-text)' }}>{metrics.totalTransit}</div>
-                <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>total miles</div>
+                <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{t('total miles')}</div>
               </div>
               <div className="p-4 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingDown className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>hauling</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('hauling')}</span>
                 </div>
                 <div className="text-2xl font-black tabular-nums" style={{ color: 'var(--color-text)' }}>${metrics.haulingCost.toLocaleString()}</div>
-                <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>labor + truck</div>
+                <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{t('labor + truck')}</div>
               </div>
               <div className="p-4 rounded-lg" style={{
                 background: 'color-mix(in srgb, var(--color-green) 8%, var(--color-surface2))',
@@ -123,22 +125,22 @@ export default function LogisticsSnapshot() {
               }}>
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className="w-3.5 h-3.5" style={{ color: 'var(--color-green)' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-green)' }}>total</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-green)' }}>{t('total')}</span>
                 </div>
                 <div className="text-2xl font-black tabular-nums" style={{ color: 'var(--color-green)' }}>${metrics.total.toLocaleString()}</div>
-                <div className="text-[10px]" style={{ color: 'var(--color-green)' }}>${metrics.perGal.toFixed(3)}/GAL</div>
+                <div className="text-[10px]" style={{ color: 'var(--color-green)' }}>${metrics.perGal.toFixed(3)}/{t('GAL')}</div>
               </div>
             </div>
 
             <div className="flex items-center gap-4 text-[11px] flex-wrap" style={{ color: 'var(--color-muted)' }}>
               <span className="flex items-center gap-1">
                 <Droplets className="w-3 h-3" />
-                {gallons.toLocaleString()} GAL × {config.disposalFeePerGallon}/GAL disposal
+                {gallons.toLocaleString()} GAL × {config.disposalFeePerGallon}/{t('GAL')} {t('disposal')}
               </span>
               <span>·</span>
-              <span>{metrics.totalOpHours.toFixed(1)} operation hours</span>
+              <span>{metrics.totalOpHours.toFixed(1)} {t('operation hours')}</span>
               <span>·</span>
-              <span>${metrics.disposalFee.toLocaleString()} disposal fee</span>
+              <span>${metrics.disposalFee.toLocaleString()} {t('disposal fee')}</span>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Activity {
   id: string;
@@ -10,6 +11,7 @@ interface Activity {
 }
 
 export default function LiveActivityTicker() {
+  const { t } = useLanguage();
   const [items, setItems] = useState<Activity[]>([]);
   const [current, setCurrent] = useState(0);
   const [hasData, setHasData] = useState(false);
@@ -51,7 +53,7 @@ export default function LiveActivityTicker() {
       <div className="max-w-[1400px] mx-auto px-5 md:px-8 flex items-center gap-4">
         <span className="text-[10px] font-black uppercase tracking-widest shrink-0" style={{ color: 'var(--color-red)' }}>
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-red animate-pulse mr-1.5 align-middle" />
-          LIVE
+          {t('LIVE')}
         </span>
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <span className="text-sm shrink-0">{active.icon}</span>

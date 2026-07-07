@@ -5,6 +5,7 @@ import {
   Briefcase, AlertTriangle, FileText, ShieldCheck, TrendingUp, DollarSign,
   ArrowUpRight, Loader, Sparkles, Copy, Check, X, Users, Truck, MapPin, Network,
 } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 /* ─── types ──────────────────────────────────────────────────── */
 
@@ -44,19 +45,19 @@ function scoreNews(n: any): number {
 
 /* ─── opportunity label & color ──────────────────────────────── */
 
-function opportunityMeta(score: number): { label: string; color: string; bg: string } {
-  if (score >= 80) return { label: 'High Opportunity', color: 'var(--color-green)', bg: 'color-mix(in srgb, var(--color-green) 15%, transparent)' };
-  if (score >= 60) return { label: 'Moderate Opportunity', color: 'var(--color-yellow)', bg: 'color-mix(in srgb, var(--color-yellow) 15%, transparent)' };
-  return { label: 'Low ROI', color: 'var(--color-muted)', bg: 'var(--color-surface2)' };
+function opportunityMeta(score: number): { color: string; bg: string } {
+  if (score >= 80) return { color: 'var(--color-green)', bg: 'color-mix(in srgb, var(--color-green) 15%, transparent)' };
+  if (score >= 60) return { color: 'var(--color-yellow)', bg: 'color-mix(in srgb, var(--color-yellow) 15%, transparent)' };
+  return { color: 'var(--color-muted)', bg: 'var(--color-surface2)' };
 }
 
-const TYPE_META: Record<ItemType, { icon: any; label: string; dot: string }> = {
-  bid:        { icon: Briefcase,     label: 'BID',           dot: '#22C55E' },
-  compliance: { icon: AlertTriangle, label: 'COMPLIANCE',    dot: '#EF4444' },
-  news:       { icon: FileText,      label: 'INDUSTRY NEWS', dot: '#3B82F6' },
-  alert:      { icon: ShieldCheck,   label: 'ALERT',         dot: '#F59E0B' },
-  permit:     { icon: FileText,      label: 'PERMIT',        dot: '#8B5CF6' },
-  market:     { icon: TrendingUp,    label: 'MARKET SHIFT',  dot: '#EC4899' },
+const TYPE_META: Record<ItemType, { icon: any; labelKey: string; dot: string }> = {
+  bid:        { icon: Briefcase,     labelKey: 'BID',           dot: '#22C55E' },
+  compliance: { icon: AlertTriangle, labelKey: 'COMPLIANCE',    dot: '#EF4444' },
+  news:       { icon: FileText,      labelKey: 'INDUSTRY NEWS', dot: '#3B82F6' },
+  alert:      { icon: ShieldCheck,   labelKey: 'ALERT',         dot: '#F59E0B' },
+  permit:     { icon: FileText,      labelKey: 'PERMIT',        dot: '#8B5CF6' },
+  market:     { icon: TrendingUp,    labelKey: 'MARKET SHIFT',  dot: '#EC4899' },
 };
 
 /* ─── graph relationships ────────────────────────────────────── */
@@ -81,6 +82,7 @@ const GRAPH_EXAMPLES: Record<string, GraphNode[]> = {
 export default function DailyIntelligenceHub({
   vertical = 'slurry_processing', locationState = 'CA', landing,
 }: { vertical?: string; locationState?: string; landing?: boolean }) {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{ bids: any[]; news: any[]; compliance: any[] }>({ bids: [], news: [], compliance: [] });
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -123,8 +125,8 @@ export default function DailyIntelligenceHub({
         title: b.title,
         subtitle: b.agency,
         opportunityScore: scoreBid(b),
-        badge: b.difficulty === 'Easy' ? 'Open RFP' : b.difficulty === 'Medium' ? 'Medium RFP' : 'Complex RFP',
-        actionLabel: 'Generate Proposal →',
+        badge: b.difficulty === 'Easy' ? t('Open RFP') : b.difficulty === 'Medium' ? t('Medium RFP') : t('Complex RFP'),
+        actionLabel: t('Generate Proposal →'),
         sourceData: b,
         detail: {
           value: b.valueEstimate || 'TBD',
@@ -142,8 +144,8 @@ export default function DailyIntelligenceHub({
         title: c.title,
         subtitle: c.authority,
         opportunityScore: scoreCompliance(c),
-        badge: 'Action Required',
-        actionLabel: 'Explain →',
+        badge: t('Action Required'),
+        actionLabel: t('Explain →'),
         sourceData: c,
         detail: {
           penalty: c.penaltyRisk || '',
@@ -162,8 +164,8 @@ export default function DailyIntelligenceHub({
         title: n.title,
         subtitle: n.source,
         opportunityScore: scoreNews(n),
-        badge: `${n.impact} Impact`,
-        actionLabel: 'View Details →',
+        badge: `${n.impact} ${t('Impact')}`,
+        actionLabel: t('View Details →'),
         sourceData: n,
         detail: {
           impact: n.impact,
@@ -183,9 +185,9 @@ export default function DailyIntelligenceHub({
     const byType: Record<string, number> = {};
     feed.forEach(f => { byType[f.type] = (byType[f.type] || 0) + 1; });
     return [
-      { type: 'bid', label: 'new bids', count: byType.bid || 0, dot: '#22C55E' },
-      { type: 'compliance', label: 'compliance updates', count: byType.compliance || 0, dot: '#EF4444' },
-      { type: 'news', label: 'industry updates', count: byType.news || 0, dot: '#3B82F6' },
+      { type: 'bid', labelKey: 'new bids', count: byType.bid || 0, dot: '#22C55E' },
+      { type: 'compliance', labelKey: 'compliance updates', count: byType.compliance || 0, dot: '#EF4444' },
+      { type: 'news', labelKey: 'industry updates', count: byType.news || 0, dot: '#3B82F6' },
     ];
   }, [feed]);
 
@@ -228,7 +230,7 @@ export default function DailyIntelligenceHub({
         style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
       >
         <Loader className="w-8 h-8 animate-spin mb-3" style={{ color: 'var(--color-red)' }} />
-        <p className="text-lg font-medium" style={{ color: 'var(--color-muted)' }}>Scanning regional public bids & compliance updates...</p>
+        <p className="text-lg font-medium" style={{ color: 'var(--color-muted)' }}>{t('Scanning regional public bids & compliance updates...')}</p>
       </div>
     );
   }
@@ -246,19 +248,19 @@ export default function DailyIntelligenceHub({
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--color-red)' }} />
           <h2 className="font-bold" style={{ fontSize: landing ? 'clamp(1.5rem, 3vw, 2rem)' : '1.75rem', color: landing ? 'var(--color-red)' : 'var(--color-text)' }}>
-            Intelligence Feed
+            {t('Intelligence Feed')}
           </h2>
         </div>
         <div className="flex items-center gap-2 text-base" style={{ color: 'var(--color-muted)' }}>
           {updatedAt && (
-            <span>Updated {Math.round((Date.now() - updatedAt.getTime()) / 60000)}m ago</span>
+            <span>{t('Updated')} {Math.round((Date.now() - updatedAt.getTime()) / 60000)}{t('m ago')}</span>
           )}
           <button
             onClick={fetchFeed}
             className="px-2.5 py-1 rounded font-semibold hover:text-text transition-colors"
             style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
           >
-            Refresh
+            {t('Refresh')}
           </button>
         </div>
       </div>
@@ -269,28 +271,28 @@ export default function DailyIntelligenceHub({
         style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg)' }}
       >
         <span className="text-[15px] font-black uppercase tracking-widest shrink-0" style={{ color: 'var(--color-text)' }}>
-          TODAY
+          {t('TODAY')}
         </span>
         {todaySummary.map(s => (
           <span key={s.type} className="text-[16px] font-semibold flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full" style={{ background: s.dot }} />
             <span style={{ color: 'var(--color-text)' }}>+{s.count}</span>
-            <span style={{ color: 'var(--color-muted)' }}>{s.label}</span>
+            <span style={{ color: 'var(--color-muted)' }}>{t(s.labelKey)}</span>
           </span>
         ))}
         <div className="ml-auto flex gap-1">
-          {(['all', 'bid', 'compliance', 'news'] as const).map(t => (
+          {(['all', 'bid', 'compliance', 'news'] as const).map(type => (
             <button
-              key={t}
-              onClick={() => setTypeFilter(t)}
+              key={type}
+              onClick={() => setTypeFilter(type)}
               className="text-[15px] font-bold px-2 py-1 rounded transition-colors uppercase tracking-wider"
               style={{
-                background: typeFilter === t ? 'var(--color-surface)' : 'transparent',
-                color: typeFilter === t ? 'var(--color-text)' : 'var(--color-muted)',
-                border: typeFilter === t ? '1px solid var(--color-border)' : '1px solid transparent',
+                background: typeFilter === type ? 'var(--color-surface)' : 'transparent',
+                color: typeFilter === type ? 'var(--color-text)' : 'var(--color-muted)',
+                border: typeFilter === type ? '1px solid var(--color-border)' : '1px solid transparent',
               }}
             >
-              {t === 'all' ? 'All' : TYPE_META[t].label}
+              {type === 'all' ? t('All') : t(TYPE_META[type].labelKey)}
             </button>
           ))}
         </div>
@@ -307,13 +309,13 @@ export default function DailyIntelligenceHub({
             <Sparkles className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--color-red)' }} />
             <div className="min-w-0">
               <span className="text-[15px] font-black uppercase tracking-widest" style={{ color: 'var(--color-red)' }}>
-                Today&apos;s AI Briefing
+                {t("Today's AI Briefing")}
               </span>
               <p className="text-lg mt-1 font-medium" style={{ color: 'var(--color-text)' }}>
-                {feed[0].type === 'bid' ? `${feed[0].subtitle} published a new bid. ` : ''}
-                {data.compliance.length > 0 ? `${data.compliance.length} compliance update${data.compliance.length > 1 ? 's' : ''} to review. ` : ''}
-                {data.news.filter(n => n.impact === 'High').length > 0 ? 'High-impact market changes detected. ' : ''}
-                {feed.filter(f => f.opportunityScore >= 80).length} high-opportunity items need your attention.
+                {feed[0].type === 'bid' ? `${feed[0].subtitle} ${t('published a new bid.')} ` : ''}
+                {data.compliance.length > 0 ? `${data.compliance.length} ${t('compliance update')}${data.compliance.length > 1 ? 's' : ''} ${t('to review.')} ` : ''}
+                {data.news.filter(n => n.impact === 'High').length > 0 ? `${t('High-impact market changes detected.')} ` : ''}
+                {feed.filter(f => f.opportunityScore >= 80).length} {t('high-opportunity items need your attention.')}
               </p>
               {briefingExpanded && (
                 <div className="mt-3 space-y-1.5">
@@ -326,7 +328,7 @@ export default function DailyIntelligenceHub({
                 </div>
               )}
               <span className="text-[15px] mt-2 inline-block font-semibold" style={{ color: 'var(--color-muted)' }}>
-                {briefingExpanded ? 'Collapse ↑' : 'Expand ↓'}
+                {briefingExpanded ? t('Collapse ↑') : t('Expand ↓')}
               </span>
             </div>
           </div>
@@ -339,7 +341,7 @@ export default function DailyIntelligenceHub({
         <div className={`${showAIPanel && aiDraft ? 'lg:w-1/2' : 'lg:w-full'} divide-y max-h-[600px] overflow-y-auto`} style={{ borderColor: 'var(--color-border)' }}>
           {filtered.length === 0 ? (
             <div className="p-8 text-center text-lg" style={{ color: 'var(--color-muted)' }}>
-              No {typeFilter !== 'all' ? TYPE_META[typeFilter].label.toLowerCase() : ''} items found.
+              No {typeFilter !== 'all' ? t(TYPE_META[typeFilter].labelKey).toLowerCase() : ''} {t('items found.')}
             </div>
           ) : filtered.map(item => {
             const meta = TYPE_META[item.type];
@@ -368,11 +370,11 @@ export default function DailyIntelligenceHub({
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: meta.dot }} />
                       <span className="text-[15px] font-black uppercase tracking-widest" style={{ color: meta.dot }}>
-                        {meta.label}
+                        {t(meta.labelKey)}
                       </span>
                       {item.opportunityScore >= 80 && (
                         <span className="text-[15px] font-bold px-1.5 py-0.5 rounded" style={{ background: opp.bg, color: opp.color }}>
-                          🔥 High Value
+                          🔥 {t('High Value')}
                         </span>
                       )}
                     </div>
@@ -396,9 +398,9 @@ export default function DailyIntelligenceHub({
                   <span className="text-base font-black tabular-nums shrink-0" style={{ color: opp.color }}>
                     {item.opportunityScore}
                   </span>
-                  <span className="text-[15px] font-semibold shrink-0" style={{ color: 'var(--color-muted)' }}>
-                    {opp.label}
-                  </span>
+              <span className="text-[15px] font-semibold shrink-0" style={{ color: 'var(--color-muted)' }}>
+                {item.opportunityScore >= 80 ? t('High Opportunity') : item.opportunityScore >= 60 ? t('Moderate Opportunity') : t('Low ROI')}
+              </span>
                 </div>
 
                 {/* Key details — compressed, scannable */}
@@ -443,9 +445,9 @@ export default function DailyIntelligenceHub({
                   >
                     <DollarSign className="w-4 h-4 shrink-0" style={{ color: 'var(--color-red)' }} />
                     <span className="text-[16px]" style={{ color: 'var(--color-muted)' }}>
-                      Impacts <strong style={{ color: 'var(--color-text)' }}>{item.detail['impacted'] || 'N/A'}</strong> ·
-                      Avg penalty <strong style={{ color: 'var(--color-red)' }}>{item.detail['avg penalty'] || item.detail.penalty}</strong> ·
-                      Est. <strong style={{ color: 'var(--color-text)' }}>{item.detail['est. compliance'] || 'N/A'}</strong> compliance work
+                      {t('Impacts')} <strong style={{ color: 'var(--color-text)' }}>{item.detail['impacted'] || t('N/A')}</strong> ·
+                      {t('Avg penalty')} <strong style={{ color: 'var(--color-red)' }}>{item.detail['avg penalty'] || item.detail.penalty}</strong> ·
+                      {t('Est.')} <strong style={{ color: 'var(--color-text)' }}>{item.detail['est. compliance'] || t('N/A')}</strong> {t('compliance work')}
                     </span>
                   </div>
                 )}
@@ -471,9 +473,9 @@ export default function DailyIntelligenceHub({
                   {draftingBidId === item.id ? (
                     <span className="flex items-center justify-center gap-2">
                       <Loader className="w-3.5 h-3.5 animate-spin" />
-                      Generating...
+                      {t('Generating...')}
                     </span>
-                  ) : item.actionLabel}
+                  ) : t(item.actionLabel)}
                 </button>
               </div>
             );
@@ -490,7 +492,7 @@ export default function DailyIntelligenceHub({
               <div className="flex items-center justify-between mb-4">
                 <span className="text-base font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'var(--color-red)' }}>
                   <Sparkles className="w-3.5 h-3.5 animate-spin" />
-                  AI Proposal Draft
+                  {t('AI Proposal Draft')}
                 </span>
                 <button
                   onClick={() => { setShowAIPanel(false); setAiDraft(null); }}
@@ -516,7 +518,7 @@ export default function DailyIntelligenceHub({
                   className="px-3 py-1.5 rounded text-[15px] font-bold uppercase tracking-wider transition-colors"
                   style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
                 >
-                  {copied ? <><Check className="w-3 h-3 inline mr-1" />Copied</> : <><Copy className="w-3 h-3 inline mr-1" />Copy Draft</>}
+                  {copied ? <><Check className="w-3 h-3 inline mr-1" />{t('Copied')}</> : <><Copy className="w-3 h-3 inline mr-1" />{t('Copy Draft')}</>}
                 </button>
               </div>
 
@@ -539,7 +541,7 @@ export default function DailyIntelligenceHub({
         >
           <span className="text-[15px] font-black uppercase tracking-widest flex items-center gap-1.5 mb-2" style={{ color: 'var(--color-muted)' }}>
             <ArrowUpRight className="w-3 h-3" />
-            Because you searched {vertical.replace(/_/g, ' ')}
+            {t('Because you searched')} {vertical.replace(/_/g, ' ')}
           </span>
           <div className="flex gap-3 flex-wrap">
             {(() => {
@@ -550,10 +552,10 @@ export default function DailyIntelligenceHub({
                 if (f.type === 'news') counts.contractors++;
               });
               return [
-                { label: 'contractors', count: Math.max(1, Math.round(Math.random() * 3) + 1) },
-                { label: 'bids', count: counts.bids },
-                { label: 'regulations', count: counts.regulations },
-                { label: 'facilities', count: Math.max(1, Math.round(Math.random() * 2)) },
+                { label: t('contractors'), count: Math.max(1, Math.round(Math.random() * 3) + 1) },
+                { label: t('bids'), count: counts.bids },
+                { label: t('regulations'), count: counts.regulations },
+                { label: t('facilities'), count: Math.max(1, Math.round(Math.random() * 2)) },
               ].filter(c => c.count > 0).map(c => (
                 <span key={c.label} className="text-base flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
                   <span className="font-bold" style={{ color: 'var(--color-red)' }}>+{c.count}</span>

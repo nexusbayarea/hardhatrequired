@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Truck, Container, Fuel, Zap, Drill, Gauge, ArrowRight, Loader } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface EquipmentItem {
   id: string;
@@ -15,6 +16,7 @@ interface EquipmentItem {
 const ICONS = [Truck, Container, Fuel, Zap, Drill, Gauge];
 
 export default function EquipmentStrip() {
+  const { t } = useLanguage();
   const [equipment, setEquipment] = useState<EquipmentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasData, setHasData] = useState(false);
@@ -45,10 +47,10 @@ export default function EquipmentStrip() {
     <section className="py-24 md:py-36">
       <div className="max-w-[1400px] mx-auto px-5 md:px-8">
         <div className="mb-12">
-          <p className="section-label mb-4">equipment availability</p>
+          <p className="section-label mb-4">{t('equipment availability')}</p>
           <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
-            nearby equipment.<br />
-            <span style={{ color: 'var(--color-muted)' }}>ready to roll.</span>
+            {t('nearby equipment.')}<br />
+            <span style={{ color: 'var(--color-muted)' }}>{t('ready to roll.')}</span>
           </h2>
         </div>
 
@@ -61,11 +63,11 @@ export default function EquipmentStrip() {
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface2)' }}
           >
             <span className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>
-              Available near you
+              {t('Available near you')}
             </span>
             {hasData && (
               <span className="text-[10px] font-semibold" style={{ color: 'var(--color-muted)' }}>
-                {equipment.length} assets found
+                {equipment.length} {t('assets found')}
               </span>
             )}
           </div>
@@ -117,7 +119,7 @@ export default function EquipmentStrip() {
               style={{ borderColor: 'var(--color-border)' }}
             >
               <span className="text-xs font-semibold" style={{ color: 'var(--color-muted)' }}>
-                View full equipment catalog
+                {t('View full equipment catalog')}
               </span>
               <ArrowRight className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
             </div>

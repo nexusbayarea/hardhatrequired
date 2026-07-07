@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Database, Truck, Wrench, FileCheck, Briefcase, Users } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface CoverageData {
   companies: number;
@@ -19,6 +20,7 @@ function formatCount(n: number): string {
 }
 
 export default function CoverageStatistics() {
+  const { t } = useLanguage();
   const [data, setData] = useState<CoverageData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -37,22 +39,22 @@ export default function CoverageStatistics() {
   if (!data && !loading) return null;
 
   const stats = data ? [
-    { icon: Database, label: 'Companies Indexed', value: formatCount(data.companies), color: 'var(--color-red)' },
-    { icon: FileCheck, label: 'Active Permits', value: formatCount(data.permits), color: 'var(--color-green)' },
-    { icon: Wrench, label: 'Equipment Assets', value: formatCount(data.equipment), color: 'var(--color-blue)' },
-    { icon: Truck, label: 'Disposal Facilities', value: formatCount(data.companies), color: 'var(--color-yellow)' },
-    { icon: Briefcase, label: 'Open Bids', value: formatCount(data.bids), color: 'var(--color-indigo)' },
-    { icon: Users, label: 'Deep Profiles', value: formatCount(data.deepProfiles), color: 'var(--color-green)' },
+    { icon: Database, label: t('Companies Indexed'), value: formatCount(data.companies), color: 'var(--color-red)' },
+    { icon: FileCheck, label: t('Active Permits'), value: formatCount(data.permits), color: 'var(--color-green)' },
+    { icon: Wrench, label: t('Equipment Assets'), value: formatCount(data.equipment), color: 'var(--color-blue)' },
+    { icon: Truck, label: t('Disposal Facilities'), value: formatCount(data.companies), color: 'var(--color-yellow)' },
+    { icon: Briefcase, label: t('Open Bids'), value: formatCount(data.bids), color: 'var(--color-indigo)' },
+    { icon: Users, label: t('Deep Profiles'), value: formatCount(data.deepProfiles), color: 'var(--color-green)' },
   ] : [];
 
   return (
     <section className="py-24 md:py-36">
       <div className="max-w-[1400px] mx-auto px-5 md:px-8">
         <div className="mb-12">
-          <p className="section-label mb-4">live platform coverage</p>
+          <p className="section-label mb-4">{t('live platform coverage')}</p>
           <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
-            your market,<br />
-            <span style={{ color: 'var(--color-muted)' }}>fully mapped.</span>
+            {t('your market,')}<br />
+            <span style={{ color: 'var(--color-muted)' }}>{t('fully mapped.')}</span>
           </h2>
         </div>
 

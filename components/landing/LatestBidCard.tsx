@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Briefcase, Calendar, ArrowRight, DollarSign, Loader, Sparkles } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Bid {
   id: string;
@@ -17,6 +18,7 @@ interface Bid {
 }
 
 export default function LatestBidCard() {
+  const { t } = useLanguage();
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -46,7 +48,7 @@ export default function LatestBidCard() {
   if (!hasData && !loading) return null;
 
   const formatValue = (v: number | null) => {
-    if (!v) return 'Value undisclosed';
+    if (!v) return t('Value undisclosed');
     return `$${v.toLocaleString()}`;
   };
 
@@ -71,10 +73,10 @@ export default function LatestBidCard() {
     <section className="py-24 md:py-36">
       <div className="max-w-[1400px] mx-auto px-5 md:px-8">
         <div className="mb-12">
-          <p className="section-label mb-4">open bids</p>
+          <p className="section-label mb-4">{t('open bids')}</p>
           <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
-            win more work.<br />
-            <span style={{ color: 'var(--color-muted)' }}>bid smarter.</span>
+            {t('win more work.')}<br />
+            <span style={{ color: 'var(--color-muted)' }}>{t('bid smarter.')}</span>
           </h2>
         </div>
 
@@ -89,7 +91,7 @@ export default function LatestBidCard() {
             <div className="flex items-center gap-2">
               <Briefcase className="w-4 h-4" style={{ color: 'var(--color-red)' }} />
               <span className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>
-                Featured Opportunity
+                {t('Featured Opportunity')}
               </span>
             </div>
             <div className="flex gap-1">
@@ -117,7 +119,7 @@ export default function LatestBidCard() {
                       : 'color-mix(in srgb, var(--color-green) 12%, transparent)',
                     color: bid.status === 'closing_soon' ? 'var(--color-red)' : 'var(--color-green)',
                   }}>
-                    {bid.status === 'closing_soon' ? 'Closing Soon' : 'Open'}
+                    {bid.status === 'closing_soon' ? t('Closing Soon') : t('Open')}
                   </span>
                   <span className="text-[10px] font-bold px-2 py-1 rounded" style={{
                     background: 'var(--color-surface2)',
@@ -158,10 +160,10 @@ export default function LatestBidCard() {
               >
                 <Sparkles className="w-5 h-5 mb-1" style={{ color: 'var(--color-red)' }} />
                 <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--color-red)' }}>
-                  AI Pitch Bid
+                  {t('AI Pitch Bid')}
                 </span>
                 <span className="text-[10px] mt-1 text-center" style={{ color: 'var(--color-muted)' }}>
-                  Generate proposal in seconds
+                  {t('Generate proposal in seconds')}
                 </span>
               </div>
             </div>
@@ -172,7 +174,7 @@ export default function LatestBidCard() {
             style={{ borderColor: 'var(--color-border)' }}
           >
             <span className="text-xs font-semibold" style={{ color: 'var(--color-muted)' }}>
-              View all {bids.length} open bids
+              {t('View all')} {bids.length} {t('open bids')}
             </span>
             <ArrowRight className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
           </div>
