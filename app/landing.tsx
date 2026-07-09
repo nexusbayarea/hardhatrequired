@@ -17,6 +17,7 @@ import LogisticsSnapshot from '@/components/landing/LogisticsSnapshot';
 import EquipmentStrip from '@/components/landing/EquipmentStrip';
 import LatestBidCard from '@/components/landing/LatestBidCard';
 import ComplianceAlertStrip from '@/components/landing/ComplianceAlertStrip';
+import CopilotDrawer from '@/components/ai/CopilotDrawer';
 
 /* ─── nav ─────────────────────────────────────────────────────── */
 const navLinks = [
@@ -345,6 +346,9 @@ function LandingInner() {
             </div>
           </div>
         </div>
+
+        {/* Copilot */}
+        <CopilotDrawer />
 
         {/* Scroll cue */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60">
