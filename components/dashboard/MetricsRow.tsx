@@ -10,7 +10,7 @@ export default function MetricsRow() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/dashboard/overview', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+    fetch('/api/dashboard/overview', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-iie-client-context': 'slurry_processing' } })
       .then(r => r.json())
       .then(data => {
         if (data?.metrics) setMetrics(data.metrics);

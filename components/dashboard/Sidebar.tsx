@@ -35,9 +35,10 @@ export default function Sidebar({ slim = false }: SidebarProps) {
   const [creditsUsed, setCreditsUsed] = useState<number | null>(null);
 
   useEffect(() => {
+    const vertical = activeProject?.vertical || 'slurry_processing';
     Promise.all([
-      fetch('/api/billing/current', { method: 'POST' }).then(r => r.json()),
-      fetch('/api/billing/usage', { method: 'POST', body: '{}' }).then(r => r.json()),
+      fetch('/api/billing/current', { method: 'POST', headers: { 'x-iie-client-context': vertical } }).then(r => r.json()),
+      fetch('/api/billing/usage', { method: 'POST', body: '{}', headers: { 'Content-Type': 'application/json', 'x-iie-client-context': vertical } }).then(r => r.json()),
     ]).then(([current, usage]) => {
       if (current.subscription) {
         setPlanTier(

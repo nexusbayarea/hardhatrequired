@@ -16,7 +16,7 @@ export default function UsageCard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/billing/current', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+    fetch('/api/billing/current', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-iie-client-context': 'slurry_processing' } })
       .then(r => r.json())
       .then(d => {
         if (d?.subscription) {
