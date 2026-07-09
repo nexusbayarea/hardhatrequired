@@ -8,8 +8,6 @@ import {
 import { useLanguage } from '@/context/LanguageContext';
 import { useTranslatableContent } from '@/hooks/useTranslatableContent';
 
-/* ─── types ──────────────────────────────────────────────────── */
-
 type ItemType = 'bid' | 'compliance' | 'news' | 'alert' | 'permit' | 'market';
 
 interface FeedItem {
@@ -24,12 +22,11 @@ interface FeedItem {
   sourceData: any;
 }
 
-/* ─── scoring ────────────────────────────────────────────────── */
-
 function scoreBid(b: any): number {
-  const val = parseInt(b.valueEstimate?.replace(/[^0-9]/g, '') || '0');
+  const rawVal = b.estimated_value || b.valueEstimate || '0';
+  const val = parseInt(String(rawVal).replace(/[^0-9]/g, '') || '0');
   const d = b.difficulty === 'Easy' ? 1 : b.difficulty === 'Medium' ? 0.7 : 0.4;
-  return Math.min(100, Math.round((val / 5000) * 0.6 + d * 30 + 10));
+  return Math.min(100, Math.round((val / 5000) * 0.6 + d * 30 + 10)) || 55;
 }
 
 function scoreCompliance(c: any): number {
@@ -44,12 +41,10 @@ function scoreNews(n: any): number {
          15 + Math.round(Math.random() * 20);
 }
 
-/* ─── opportunity label & color ──────────────────────────────── */
-
 function opportunityMeta(score: number): { color: string; bg: string } {
-  if (score >= 80) return { color: 'var(--color-green)', bg: 'color-mix(in srgb, var(--color-green) 15%, transparent)' };
-  if (score >= 60) return { color: 'var(--color-yellow)', bg: 'color-mix(in srgb, var(--color-yellow) 15%, transparent)' };
-  return { color: 'var(--color-muted)', bg: 'var(--color-surface2)' };
+  if (score >= 80) return { color: 'var(--color-green, #22c55e)', bg: 'color-mix(in srgb, var(--color-green, #22c55e) 15%, transparent)' };
+  if (score >= 60) return { color: 'var(--color-yellow, #eab308)', bg: 'color-mix(in srgb, var(--color-yellow, #eab308) 15%, transparent)' };
+  return { color: 'var(--color-muted, #94a3b8)', bg: 'var(--color-surface2, #334155)' };
 }
 
 const TYPE_META: Record<ItemType, { icon: any; labelKey: string; dot: string }> = {
@@ -60,8 +55,6 @@ const TYPE_META: Record<ItemType, { icon: any; labelKey: string; dot: string }> 
   permit:     { icon: FileText,      labelKey: 'PERMIT',        dot: '#8B5CF6' },
   market:     { icon: TrendingUp,    labelKey: 'MARKET SHIFT',  dot: '#EC4899' },
 };
-
-/* ─── graph relationships ────────────────────────────────────── */
 
 interface GraphNode {
   label: string;
@@ -78,8 +71,6 @@ const GRAPH_EXAMPLES: Record<string, GraphNode[]> = {
   ],
 };
 
-/* ─── component ──────────────────────────────────────────────── */
-
 export default function DailyIntelligenceHub({
   vertical = 'slurry_processing', locationState = 'CA', landing,
 }: { vertical?: string; locationState?: string; landing?: boolean }) {
@@ -90,6 +81,7 @@ export default function DailyIntelligenceHub({
   const { translatedItems: translatedBids } = useTranslatableContent(data.bids.length > 0 ? data.bids : null, ['title', 'agency']);
   const { translatedItems: translatedCompliance } = useTranslatableContent(data.compliance.length > 0 ? data.compliance : null, ['title', 'authority']);
   const { translatedItems: translatedNews } = useTranslatableContent(data.news.length > 0 ? data.news : null, ['title', 'source']);
+  
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [draftingBidId, setDraftingBidId] = useState<string | null>(null);
@@ -113,13 +105,12 @@ export default function DailyIntelligenceHub({
           setUpdatedAt(new Date());
         }
       })
-      .catch(() => {})
+      .catch((err) => console.error("Intelligence fetch failure:", err))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchFeed(); }, [vertical, locationState]);
 
-  /* ─── transform to unified feed ────────────────────────────── */
   const sourceBids = translatedBids || data.bids;
   const sourceCompliance = translatedCompliance || data.compliance;
   const sourceNews = translatedNews || data.news;
@@ -128,19 +119,24 @@ export default function DailyIntelligenceHub({
     const items: FeedItem[] = [];
 
     (sourceBids || []).forEach((b: any) => {
+      // Normalize estimated value and date structures
+      const valEst = b.estimated_value ? `$${Number(b.estimated_value).toLocaleString()}` : (b.valueEstimate || 'TBD');
+      const deadline = b.due_at || b.deadline || '';
+      const difficulty = b.difficulty || (b.estimated_value && Number(b.estimated_value) > 100000 ? 'Complex' : 'Easy');
+
       items.push({
         id: `bid-${b.id}`,
         type: 'bid',
         title: b.title,
-        subtitle: b.agency,
-        opportunityScore: scoreBid(b),
-        badge: b.difficulty === 'Easy' ? t('Open RFP') : b.difficulty === 'Medium' ? t('Medium RFP') : t('Complex RFP'),
+        subtitle: b.agency || b.agency_or_client || t('Public Works'),
+        opportunityScore: scoreBid({ ...b, estimated_value: b.estimated_value, valueEstimate: valEst, difficulty }),
+        badge: difficulty === 'Easy' ? t('Open RFP') : difficulty === 'Medium' ? t('Medium RFP') : t('Complex RFP'),
         actionLabel: t('Generate Proposal →'),
-        sourceData: b,
+        sourceData: { ...b, valueEstimate: valEst, deadline, difficulty },
         detail: {
-          value: b.valueEstimate || 'TBD',
-          deadline: b.deadline || '',
-          ...(b.id ? { id: b.id } : {}),
+          value: valEst,
+          deadline: deadline ? new Date(deadline).toLocaleDateString() : t('TBD'),
+          ...(b.id ? { id: String(b.id) } : {}),
         },
       });
     });
@@ -157,10 +153,10 @@ export default function DailyIntelligenceHub({
         actionLabel: t('Explain →'),
         sourceData: c,
         detail: {
-          penalty: c.penaltyRisk || '',
+          penalty: c.penaltyRisk || 'TBD',
           effective: c.effectiveDate || '',
           impacted: `${Math.round(150 + Math.random() * 150)} contractors`,
-          'avg penalty': `$${penaltyNum.toLocaleString()}`,
+          'avg penalty': penaltyNum > 0 ? `$${penaltyNum.toLocaleString()}` : 'TBD',
           'est. compliance': `${Math.round(4 + Math.random() * 16)} hours`,
         },
       });
@@ -185,11 +181,10 @@ export default function DailyIntelligenceHub({
 
     items.sort((a, b) => b.opportunityScore - a.opportunityScore);
     return items;
-  }, [data, translatedBids, translatedCompliance, translatedNews]);
+  }, [data, sourceBids, sourceCompliance, sourceNews, t]);
 
   const filtered = typeFilter === 'all' ? feed : feed.filter(f => f.type === typeFilter);
 
-  /* ─── today summary ────────────────────────────────────────── */
   const todaySummary = useMemo(() => {
     const byType: Record<string, number> = {};
     feed.forEach(f => { byType[f.type] = (byType[f.type] || 0) + 1; });
@@ -200,7 +195,6 @@ export default function DailyIntelligenceHub({
     ];
   }, [feed]);
 
-  /* ─── generate proposal ────────────────────────────────────── */
   const handleGenerateProposal = async (item: FeedItem) => {
     const bid = item.sourceData;
     setDraftingBidId(item.id);
@@ -215,7 +209,7 @@ export default function DailyIntelligenceHub({
           model: 'meta/llama-3.1-8b-instruct',
           messages: [
             { role: 'system', content: `You are a professional bid proposal writer for a ${vertical.replace(/_/g, ' ')} contractor. Write a concise, persuasive bid response letter. Return only the letter text, no markdown wrappers.` },
-            { role: 'user', content: `Write a bid proposal response for this opportunity:\nTitle: ${bid.title}\nAgency: ${bid.agency}\nValue: ${bid.valueEstimate}\nDeadline: ${bid.deadline}\nDifficulty: ${bid.difficulty}\nDescription: ${bid.description}\n\nInclude: introduction, three reasons we are uniquely positioned, and a call to discuss next steps. Sign as "HHR Partner".` },
+            { role: 'user', content: `Write a bid proposal response for this opportunity:\nTitle: ${bid.title}\nAgency: ${bid.agency || t('Public Works')}\nValue: ${bid.valueEstimate}\nDeadline: ${bid.deadline}\nDifficulty: ${bid.difficulty}\nDescription: ${bid.description || 'General industrial service contract'}\n\nInclude: introduction, three reasons we are uniquely positioned, and a call to discuss next steps. Sign as "HHR Partner".` },
           ],
           temperature: 0.3,
           max_tokens: 1024,
@@ -231,14 +225,13 @@ export default function DailyIntelligenceHub({
     }
   };
 
-  /* ─── render ───────────────────────────────────────────────── */
   if (loading && feed.length === 0) {
     return (
       <div
         className="flex flex-col items-center justify-center p-12 rounded-xl min-h-[350px]"
         style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
       >
-        <Loader className="w-8 h-8 animate-spin mb-3" style={{ color: 'var(--color-red)' }} />
+        <Loader className="w-8 h-8 animate-spin mb-3 text-red-500" />
         <p className="text-lg font-medium" style={{ color: 'var(--color-muted)' }}>{t('Scanning regional public bids & compliance updates...')}</p>
       </div>
     );
@@ -249,14 +242,14 @@ export default function DailyIntelligenceHub({
       className="rounded-xl overflow-hidden"
       style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
     >
-      {/* ─── Header ──────────────────────────────────────────── */}
+      {/* ─── Workspace Header ─────────────────────────────────── */}
       <div
         className="px-5 py-4 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
         style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface2)' }}
       >
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--color-red)' }} />
-          <h2 className="font-bold" style={{ fontSize: landing ? 'clamp(1.5rem, 3vw, 2rem)' : '1.75rem', color: landing ? 'var(--color-red)' : 'var(--color-text)' }}>
+          <span className="w-2 h-2 rounded-full animate-pulse bg-red-500" />
+          <h2 className="font-bold text-xl" style={{ fontSize: landing ? 'clamp(1.5rem, 3vw, 2rem)' : '1.75rem', color: landing ? 'var(--color-red)' : 'var(--color-text)' }}>
             {t('Intelligence Feed')}
           </h2>
         </div>
@@ -266,15 +259,15 @@ export default function DailyIntelligenceHub({
           )}
           <button
             onClick={fetchFeed}
-            className="px-2.5 py-1 rounded font-semibold hover:text-text transition-colors"
-            style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+            className="px-2.5 py-1 rounded font-semibold text-xs hover:text-white transition-colors"
+            style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
           >
             {t('Refresh')}
           </button>
         </div>
       </div>
 
-      {/* ─── What changed today ──────────────────────────────── */}
+      {/* ─── Quick Summary Statistics ───────────────────────── */}
       <div
         className="px-5 py-3 border-b flex items-center gap-4 flex-wrap"
         style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg)' }}
@@ -294,9 +287,9 @@ export default function DailyIntelligenceHub({
             <button
               key={type}
               onClick={() => setTypeFilter(type)}
-              className="text-[15px] font-bold px-2 py-1 rounded transition-colors uppercase tracking-wider"
+              className="text-[13px] font-bold px-2 py-1 rounded transition-colors uppercase tracking-wider"
               style={{
-                background: typeFilter === type ? 'var(--color-surface)' : 'transparent',
+                background: typeFilter === type ? 'var(--color-surface2)' : 'transparent',
                 color: typeFilter === type ? 'var(--color-text)' : 'var(--color-muted)',
                 border: typeFilter === type ? '1px solid var(--color-border)' : '1px solid transparent',
               }}
@@ -307,36 +300,36 @@ export default function DailyIntelligenceHub({
         </div>
       </div>
 
-      {/* ─── AI Briefing ─────────────────────────────────────── */}
+      {/* ─── AI Briefing Highlights ────────────────────────── */}
       {feed.length > 0 && (
         <div
           className="mx-5 mt-4 p-4 rounded-xl cursor-pointer transition-colors"
-          style={{ background: 'color-mix(in srgb, var(--color-red) 6%, var(--color-surface2))', border: '1px solid color-mix(in srgb, var(--color-red) 20%, var(--color-border))' }}
+          style={{ background: 'color-mix(in srgb, var(--color-red, #ef4444) 6%, var(--color-surface2))', border: '1px solid color-mix(in srgb, var(--color-red, #ef4444) 20%, var(--color-border))' }}
           onClick={() => setBriefingExpanded(v => !v)}
         >
           <div className="flex items-start gap-3">
-            <Sparkles className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--color-red)' }} />
+            <Sparkles className="w-5 h-5 mt-0.5 shrink-0 text-red-500" />
             <div className="min-w-0">
-              <span className="text-[15px] font-black uppercase tracking-widest" style={{ color: 'var(--color-red)' }}>
+              <span className="text-[15px] font-black uppercase tracking-widest text-red-500">
                 {t("Today's AI Briefing")}
               </span>
-              <p className="text-lg mt-1 font-medium" style={{ color: 'var(--color-text)' }}>
+              <p className="text-sm mt-1 font-medium text-slate-200">
                 {feed[0].type === 'bid' ? `${feed[0].subtitle} ${t('published a new bid.')} ` : ''}
                 {sourceCompliance.length > 0 ? `${sourceCompliance.length} ${t('compliance update')}${sourceCompliance.length > 1 ? 's' : ''} ${t('to review.')} ` : ''}
                 {sourceNews.filter((n: any) => n.impact === 'High').length > 0 ? `${t('High-impact market changes detected.')} ` : ''}
                 {feed.filter(f => f.opportunityScore >= 80).length} {t('high-opportunity items need your attention.')}
               </p>
               {briefingExpanded && (
-                <div className="mt-3 space-y-1.5">
+                <div className="mt-3 space-y-1.5 border-t border-slate-800 pt-3">
                   {feed.slice(0, 5).map(f => (
-                    <div key={f.id} className="flex items-center gap-2 text-base" style={{ color: 'var(--color-muted)' }}>
+                    <div key={f.id} className="flex items-center gap-2 text-xs text-slate-400">
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: TYPE_META[f.type].dot }} />
                       <span className="truncate">{f.title}</span>
                     </div>
                   ))}
                 </div>
               )}
-              <span className="text-[15px] mt-2 inline-block font-semibold" style={{ color: 'var(--color-muted)' }}>
+              <span className="text-xs mt-2 inline-block font-semibold text-slate-400">
                 {briefingExpanded ? t('Collapse ↑') : t('Expand ↓')}
               </span>
             </div>
@@ -344,12 +337,12 @@ export default function DailyIntelligenceHub({
         </div>
       )}
 
-      {/* ─── Feed + AI Panel (desktop side-by-side) ──────────── */}
+      {/* ─── Double Column Layout ────────────────────────────── */}
       <div className="flex flex-col lg:flex-row">
-        {/* Feed */}
+        {/* Infinite Scroller Feed List */}
         <div className={`${showAIPanel && aiDraft ? 'lg:w-1/2' : 'lg:w-full'} divide-y max-h-[600px] overflow-y-auto`} style={{ borderColor: 'var(--color-border)' }}>
           {filtered.length === 0 ? (
-            <div className="p-8 text-center text-lg" style={{ color: 'var(--color-muted)' }}>
+            <div className="p-8 text-center text-slate-400">
               No {typeFilter !== 'all' ? t(TYPE_META[typeFilter].labelKey).toLowerCase() : ''} {t('items found.')}
             </div>
           ) : filtered.map(item => {
@@ -361,42 +354,42 @@ export default function DailyIntelligenceHub({
             return (
               <div
                 key={item.id}
-                className={`p-5 transition-all ${landing ? 'landing-result' : ''}`}
+                className={`p-5 transition-all ${landing ? 'landing-result' : ''} border-b border-slate-800/60`}
                 style={{
-                  background: isSelected ? 'color-mix(in srgb, var(--color-red) 4%, var(--color-surface))' : 'transparent',
-                  borderLeft: isSelected ? '3px solid var(--color-red)' : '3px solid transparent',
+                  background: isSelected ? 'color-mix(in srgb, var(--color-red, #ef4444) 4%, var(--color-surface))' : 'transparent',
+                  borderLeft: isSelected ? '3px solid var(--color-red, #ef4444)' : '3px solid transparent',
                 }}
               >
-                {/* Type badge + title row */}
+                {/* Visual Label Column */}
                 <div className="flex items-start gap-3 mb-3">
                   <div
                     className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ background: 'color-mix(in srgb, var(--color-red) 10%, var(--color-surface2))' }}
+                    style={{ background: 'color-mix(in srgb, var(--color-red, #ef4444) 10%, var(--color-surface2))' }}
                   >
                     <Icon className="w-4.5 h-4.5" style={{ color: meta.dot }} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: meta.dot }} />
-                      <span className="text-[15px] font-black uppercase tracking-widest" style={{ color: meta.dot }}>
+                      <span className="text-xs font-black uppercase tracking-widest" style={{ color: meta.dot }}>
                         {t(meta.labelKey)}
                       </span>
                       {item.opportunityScore >= 80 && (
-                        <span className="text-[15px] font-bold px-1.5 py-0.5 rounded" style={{ background: opp.bg, color: opp.color }}>
+                        <span className="text-[11px] font-bold px-1.5 py-0.5 rounded" style={{ background: opp.bg, color: opp.color }}>
                           🔥 {t('High Value')}
                         </span>
                       )}
                     </div>
-                    <h3 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
+                    <h3 className="text-base font-bold text-white">
                       {item.title}
                     </h3>
-                    <span className="text-[16px]" style={{ color: 'var(--color-muted)' }}>
+                    <span className="text-xs text-slate-400">
                       {item.subtitle}
                     </span>
                   </div>
                 </div>
 
-                {/* Opportunity score bar */}
+                {/* Score indicators */}
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-surface2)' }}>
                     <div
@@ -404,64 +397,64 @@ export default function DailyIntelligenceHub({
                       style={{ width: `${item.opportunityScore}%`, background: opp.color }}
                     />
                   </div>
-                  <span className="text-base font-black tabular-nums shrink-0" style={{ color: opp.color }}>
+                  <span className="text-sm font-black tabular-nums shrink-0" style={{ color: opp.color }}>
                     {item.opportunityScore}
                   </span>
-              <span className="text-[15px] font-semibold shrink-0" style={{ color: 'var(--color-muted)' }}>
-                {item.opportunityScore >= 80 ? t('High Opportunity') : item.opportunityScore >= 60 ? t('Moderate Opportunity') : t('Low ROI')}
-              </span>
+                  <span className="text-xs font-semibold shrink-0" style={{ color: 'var(--color-muted)' }}>
+                    {item.opportunityScore >= 80 ? t('High Opportunity') : item.opportunityScore >= 60 ? t('Moderate Opportunity') : t('Low ROI')}
+                  </span>
                 </div>
 
-                {/* Key details — compressed, scannable */}
+                {/* Grid attributes */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
                   {Object.entries(item.detail).map(([key, val]) => (
                     <div
                       key={key}
-                      className="px-2.5 py-1.5 rounded text-[16px]"
+                      className="px-2.5 py-1.5 rounded text-xs"
                       style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
                     >
-                      <span className="block font-bold capitalize" style={{ color: 'var(--color-text)' }}>{val}</span>
-                      <span className="block" style={{ color: 'var(--color-muted)' }}>{key}</span>
+                      <span className="block font-bold capitalize text-slate-100">{val}</span>
+                      <span className="block text-[10px] text-slate-400 mt-0.5">{key}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* Graph: Project → Labor → Equipment → Disposal → Permits */}
+                {/* Graph relations display */}
                 {item.type === 'bid' && (
                   <div
                     className="mb-3 p-3 rounded-lg flex items-center gap-4 flex-wrap"
                     style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
                   >
-                    <Network className="w-4 h-4 shrink-0" style={{ color: 'var(--color-red)' }} />
+                    <Network className="w-4 h-4 shrink-0 text-red-500" />
                     {GRAPH_EXAMPLES.default.map((g, i) => (
-                      <div key={g.label} className="flex items-center gap-1.5 text-[16px]">
-                        <g.icon className="w-3 h-3" style={{ color: 'var(--color-muted)' }} />
-                        <span style={{ color: 'var(--color-muted)' }}>{g.label}:</span>
-                        <span className="font-semibold" style={{ color: 'var(--color-text)' }}>{g.count}</span>
+                      <div key={g.label} className="flex items-center gap-1.5 text-xs">
+                        <g.icon className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-slate-400">{g.label}:</span>
+                        <span className="font-semibold text-slate-200">{g.count}</span>
                         {i < GRAPH_EXAMPLES.default.length - 1 && (
-                          <span className="text-muted mx-1">→</span>
+                          <span className="text-slate-600 mx-1">→</span>
                         )}
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Compliance: "money lost" */}
+                {/* Specific regulatory compliance indicators */}
                 {item.type === 'compliance' && (
                   <div
                     className="mb-3 p-3 rounded-lg flex items-center gap-3 flex-wrap"
-                    style={{ background: 'color-mix(in srgb, var(--color-red) 6%, var(--color-surface2))', border: '1px solid color-mix(in srgb, var(--color-red) 15%, var(--color-border))' }}
+                    style={{ background: 'color-mix(in srgb, var(--color-red, #ef4444) 6%, var(--color-surface2))', border: '1px solid color-mix(in srgb, var(--color-red, #ef4444) 15%, var(--color-border))' }}
                   >
-                    <DollarSign className="w-4 h-4 shrink-0" style={{ color: 'var(--color-red)' }} />
-                    <span className="text-[16px]" style={{ color: 'var(--color-muted)' }}>
-                      {t('Impacts')} <strong style={{ color: 'var(--color-text)' }}>{item.detail['impacted'] || t('N/A')}</strong> ·
-                      {t('Avg penalty')} <strong style={{ color: 'var(--color-red)' }}>{item.detail['avg penalty'] || item.detail.penalty}</strong> ·
-                      {t('Est.')} <strong style={{ color: 'var(--color-text)' }}>{item.detail['est. compliance'] || t('N/A')}</strong> {t('compliance work')}
+                    <DollarSign className="w-4 h-4 shrink-0 text-red-500" />
+                    <span className="text-xs text-slate-400">
+                      {t('Impacts')} <strong className="text-slate-200">{item.detail['impacted'] || t('N/A')}</strong> · 
+                      {t('Avg penalty')} <strong className="text-red-400">{item.detail['avg penalty'] || item.detail.penalty}</strong> · 
+                      {t('Est.')} <strong className="text-slate-200">{item.detail['est. compliance'] || t('N/A')}</strong> {t('compliance work')}
                     </span>
                   </div>
                 )}
 
-                {/* Action button */}
+                {/* Dynamic trigger button */}
                 <button
                   onClick={() => {
                     setSelectedId(item.id);
@@ -472,7 +465,7 @@ export default function DailyIntelligenceHub({
                       setSelectedId(item.id);
                     }
                   }}
-                  className="w-full py-2.5 rounded-lg text-base font-bold uppercase tracking-wider transition-all"
+                  className="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
                   style={{
                     background: item.opportunityScore >= 80 ? 'var(--color-red)' : 'var(--color-surface2)',
                     color: item.opportunityScore >= 80 ? 'white' : 'var(--color-text)',
@@ -481,7 +474,7 @@ export default function DailyIntelligenceHub({
                 >
                   {draftingBidId === item.id ? (
                     <span className="flex items-center justify-center gap-2">
-                      <Loader className="w-3.5 h-3.5 animate-spin" />
+                      <Loader className="w-3 h-3 animate-spin" />
                       {t('Generating...')}
                     </span>
                   ) : t(item.actionLabel)}
@@ -491,23 +484,23 @@ export default function DailyIntelligenceHub({
           })}
         </div>
 
-        {/* ─── AI Proposal Side Panel ─────────────────────────── */}
+        {/* Dynamic proposal text panel (desktop viewport slider) */}
         {showAIPanel && aiDraft && (
           <div
-            className="lg:w-1/2 border-t lg:border-t-0 lg:border-l overflow-y-auto max-h-[600px]"
+            className="lg:w-1/2 border-t lg:border-t-0 lg:border-l overflow-y-auto max-h-[600px] bg-slate-900/60"
             style={{ borderColor: 'var(--color-border)' }}
           >
             <div className="p-5">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-base font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'var(--color-red)' }}>
+                <span className="text-sm font-black uppercase tracking-widest flex items-center gap-1.5 text-red-500">
                   <Sparkles className="w-3.5 h-3.5 animate-spin" />
                   {t('AI Proposal Draft')}
                 </span>
                 <button
                   onClick={() => { setShowAIPanel(false); setAiDraft(null); }}
-                  className="p-1 rounded hover:bg-surface2 transition-colors"
+                  className="p-1 rounded hover:bg-slate-800 transition-colors"
                 >
-                  <X className="w-4 h-4" style={{ color: 'var(--color-muted)' }} />
+                  <X className="w-4 h-4 text-slate-400" />
                 </button>
               </div>
 
@@ -515,25 +508,20 @@ export default function DailyIntelligenceHub({
                 <button
                   onClick={() => {
                     if (!aiDraft) return;
-                    const ta = document.createElement('textarea');
-                    ta.value = aiDraft;
-                    document.body.appendChild(ta);
-                    ta.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(ta);
+                    navigator.clipboard.writeText(aiDraft);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="px-3 py-1.5 rounded text-[15px] font-bold uppercase tracking-wider transition-colors"
-                  style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
+                  className="px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider transition-colors bg-slate-800 text-white hover:bg-slate-750"
+                  style={{ border: '1px solid var(--color-border)' }}
                 >
-                  {copied ? <><Check className="w-3 h-3 inline mr-1" />{t('Copied')}</> : <><Copy className="w-3 h-3 inline mr-1" />{t('Copy Draft')}</>}
+                  {copied ? <><Check className="w-3.5 h-3.5 inline mr-1 text-emerald-400" />{t('Copied')}</> : <><Copy className="w-3.5 h-3.5 inline mr-1" />{t('Copy Draft')}</>}
                 </button>
               </div>
 
               <pre
-                className="text-base leading-relaxed whitespace-pre-wrap rounded-lg p-4 overflow-y-auto max-h-[400px] font-mono"
-                style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)', color: 'var(--color-muted)' }}
+                className="text-xs leading-relaxed whitespace-pre-wrap rounded-lg p-4 overflow-y-auto max-h-[400px] font-mono text-slate-300"
+                style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
               >
                 {aiDraft}
               </pre>
@@ -542,15 +530,15 @@ export default function DailyIntelligenceHub({
         )}
       </div>
 
-      {/* ─── Because you searched... ──────────────────────────── */}
+      {/* ─── Search Context Pill Badges ─────────────────────── */}
       {feed.length > 0 && (
         <div
           className="mx-5 mb-4 p-4 rounded-xl"
           style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
         >
-          <span className="text-[15px] font-black uppercase tracking-widest flex items-center gap-1.5 mb-2" style={{ color: 'var(--color-muted)' }}>
+          <span className="text-xs font-black uppercase tracking-widest flex items-center gap-1.5 mb-2 text-slate-400">
             <ArrowUpRight className="w-3 h-3" />
-            {t('Because you searched')} {vertical.replace(/_/g, ' ')}
+            {t('Because you searched')} "{vertical.replace(/_/g, ' ')}"
           </span>
           <div className="flex gap-3 flex-wrap">
             {(() => {
@@ -566,8 +554,8 @@ export default function DailyIntelligenceHub({
                 { label: t('regulations'), count: counts.regulations },
                 { label: t('facilities'), count: Math.max(1, Math.round(Math.random() * 2)) },
               ].filter(c => c.count > 0).map(c => (
-                <span key={c.label} className="text-base flex items-center gap-1" style={{ color: 'var(--color-text)' }}>
-                  <span className="font-bold" style={{ color: 'var(--color-red)' }}>+{c.count}</span>
+                <span key={c.label} className="text-xs flex items-center gap-1 text-slate-300">
+                  <span className="font-bold text-red-500">+{c.count}</span>
                   {c.label}
                 </span>
               ));
