@@ -6,10 +6,12 @@ export async function POST(_req: NextRequest) {
     const res = await supabaseFetch(
       "/rest/v1/regulatory_facilities?select=facility_name,city,county,permit_status,regulatory_status,vertical,confidence,imported_at&order=imported_at.desc&limit=5"
     );
-    if (!res.ok) throw new Error(`Supabase responded ${res.status}`);
-    const alerts = await res.json();
-    return NextResponse.json({ alerts: alerts || [] });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    if (res.ok) {
+      const alerts = await res.json();
+      return NextResponse.json({ alerts: alerts || [] });
+    }
+    return NextResponse.json({ alerts: [] });
+  } catch {
+    return NextResponse.json({ alerts: [] });
   }
 }

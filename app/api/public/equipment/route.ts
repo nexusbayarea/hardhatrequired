@@ -6,7 +6,7 @@ export async function POST(_req: NextRequest) {
     const res = await supabaseFetch(
       '/rest/v1/deep_profiles?select=company_name,city,state,equipment,updated_at&order=updated_at.desc&limit=20'
     );
-    if (!res.ok) throw new Error(`Supabase responded ${res.status}`);
+    if (!res.ok) return NextResponse.json({ featured: [] });
     const rows = await res.json();
 
     const featured = (rows || [])
@@ -25,7 +25,7 @@ export async function POST(_req: NextRequest) {
       });
 
     return NextResponse.json({ featured });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ featured: [] });
   }
 }

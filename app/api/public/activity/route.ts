@@ -61,7 +61,7 @@ export async function POST(_req: NextRequest) {
     });
 
     return NextResponse.json({ items: items.slice(0, 8) });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ items: [] });
   }
 }
