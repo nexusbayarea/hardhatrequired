@@ -51,8 +51,8 @@ export default function Topbar({ mobile = false }: TopbarProps) {
         >
           U
         </div>
-        <ThemeToggle />
         <LanguageToggle />
+        <ThemeToggle />
       </div>
     );
   }
