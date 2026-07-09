@@ -20,6 +20,16 @@ export class PageAgent {
     this.config = config;
   }
 
+  setActionHandler(handler: (action: PageAction) => Promise<void>): void {
+    this.configure({
+      onStoreAction: async (actions) => {
+        for (const action of actions) {
+          await handler(action);
+        }
+      },
+    });
+  }
+
   async execute(actions: PageAction[]): Promise<void> {
     if (!this.config) {
       console.warn('[PageAgent] not configured');
