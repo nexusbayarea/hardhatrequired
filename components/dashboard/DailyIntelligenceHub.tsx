@@ -42,9 +42,9 @@ function scoreNews(n: any): number {
 }
 
 function opportunityMeta(score: number): { color: string; bg: string } {
-  if (score >= 80) return { color: 'var(--color-green, #22c55e)', bg: 'color-mix(in srgb, var(--color-green, #22c55e) 15%, transparent)' };
-  if (score >= 60) return { color: 'var(--color-yellow, #eab308)', bg: 'color-mix(in srgb, var(--color-yellow, #eab308) 15%, transparent)' };
-  return { color: 'var(--color-muted, #94a3b8)', bg: 'var(--color-surface2, #334155)' };
+  if (score >= 80) return { color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)' };
+  if (score >= 60) return { color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)' };
+  return { color: '#94a3b8', bg: '#334155' };
 }
 
 const TYPE_META: Record<ItemType, { icon: any; labelKey: string; dot: string }> = {
@@ -57,29 +57,28 @@ const TYPE_META: Record<ItemType, { icon: any; labelKey: string; dot: string }> 
 };
 
 interface GraphNode {
-  label: string;
+  labelKey: string;
   count: string;
+  unitKey: string;
   icon: any;
 }
 
-const GRAPH_EXAMPLES: Record<string, GraphNode[]> = {
-  default: [
-    { label: 'Labor Needed', count: '4 operators', icon: Users },
-    { label: 'Equipment', count: '2 vacuum trucks', icon: Truck },
-    { label: 'Disposal Sites', count: '3 nearby', icon: MapPin },
-    { label: 'Permits Required', count: 'SWPPP, Traffic', icon: FileText },
-  ],
-};
+const GRAPH_EXAMPLES: GraphNode[] = [
+  { labelKey: 'Labor Needed', count: '4', unitKey: 'operators', icon: Users },
+  { labelKey: 'Equipment', count: '2', unitKey: 'vacuum trucks', icon: Truck },
+  { labelKey: 'Disposal Sites', count: '3', unitKey: 'nearby', icon: MapPin },
+  { labelKey: 'Permits Required', count: 'SWPPP, Traffic', unitKey: '', icon: FileText },
+];
 
 export default function DailyIntelligenceHub({
   vertical = 'slurry_processing', locationState = 'CA', landing,
 }: { vertical?: string; locationState?: string; landing?: boolean }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{ bids: any[]; news: any[]; compliance: any[] }>({ bids: [], news: [], compliance: [] });
 
-  const { translatedItems: translatedBids } = useTranslatableContent(data.bids.length > 0 ? data.bids : null, ['title', 'agency']);
-  const { translatedItems: translatedCompliance } = useTranslatableContent(data.compliance.length > 0 ? data.compliance : null, ['title', 'authority']);
+  const { translatedItems: translatedBids } = useTranslatableContent(data.bids.length > 0 ? data.bids : null, ['title', 'agency', 'description']);
+  const { translatedItems: translatedCompliance } = useTranslatableContent(data.compliance.length > 0 ? data.compliance : null, ['title', 'authority', 'penaltyRisk']);
   const { translatedItems: translatedNews } = useTranslatableContent(data.news.length > 0 ? data.news : null, ['title', 'source']);
   
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -95,7 +94,11 @@ export default function DailyIntelligenceHub({
     setLoading(true);
     fetch('/api/intelligence', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-iie-client-context': vertical },
+      headers: { 
+        'Content-Type': 'application/json', 
+        'x-iie-client-context': vertical,
+        'Accept-Language': language
+      },
       body: JSON.stringify({ state: locationState }),
     })
       .then(r => r.ok ? r.json() : null)
@@ -119,7 +122,6 @@ export default function DailyIntelligenceHub({
     const items: FeedItem[] = [];
 
     (sourceBids || []).forEach((b: any) => {
-      // Normalize estimated value and date structures
       const valEst = b.estimated_value ? `$${Number(b.estimated_value).toLocaleString()}` : (b.valueEstimate || 'TBD');
       const deadline = b.due_at || b.deadline || '';
       const difficulty = b.difficulty || (b.estimated_value && Number(b.estimated_value) > 100000 ? 'Complex' : 'Easy');
@@ -135,7 +137,7 @@ export default function DailyIntelligenceHub({
         sourceData: { ...b, valueEstimate: valEst, deadline, difficulty },
         detail: {
           value: valEst,
-          deadline: deadline ? new Date(deadline).toLocaleDateString() : t('TBD'),
+          deadline: deadline ? new Date(deadline).toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US') : t('TBD'),
           ...(b.id ? { id: String(b.id) } : {}),
         },
       });
@@ -155,9 +157,9 @@ export default function DailyIntelligenceHub({
         detail: {
           penalty: c.penaltyRisk || 'TBD',
           effective: c.effectiveDate || '',
-          impacted: `${Math.round(150 + Math.random() * 150)} contractors`,
+          impacted: `${Math.round(150 + Math.random() * 150)} ${t('contractors')}`,
           'avg penalty': penaltyNum > 0 ? `$${penaltyNum.toLocaleString()}` : 'TBD',
-          'est. compliance': `${Math.round(4 + Math.random() * 16)} hours`,
+          'est. compliance': `${Math.round(4 + Math.random() * 16)} ${t('hours')}`,
         },
       });
     });
@@ -169,11 +171,11 @@ export default function DailyIntelligenceHub({
         title: n.title,
         subtitle: n.source,
         opportunityScore: scoreNews(n),
-        badge: `${n.impact} ${t('Impact')}`,
+        badge: n.impact === 'High' ? t('High Impact') : n.impact === 'Medium' ? t('Medium Impact') : t('Low Impact'),
         actionLabel: t('View Details →'),
         sourceData: n,
         detail: {
-          impact: n.impact,
+          impact: t(n.impact),
           published: n.publishedAt || '',
         },
       });
@@ -181,9 +183,7 @@ export default function DailyIntelligenceHub({
 
     items.sort((a, b) => b.opportunityScore - a.opportunityScore);
     return items;
-  }, [data, sourceBids, sourceCompliance, sourceNews, t]);
-
-  const filtered = typeFilter === 'all' ? feed : feed.filter(f => f.type === typeFilter);
+  }, [data, sourceBids, sourceCompliance, sourceNews, t, language]);
 
   const todaySummary = useMemo(() => {
     const byType: Record<string, number> = {};
@@ -195,12 +195,20 @@ export default function DailyIntelligenceHub({
     ];
   }, [feed]);
 
+  const filtered = useMemo(() => {
+    if (typeFilter === 'all') return feed;
+    return feed.filter(f => f.type === typeFilter);
+  }, [feed, typeFilter]);
+
   const handleGenerateProposal = async (item: FeedItem) => {
     const bid = item.sourceData;
     setDraftingBidId(item.id);
     setAiDraft(null);
     setShowAIPanel(true);
     setSelectedId(item.id);
+    
+    const targetLangLabel = language === 'zh' ? 'Simplified Chinese (简体中文)' : 'English';
+
     try {
       const res = await fetch('/api/ai/chat/completions', {
         method: 'POST',
@@ -208,8 +216,14 @@ export default function DailyIntelligenceHub({
         body: JSON.stringify({
           model: 'meta/llama-3.1-8b-instruct',
           messages: [
-            { role: 'system', content: `You are a professional bid proposal writer for a ${vertical.replace(/_/g, ' ')} contractor. Write a concise, persuasive bid response letter. Return only the letter text, no markdown wrappers.` },
-            { role: 'user', content: `Write a bid proposal response for this opportunity:\nTitle: ${bid.title}\nAgency: ${bid.agency || t('Public Works')}\nValue: ${bid.valueEstimate}\nDeadline: ${bid.deadline}\nDifficulty: ${bid.difficulty}\nDescription: ${bid.description || 'General industrial service contract'}\n\nInclude: introduction, three reasons we are uniquely positioned, and a call to discuss next steps. Sign as "HHR Partner".` },
+            { 
+              role: 'system', 
+              content: `You are a professional bid proposal writer for a ${vertical.replace(/_/g, ' ')} contractor. Write a concise, highly persuasive bid response letter. IMPORTANT: Write the entire response in ${targetLangLabel}. Return only the letter text, no markdown wrappers, no notes.` 
+            },
+            { 
+              role: 'user', 
+              content: `Write a bid proposal response in ${targetLangLabel} for this opportunity:\nTitle: ${bid.title}\nAgency: ${bid.agency || t('Public Works')}\nValue: ${bid.valueEstimate}\nDeadline: ${bid.deadline}\nDifficulty: ${bid.difficulty}\nDescription: ${bid.description || 'General industrial service contract'}\n\nInclude: introduction, three reasons we are uniquely positioned, and a call to discuss next steps. Sign as "HHR Partner".` 
+            },
           ],
           temperature: 0.3,
           max_tokens: 1024,
@@ -217,9 +231,9 @@ export default function DailyIntelligenceHub({
       });
       if (!res.ok) throw new Error('Failed');
       const json = await res.json();
-      setAiDraft(json.choices?.[0]?.message?.content || 'No proposal generated.');
+      setAiDraft(json.choices?.[0]?.message?.content || t('No proposal generated.'));
     } catch {
-      setAiDraft('Failed to generate proposal. Please try again.');
+      setAiDraft(t('Failed to generate proposal. Please try again.'));
     } finally {
       setDraftingBidId(null);
     }
@@ -232,7 +246,7 @@ export default function DailyIntelligenceHub({
         style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
       >
         <Loader className="w-8 h-8 animate-spin mb-3 text-red-500" />
-        <p className="text-lg font-medium" style={{ color: 'var(--color-muted)' }}>{t('Scanning regional public bids & compliance updates...')}</p>
+        <p className="text-lg font-medium text-center" style={{ color: 'var(--color-muted)' }}>{t('Scanning regional public bids & compliance updates...')}</p>
       </div>
     );
   }
@@ -304,7 +318,7 @@ export default function DailyIntelligenceHub({
       {feed.length > 0 && (
         <div
           className="mx-5 mt-4 p-4 rounded-xl cursor-pointer transition-colors"
-          style={{ background: 'color-mix(in srgb, var(--color-red, #ef4444) 6%, var(--color-surface2))', border: '1px solid color-mix(in srgb, var(--color-red, #ef4444) 20%, var(--color-border))' }}
+          style={{ background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.2)' }}
           onClick={() => setBriefingExpanded(v => !v)}
         >
           <div className="flex items-start gap-3">
@@ -340,10 +354,10 @@ export default function DailyIntelligenceHub({
       {/* ─── Double Column Layout ────────────────────────────── */}
       <div className="flex flex-col lg:flex-row">
         {/* Infinite Scroller Feed List */}
-        <div className={`${showAIPanel && aiDraft ? 'lg:w-1/2' : 'lg:w-full'} divide-y max-h-[600px] overflow-y-auto`} style={{ borderColor: 'var(--color-border)' }}>
+        <div className={`${showAIPanel && aiDraft ? 'lg:w-1/2' : 'lg:w-full'} divide-y max-h-[600px] overflow-y-auto w-full`} style={{ borderColor: 'var(--color-border)' }}>
           {filtered.length === 0 ? (
             <div className="p-8 text-center text-slate-400">
-              No {typeFilter !== 'all' ? t(TYPE_META[typeFilter].labelKey).toLowerCase() : ''} {t('items found.')}
+              {t('No')} {typeFilter !== 'all' ? t(TYPE_META[typeFilter].labelKey).toLowerCase() : ''} {t('items found.')}
             </div>
           ) : filtered.map(item => {
             const meta = TYPE_META[item.type];
@@ -356,15 +370,15 @@ export default function DailyIntelligenceHub({
                 key={item.id}
                 className={`p-5 transition-all ${landing ? 'landing-result' : ''} border-b border-slate-800/60`}
                 style={{
-                  background: isSelected ? 'color-mix(in srgb, var(--color-red, #ef4444) 4%, var(--color-surface))' : 'transparent',
-                  borderLeft: isSelected ? '3px solid var(--color-red, #ef4444)' : '3px solid transparent',
+                  background: isSelected ? 'rgba(239, 68, 68, 0.04)' : 'transparent',
+                  borderLeft: isSelected ? '3px solid #ef4444' : '3px solid transparent',
                 }}
               >
                 {/* Visual Label Column */}
                 <div className="flex items-start gap-3 mb-3">
                   <div
                     className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ background: 'color-mix(in srgb, var(--color-red, #ef4444) 10%, var(--color-surface2))' }}
+                    style={{ background: 'rgba(239, 68, 68, 0.1)' }}
                   >
                     <Icon className="w-4.5 h-4.5" style={{ color: meta.dot }} />
                   </div>
@@ -375,12 +389,12 @@ export default function DailyIntelligenceHub({
                         {t(meta.labelKey)}
                       </span>
                       {item.opportunityScore >= 80 && (
-                        <span className="text-[11px] font-bold px-1.5 py-0.5 rounded" style={{ background: opp.bg, color: opp.color }}>
+                        <span className="text-[11px] font-bold px-1.5 py-0.5 rounded animate-pulse" style={{ background: opp.bg, color: opp.color }}>
                           🔥 {t('High Value')}
                         </span>
                       )}
                     </div>
-                    <h3 className="text-base font-bold text-white">
+                    <h3 className="text-base font-bold text-white leading-snug">
                       {item.title}
                     </h3>
                     <span className="text-xs text-slate-400">
@@ -413,8 +427,8 @@ export default function DailyIntelligenceHub({
                       className="px-2.5 py-1.5 rounded text-xs"
                       style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
                     >
-                      <span className="block font-bold capitalize text-slate-100">{val}</span>
-                      <span className="block text-[10px] text-slate-400 mt-0.5">{key}</span>
+                      <span className="block font-bold text-slate-100">{val}</span>
+                      <span className="block text-[10px] text-slate-400 mt-0.5 capitalize">{t(key)}</span>
                     </div>
                   ))}
                 </div>
@@ -426,12 +440,14 @@ export default function DailyIntelligenceHub({
                     style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
                   >
                     <Network className="w-4 h-4 shrink-0 text-red-500" />
-                    {GRAPH_EXAMPLES.default.map((g, i) => (
-                      <div key={g.label} className="flex items-center gap-1.5 text-xs">
+                    {GRAPH_EXAMPLES.map((g, i) => (
+                      <div key={g.labelKey} className="flex items-center gap-1.5 text-xs">
                         <g.icon className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-slate-400">{g.label}:</span>
-                        <span className="font-semibold text-slate-200">{g.count}</span>
-                        {i < GRAPH_EXAMPLES.default.length - 1 && (
+                        <span className="text-slate-400">{t(g.labelKey)}:</span>
+                        <span className="font-semibold text-slate-200">
+                          {g.count} {g.unitKey ? t(g.unitKey) : ''}
+                        </span>
+                        {i < GRAPH_EXAMPLES.length - 1 && (
                           <span className="text-slate-600 mx-1">→</span>
                         )}
                       </div>
@@ -439,11 +455,11 @@ export default function DailyIntelligenceHub({
                   </div>
                 )}
 
-                {/* Specific regulatory compliance indicators */}
+                {/* Regulatory compliance indicators */}
                 {item.type === 'compliance' && (
                   <div
                     className="mb-3 p-3 rounded-lg flex items-center gap-3 flex-wrap"
-                    style={{ background: 'color-mix(in srgb, var(--color-red, #ef4444) 6%, var(--color-surface2))', border: '1px solid color-mix(in srgb, var(--color-red, #ef4444) 15%, var(--color-border))' }}
+                    style={{ background: 'rgba(239, 68, 68, 0.04)', border: '1px solid rgba(239, 68, 68, 0.1)' }}
                   >
                     <DollarSign className="w-4 h-4 shrink-0 text-red-500" />
                     <span className="text-xs text-slate-400">
@@ -467,7 +483,7 @@ export default function DailyIntelligenceHub({
                   }}
                   className="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
                   style={{
-                    background: item.opportunityScore >= 80 ? 'var(--color-red)' : 'var(--color-surface2)',
+                    background: item.opportunityScore >= 80 ? 'var(--color-red, #ef4444)' : 'var(--color-surface2)',
                     color: item.opportunityScore >= 80 ? 'white' : 'var(--color-text)',
                     border: item.opportunityScore >= 80 ? 'none' : '1px solid var(--color-border)',
                   }}
@@ -487,7 +503,7 @@ export default function DailyIntelligenceHub({
         {/* Dynamic proposal text panel (desktop viewport slider) */}
         {showAIPanel && aiDraft && (
           <div
-            className="lg:w-1/2 border-t lg:border-t-0 lg:border-l overflow-y-auto max-h-[600px] bg-slate-900/60"
+            className="lg:w-1/2 border-t lg:border-t-0 lg:border-l overflow-y-auto max-h-[600px] bg-slate-900/60 w-full"
             style={{ borderColor: 'var(--color-border)' }}
           >
             <div className="p-5">
@@ -538,7 +554,7 @@ export default function DailyIntelligenceHub({
         >
           <span className="text-xs font-black uppercase tracking-widest flex items-center gap-1.5 mb-2 text-slate-400">
             <ArrowUpRight className="w-3 h-3" />
-            {t('Because you searched')} "{vertical.replace(/_/g, ' ')}"
+            {t('Because you searched')} "{t(vertical.replace(/_/g, ' '))}"
           </span>
           <div className="flex gap-3 flex-wrap">
             {(() => {
