@@ -28,7 +28,7 @@ export default function Sidebar({ slim = false }: SidebarProps) {
   const router = useRouter();
   const { t } = useLanguage();
   const { workspace, setWorkspace } = useWorkspace();
-  const { projects, activeProjectId, setActiveProject, createProject } = useProject();
+  const { projects, activeProjectId, activeProject, setActiveProject, createProject } = useProject();
   const [showNewModal, setShowNewModal] = useState(false);
 
   const [planTier, setPlanTier] = useState('Growth');
