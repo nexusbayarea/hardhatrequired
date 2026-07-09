@@ -8,7 +8,7 @@ interface LocalizedString {
   zh: string;
 }
 
-interface MockCompliance {
+interface ComplianceEntry {
   id: string;
   title: LocalizedString;
   authority: LocalizedString;
@@ -16,7 +16,7 @@ interface MockCompliance {
   effectiveDate: string;
 }
 
-interface MockNews {
+interface NewsEntry {
   id: string;
   title: LocalizedString;
   source: LocalizedString;
@@ -24,7 +24,7 @@ interface MockNews {
   publishedAt: string;
 }
 
-const VERTICAL_DATA: Record<string, { compliance: MockCompliance[]; news: MockNews[] }> = {
+const VERTICAL_DATA: Record<string, { compliance: ComplianceEntry[]; news: NewsEntry[] }> = {
   slurry_processing: {
     compliance: [
       {

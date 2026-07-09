@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { LayoutDashboard, Search, TrendingUp, Layers, Settings } from 'lucide-react';
+import { LayoutDashboard, Search, TrendingUp, Layers, Phone, Settings } from 'lucide-react';
 
 const items = [
   { icon: LayoutDashboard, label: 'overview', href: '/dashboard' },
   { icon: Search,          label: 'search',   href: '/dashboard/search' },
   { icon: TrendingUp,      label: 'markets',  href: '/dashboard/markets' },
   { icon: Layers,          label: 'campaigns',href: '/dashboard/campaigns' },
+  { icon: Phone,           label: 'outreach', href: '/dashboard/outreach' },
   { icon: Settings,        label: 'settings', href: '/dashboard/settings' },
 ];
 

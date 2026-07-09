@@ -3,12 +3,14 @@
 import { useEffect } from 'react';
 import { pageAgent } from '@/lib/page-agent';
 import { frontendOrchestrator } from '@/lib/api/orchestrator/FrontendOrchestrator';
-import { eventBus } from '@/lib/api/orchestrator/eventBus';
-import { resultsStore } from '@/stores/results.store';
-import { searchStore } from '@/stores/search.store';
+import { hhrManifest, registerProduct } from '@iie/product-manifests';
+import { registerHHRWorkspaces } from '@/lib/workspace-registry';
 
 export function AppInit() {
   useEffect(() => {
+    registerProduct(hhrManifest);
+    registerHHRWorkspaces();
+
     pageAgent.setActionHandler(async (action) => {
       await frontendOrchestrator.executePageActions([action]);
     });

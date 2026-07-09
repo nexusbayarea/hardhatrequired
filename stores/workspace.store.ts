@@ -1,29 +1,11 @@
-import { createStore, useStore } from './index';
+import { createStore } from './index';
 
-export type WorkspaceId =
-  | 'command-center'
-  | 'search'
-  | 'logistics'
-  | 'equipment'
-  | 'bids'
-  | 'market'
-  | 'saved-searches'
-  | 'saved-vendors'
-  | 'projects'
-  | 'settings';
-
-interface WorkspaceState {
-  active: WorkspaceId;
+export interface WorkspaceState {
+  active: string;
+  previous: string | null;
 }
 
-export const workspaceStore = createStore<WorkspaceState>({
-  active: 'command-center',
-});
+const saved = typeof window !== 'undefined' ? localStorage.getItem('hhr-workspace') : null;
+const initialActive = saved || 'search';
 
-export function useWorkspace() {
-  const active = useStore(workspaceStore, s => s.active);
-  return {
-    active,
-    setWorkspace: (id: WorkspaceId) => workspaceStore.setState({ active: id }),
-  };
-}
+export const workspaceStore = createStore<WorkspaceState>({ active: initialActive, previous: null });

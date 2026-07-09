@@ -1,20 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getVerticalConfigByDomain } from '@/lib/market/registry';
 import { supabaseFetch } from '@/lib/db';
-
-declare global {
-  var __savedSearches: Array<{
-    id: string;
-    organization_id: string;
-    vertical_id: string;
-    name: string;
-    zip_code: string;
-    radius_miles: number;
-    result_count: number;
-    created_at: string;
-  }>;
-}
-globalThis.__savedSearches ??= [];
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,15 +25,20 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === 'list') {
-      const tenantSearches = globalThis.__savedSearches
-        .filter((s) => s.vertical_id === verticalConfig.id)
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      const res = await supabaseFetch(
+        `/rest/v1/searches?vertical_id=eq.${encodeURIComponent(verticalConfig.id)}&order=created_at.desc`
+      );
 
+      if (!res.ok) {
+        return NextResponse.json({ success: true, vertical: verticalConfig.id, count: 0, searches: [] });
+      }
+
+      const data = await res.json();
       return NextResponse.json({
         success: true,
         vertical: verticalConfig.id,
-        count: tenantSearches.length,
-        searches: tenantSearches.map((row) => ({
+        count: data.length,
+        searches: (data || []).map((row: any) => ({
           id: row.id,
           organizationId: row.organization_id,
           verticalId: row.vertical_id,
@@ -67,43 +59,31 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const record = {
-        id: `search-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        organization_id: verticalConfig.id,
-        vertical_id: verticalConfig.id,
-        name,
-        zip_code: zip,
-        radius_miles: Number(radius),
-        result_count: Number(resultCount || 0),
-        created_at: new Date().toISOString()
-      };
+      const res = await supabaseFetch('/rest/v1/searches', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          organization_id: verticalConfig.id,
+          vertical_id: verticalConfig.id,
+          name,
+          zip_code: zip,
+          radius_miles: Number(radius),
+          result_count: Number(resultCount || 0)
+        })
+      });
 
-      let persisted = false;
-      try {
-        const res = await supabaseFetch('/rest/v1/searches', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Prefer': 'return=representation'
-          },
-          body: JSON.stringify({
-            organization_id: record.organization_id,
-            vertical_id: record.vertical_id,
-            name: record.name,
-            zip_code: record.zip_code,
-            radius_miles: record.radius_miles,
-            result_count: record.result_count,
-            created_at: record.created_at
-          })
-        });
-        persisted = res.ok;
-      } catch {
-        persisted = false;
+      if (!res.ok) {
+        return NextResponse.json(
+          { error: 'Failed to persist search to database.' },
+          { status: 500 }
+        );
       }
 
-      if (!persisted) {
-        globalThis.__savedSearches.push(record);
-      }
+      const data = await res.json();
+      const record = data[0];
 
       return NextResponse.json({
         success: true,
@@ -130,17 +110,16 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      globalThis.__savedSearches = globalThis.__savedSearches.filter(
-        (s) => s.id !== id
+      const res = await supabaseFetch(
+        `/rest/v1/searches?id=eq.${encodeURIComponent(id)}`,
+        { method: 'DELETE' }
       );
 
-      try {
-        await supabaseFetch(
-          `/rest/v1/searches?id=eq.${encodeURIComponent(id)}`,
-          { method: 'DELETE' }
+      if (!res.ok) {
+        return NextResponse.json(
+          { error: 'Failed to delete search from database.' },
+          { status: 500 }
         );
-      } catch {
-        // In-memory fallback already handled above
       }
 
       return NextResponse.json({ success: true, message: 'Search deleted.' });
@@ -151,7 +130,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   } catch (err: any) {
-    console.error("Save Search Internal Error:", err);
+    logger.error('Saved searches route error', { route: 'saved-searches', error: String(err) });
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

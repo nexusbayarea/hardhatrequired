@@ -25,6 +25,36 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@iie/sdk": [
+        "./packages/sdk/src"
+      ],
+      "@iie/sdk/*": [
+        "./packages/sdk/src/*"
+      ],
+      "@iie/layout-engine": [
+        "./packages/layout-engine/src"
+      ],
+      "@iie/layout-engine/*": [
+        "./packages/layout-engine/src/*"
+      ],
+      "@iie/product-manifests": [
+        "./packages/product-manifests/src"
+      ],
+      "@iie/product-manifests/*": [
+        "./packages/product-manifests/src/*"
+      ],
+      "@iie/mobile-runtime": [
+        "./packages/mobile-runtime/src"
+      ],
+      "@iie/mobile-runtime/*": [
+        "./packages/mobile-runtime/src/*"
+      ],
+      "@iie/hhr": [
+        "./packages/hhr/src"
+      ],
+      "@iie/hhr/*": [
+        "./packages/hhr/src/*"
       ]
     }
   },

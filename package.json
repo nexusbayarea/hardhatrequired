@@ -1,14 +1,19 @@
 {
-  "name": "index-intelligence-engine",
+  "name": "iie-platform",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "infisical run --env=dev -- next dev",
     "dev:next": "next dev",
     "build": "next build",
     "build:local": "infisical run --env=prod -- next build",
+    "build:packages": "turbo run build",
     "start": "next start",
     "lint": "eslint",
+    "lint:packages": "turbo run lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -53,6 +58,7 @@
     "playwright": "^1.58.2",
     "storybook": "^10.2.12",
     "tailwindcss": "^4",
+    "turbo": "^2.5.0",
     "typescript": "^5",
     "vite": "^7.3.1",
     "vitest": "^4.0.18"

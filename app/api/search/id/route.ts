@@ -5,17 +5,6 @@ import { logger } from '@/lib/logger';
 import { supabaseFetch } from '@/lib/db';
 import { z } from 'zod';
 
-interface SavedSearchRecord {
-  id: string;
-  organization_id: string;
-  vertical_slug: string;
-  filters: Record<string, unknown>;
-  result_count: number;
-  created_at: string;
-}
-
-const inMemoryFallback: SavedSearchRecord[] = [];
-
 export async function POST(req: NextRequest) {
   try {
     const tenant = await resolveTenant(req);
@@ -29,22 +18,15 @@ export async function POST(req: NextRequest) {
 
     const { id } = parsed.data!;
 
-    let row: SavedSearchRecord | undefined;
-
-    try {
-      const res = await supabaseFetch(`/rest/v1/saved_searches?id=eq.${id}`);
-      if (res.ok) {
-        const data: SavedSearchRecord[] = await res.json();
-        row = data[0];
-      }
-    } catch {
+    const res = await supabaseFetch(`/rest/v1/saved_searches?id=eq.${id}`);
+    if (!res.ok) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
+    const data = await res.json();
+    const row = data[0];
     if (!row) {
-      row = inMemoryFallback.find(s => s.id === id);
-      if (!row) {
-        return NextResponse.json({ error: 'Not found' }, { status: 404 });
-      }
+      return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
     return NextResponse.json({

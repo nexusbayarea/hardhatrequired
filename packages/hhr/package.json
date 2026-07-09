@@ -1,0 +1,13 @@
+{
+  "name": "@iie/hhr",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@iie/sdk": "*",
+    "@iie/layout-engine": "*",
+    "@iie/product-manifests": "*"
+  }
+}

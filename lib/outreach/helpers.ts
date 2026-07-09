@@ -1,8 +1,6 @@
 import { logger } from '@/lib/logger';
 import { supabaseRpc, supabaseFetch } from '@/lib/db';
 
-const inMemoryLogs: any[] = [];
-
 export async function logOutreach(params: {
   organizationId: string;
   companyId: string;
@@ -11,12 +9,6 @@ export async function logOutreach(params: {
   outcome: string;
   notes?: string;
 }): Promise<any> {
-  const entry = {
-    id: `outreach-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    ...params,
-    createdAt: new Date().toISOString()
-  };
-
   try {
     const res = await supabaseRpc('log_outreach_interaction', {
       p_org_id: params.organizationId,
@@ -27,16 +19,16 @@ export async function logOutreach(params: {
       p_notes: params.notes || null
     });
 
-    if (res.ok) {
-      const data = await res.json();
-      return data;
+    if (!res.ok) {
+      logger.error('Outreach log DB failed', { route: 'outreach/helpers', data: { status: res.status } });
+      return null;
     }
+
+    return await res.json();
   } catch (err) {
     logger.error('Outreach log DB failed', { route: 'outreach/helpers', error: String(err) });
+    return null;
   }
-
-  inMemoryLogs.unshift(entry);
-  return entry;
 }
 
 export async function getCompanyOutreach(companyId: string): Promise<any[]> {
@@ -44,12 +36,11 @@ export async function getCompanyOutreach(companyId: string): Promise<any[]> {
     const res = await supabaseFetch(
       `/rest/v1/outreach_logs?company_id=eq.${companyId}&order=created_at.desc`
     );
-    if (res.ok) {
-      return await res.json();
-    }
+    if (!res.ok) return [];
+
+    return await res.json();
   } catch (err) {
     logger.error('Outreach get DB failed', { route: 'outreach/helpers', error: String(err) });
+    return [];
   }
-
-  return inMemoryLogs.filter(l => l.companyId === companyId);
 }

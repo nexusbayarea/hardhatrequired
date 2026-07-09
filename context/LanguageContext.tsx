@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { setDictionary } from '@iie/sdk';
 
 type Language = 'en' | 'es' | 'zh' | 'vi';
 
@@ -500,6 +501,8 @@ const esDictionary: Record<string, string> = {
   '© 2026 hard hat required. all rights reserved.': '© 2026 Hard Hat Required. Todos los derechos reservados.',
 };
 
+setDictionary('es', esDictionary);
+
 const zhDictionary: Record<string, string> = {
   'english': '英语',
   'español': '西班牙语',
@@ -857,6 +860,8 @@ const zhDictionary: Record<string, string> = {
   '© 2026 hard hat required. all rights reserved.': '© 2026 Hard Hat Required. 保留所有权利。',
 };
 
+setDictionary('zh', zhDictionary);
+
 const viDictionary: Record<string, string> = {
   'english': 'Tiếng Anh',
   'español': 'Tiếng Tây Ban Nha',
@@ -1213,6 +1218,8 @@ const viDictionary: Record<string, string> = {
   // ─── Miscellaneous ───
   '© 2026 hard hat required. all rights reserved.': '© 2026 Hard Hat Required. Mọi quyền được bảo lưu.',
 };
+
+setDictionary('vi', viDictionary);
 
 const getStaticDict = (lang: Language): Record<string, string> => {
   switch (lang) {

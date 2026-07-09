@@ -1,0 +1,45 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+
+export type Listener = () => void;
+
+export interface Store<T> {
+  getState: () => T;
+  setState: (partial: Partial<T>) => void;
+  subscribe: (listener: Listener) => () => void;
+  reset: () => void;
+}
+
+export function createStore<T extends Record<string, any>>(initial: T): Store<T> {
+  let state = { ...initial };
+  const listeners = new Set<Listener>();
+
+  return {
+    getState: () => state,
+    setState: (partial: Partial<T>) => {
+      state = { ...state, ...partial };
+      listeners.forEach(l => l());
+    },
+    subscribe: (listener: Listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    reset: () => {
+      state = { ...initial };
+      listeners.forEach(l => l());
+    },
+  };
+}
+
+export function useStore<T, S>(store: Store<T>, selector: (state: T) => S): S {
+  const [snapshot, setSnapshot] = useState(() => selector(store.getState()));
+  useEffect(() => {
+    const unsub = store.subscribe(() => setSnapshot(selector(store.getState())));
+    return unsub;
+  }, [store, selector]);
+  return snapshot;
+}
+
+export { createWorkspaceStore } from './workspace.store';
+export type { WorkspaceState } from './workspace.store';
