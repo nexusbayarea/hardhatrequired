@@ -24,7 +24,7 @@ export default function RootLayout({
         {/* Blocking theme init — prevents flash of wrong theme */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('iie-theme');if(t==='day'||t==='night'){document.documentElement.setAttribute('data-theme',t);}else{document.documentElement.setAttribute('data-theme','night');}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('iie-theme');if(t==='day'||t==='night'){document.documentElement.setAttribute('data-theme',t);}else{document.documentElement.setAttribute('data-theme','day');}}catch(e){}})();`,
           }}
         />
       </head>

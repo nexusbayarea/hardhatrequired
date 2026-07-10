@@ -3,8 +3,8 @@ export type Theme = 'day' | 'night';
 const THEME_KEY = 'iie-theme';
 
 export function getStoredTheme(): Theme {
-  if (typeof window === 'undefined') return 'night';
-  return (localStorage.getItem(THEME_KEY) as Theme) || 'night';
+  if (typeof window === 'undefined') return 'day';
+  return (localStorage.getItem(THEME_KEY) as Theme) || 'day';
 }
 
 export function setStoredTheme(theme: Theme): void {
@@ -20,7 +20,7 @@ export function applyTheme(theme: Theme): void {
 }
 
 export function getPreferredTheme(): Theme {
-  if (typeof window === 'undefined') return 'night';
+  if (typeof window === 'undefined') return 'day';
   const stored = getStoredTheme();
   if (stored) return stored;
   return window.matchMedia('(prefers-color-scheme: light)').matches ? 'day' : 'night';

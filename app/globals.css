@@ -1,11 +1,31 @@
 @import "tailwindcss";
 
 /* ──────────────────────────────────────────────
-   NIGHT MODE TOKENS (default — dark, field-use)
+   DAY MODE TOKENS (default — bright, outdoor use)
+   High contrast: near-black on white
    ────────────────────────────────────────────── */
 :root,
-html[data-theme="night"],
+html[data-theme="day"],
 html:not([data-theme]) {
+  --color-bg:        #F7F7F8;
+  --color-surface:   #FFFFFF;
+  --color-surface2:  #EDEDEF;
+  --color-border:    #D1D1D6;
+  --color-text:      #0A0A0E;
+  --color-muted:     #4A4A55;
+  --color-red:       #fdb813;
+  --color-green:     #15803D;
+  --color-yellow:    #B45309;
+  --color-accent:    #fdb813;
+  --color-indigo:    #4F46E5;
+  --shadow-card:     0 0 0 1px rgba(0,0,0,0.08);
+  --shadow-glow:     0 0 60px rgba(255,206,68,0.08);
+}
+
+/* ──────────────────────────────────────────────
+   NIGHT MODE TOKENS (dark / field-use)
+   ────────────────────────────────────────────── */
+html[data-theme="night"] {
   --color-bg:        #08080A;
   --color-surface:   #0F0F12;
   --color-surface2:  #16161A;
@@ -20,26 +40,6 @@ html:not([data-theme]) {
   --shadow-card:     0 0 0 1px rgba(255,255,255,0.04);
   --shadow-glow:     0 0 60px rgba(255,206,68,0.12);
   --color-indigo:    #6366F1;
-}
-
-/* ──────────────────────────────────────────────
-   DAY MODE TOKENS (bright sun / outdoor use)
-   High contrast: near-black on white
-   ────────────────────────────────────────────── */
-html[data-theme="day"] {
-  --color-bg:        #F7F7F8;
-  --color-surface:   #FFFFFF;
-  --color-surface2:  #EDEDEF;
-  --color-border:    #D1D1D6;
-  --color-text:      #0A0A0E;
-  --color-muted:     #4A4A55;
-  --color-red:       #fdb813;
-  --color-green:     #15803D;
-  --color-yellow:    #B45309;
-  --color-accent:    #fdb813;
-  --color-indigo:    #4F46E5;
-  --shadow-card:     0 0 0 1px rgba(0,0,0,0.08);
-  --shadow-glow:     0 0 60px rgba(255,206,68,0.08);
 }
 
 /* ──────────────────────────────────────────────

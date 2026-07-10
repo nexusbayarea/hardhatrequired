@@ -10,17 +10,17 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: 'night',
+  theme: 'day',
   toggle: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('night');
+  const [theme, setTheme] = useState<Theme>('day');
 
   useEffect(() => {
     // Read from localStorage on mount
     const saved = localStorage.getItem('iie-theme') as Theme | null;
-    const initial: Theme = saved === 'day' ? 'day' : 'night';
+    const initial: Theme = saved === 'night' ? 'night' : 'day';
     setTheme(initial);
     document.documentElement.setAttribute('data-theme', initial);
   }, []);
