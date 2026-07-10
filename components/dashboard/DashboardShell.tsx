@@ -239,6 +239,10 @@ export default function DashboardShell() {
               onFeedback={handleFeedback}
             />
 
+            <div className="mt-6">
+              <LogisticsSnapshot />
+            </div>
+
             {searchState.data?.companies && searchState.data.companies.length > 0 && (
               <>
                 <LogisticsController
@@ -256,9 +260,6 @@ export default function DashboardShell() {
                   onFeedback={handleFeedback}
                   activePane={activePane}
                 />
-                <div className="mt-6">
-                  <LogisticsSnapshot />
-                </div>
               </>
             )}
           </>
