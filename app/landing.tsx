@@ -12,7 +12,6 @@ import ThemeToggle from '@/components/shared/ThemeToggle';
 import DailyIntelligenceHub from '@/components/dashboard/DailyIntelligenceHub';
 import LiveActivityTicker from '@/components/landing/LiveActivityTicker';
 import CoverageStatistics from '@/components/landing/CoverageStatistics';
-import LogisticsSnapshot from '@/components/landing/LogisticsSnapshot';
 import EquipmentStrip from '@/components/landing/EquipmentStrip';
 import LatestBidCard from '@/components/landing/LatestBidCard';
 import ComplianceAlertStrip from '@/components/landing/ComplianceAlertStrip';
@@ -380,15 +379,6 @@ function LandingInner() {
       </section>
 
       <div className="palantir-rule" />
-
-      <div className="h-16" />
-
-      {/* ───── LIVE LOGISTICS SNAPSHOT ───── */}
-      <LogisticsSnapshot />
-
-      <div className="palantir-rule" />
-
-      <div className="h-16" />
 
       {/* ───── HOW IT WORKS ───── */}
       <section id="how-it-works" className="py-24 md:py-36">

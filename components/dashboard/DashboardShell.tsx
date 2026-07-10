@@ -23,6 +23,7 @@ import EquipmentExchange from './workspace/EquipmentExchange';
 import BidIntelligence from './workspace/BidIntelligence';
 import MarketIntelligence from './workspace/MarketIntelligence';
 import SavedItems from './workspace/SavedItems';
+import LogisticsSnapshot from './LogisticsSnapshot';
 import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
 import { pageAgent } from '@/lib/page-agent';
 import { frontendOrchestrator } from '@/lib/api/orchestrator/FrontendOrchestrator';
@@ -255,6 +256,9 @@ export default function DashboardShell() {
                   onFeedback={handleFeedback}
                   activePane={activePane}
                 />
+                <div className="mt-6">
+                  <LogisticsSnapshot />
+                </div>
               </>
             )}
           </>
