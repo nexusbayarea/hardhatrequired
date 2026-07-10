@@ -15,7 +15,7 @@ export const searchStore = createStore<SearchState>({
   zip: '',
   radius: 25,
   gallons: 0,
-  activePane: 'labor',
+  activePane: 'disposal',
 });
 
 export function useSearchStore() {
