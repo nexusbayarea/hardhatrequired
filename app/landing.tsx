@@ -790,7 +790,7 @@ function LandingInner() {
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <span style={{ fontSize: 14, color: 'var(--color-muted)' }}>© 2026 Hard Hat Required. All rights reserved.</span>
-              <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>Made with 🏗️ in the USA</span>
+              <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>Made 🏗️ in the USA</span>
             </div>
             <span style={{ fontSize: 12, color: 'var(--color-muted)', maxWidth: 400, textAlign: 'center' }}>
               Data sourced from public records, permits, and licensed business registries. Verify independently for final decisions.
