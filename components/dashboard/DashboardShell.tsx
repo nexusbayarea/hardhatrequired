@@ -202,7 +202,7 @@ export default function DashboardShell() {
                 <div>
                   <div className="flex items-center gap-2 text-xs text-muted">
                     <span>{t('project workspace')}</span>
-                    <span className="text-[8px]">▶</span>
+                    <span className="text-xs">▶</span>
                     <span className="font-semibold uppercase tracking-wider text-indigo">
                       {activeProject.vertical.replace(/_/g, ' ')}
                     </span>

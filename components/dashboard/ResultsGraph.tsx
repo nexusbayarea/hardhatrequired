@@ -138,7 +138,7 @@ export default function ResultsGraph({ results, activePane, onSelect }: ResultsG
                   <div className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>
                     {root.label}
                   </div>
-                  <div className="text-[10px] font-medium" style={{ color: 'var(--color-muted)' }}>
+                  <div className="text-xs font-medium" style={{ color: 'var(--color-muted)' }}>
                     {root.count} {t('results')}
                   </div>
                 </div>
@@ -176,7 +176,7 @@ export default function ResultsGraph({ results, activePane, onSelect }: ResultsG
                         </div>
                       </div>
                       <div
-                        className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase shrink-0"
+                        className="text-xs font-bold px-1.5 py-0.5 rounded uppercase shrink-0"
                         style={{
                           background: `color-mix(in srgb, ${NODE_COLORS[child.type]} 12%, transparent)`,
                           color: NODE_COLORS[child.type],

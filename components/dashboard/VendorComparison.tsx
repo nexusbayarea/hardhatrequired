@@ -17,7 +17,7 @@ export default function VendorComparison({ companies, onFeedback }: Props) {
     <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid var(--color-border)' }}>
       <table className="w-full min-w-[700px]">
         <thead>
-          <tr className="text-[10px] font-bold uppercase tracking-wider" style={{ background: 'var(--color-surface2)', borderBottom: '1px solid var(--color-border)', color: 'var(--color-muted)' }}>
+          <tr className="text-xs font-bold uppercase tracking-wider" style={{ background: 'var(--color-surface2)', borderBottom: '1px solid var(--color-border)', color: 'var(--color-muted)' }}>
             <th className="px-4 py-3 text-left">{t('vendor')}</th>
             <th className="px-4 py-3 text-left">{t('distance')}</th>
             <th className="px-4 py-3 text-left">{t('grade')}</th>
@@ -74,7 +74,7 @@ export default function VendorComparison({ companies, onFeedback }: Props) {
                 </div>
               </td>
               <td className="px-4 py-3">
-                <span className="text-[10px] font-medium" style={{ color: 'var(--color-muted)' }}>
+                <span className="text-xs font-medium" style={{ color: 'var(--color-muted)' }}>
                   {c.fitType ? getFitTypeLabel(c.fitType) : '—'}
                 </span>
               </td>
@@ -90,7 +90,7 @@ export default function VendorComparison({ companies, onFeedback }: Props) {
               )}
               {c.permits && c.permits.length > 0 && (
                 <td className="px-4 py-3">
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{
+                  <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{
                     background: c.permits.some(p => p.status === 'Active') ? 'color-mix(in srgb, var(--color-green) 12%, transparent)' : 'color-mix(in srgb, var(--color-red) 12%, transparent)',
                     color: c.permits.some(p => p.status === 'Active') ? 'var(--color-green)' : 'var(--color-red)',
                   }}>

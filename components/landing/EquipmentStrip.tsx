@@ -66,7 +66,7 @@ export default function EquipmentStrip() {
               {t('Available near you')}
             </span>
             {hasData && (
-              <span className="text-[10px] font-semibold" style={{ color: 'var(--color-muted)' }}>
+              <span className="text-xs font-semibold" style={{ color: 'var(--color-muted)' }}>
                 {equipment.length} {t('assets found')}
               </span>
             )}
@@ -95,13 +95,13 @@ export default function EquipmentStrip() {
                       <div className="text-sm font-semibold truncate" style={{ color: 'var(--color-text)' }}>
                         {item.name}
                       </div>
-                      <div className="text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                      <div className="text-xs" style={{ color: 'var(--color-muted)' }}>
                         {item.company} · {item.city}
                       </div>
                     </div>
                     <div className="text-right shrink-0">
                       <div
-                        className="text-[11px] font-semibold"
+                        className="text-xs font-semibold"
                         style={{ color: 'var(--color-green)' }}
                       >
                         {item.availability}

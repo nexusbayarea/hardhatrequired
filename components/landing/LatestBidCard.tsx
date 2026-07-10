@@ -116,7 +116,7 @@ export default function LatestBidCard() {
             <div className="flex flex-col lg:flex-row lg:items-start gap-6">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-[10px] font-bold px-2 py-1 rounded" style={{
+                  <span className="text-xs font-bold px-2 py-1 rounded" style={{
                     background: bid.status === 'closing_soon'
                       ? 'color-mix(in srgb, var(--color-red) 12%, transparent)'
                       : 'color-mix(in srgb, var(--color-green) 12%, transparent)',
@@ -124,7 +124,7 @@ export default function LatestBidCard() {
                   }}>
                     {bid.status === 'closing_soon' ? t('Closing Soon') : t('Open')}
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-1 rounded" style={{
+                  <span className="text-xs font-bold px-2 py-1 rounded" style={{
                     background: 'var(--color-surface2)',
                     color: 'var(--color-muted)',
                     border: '1px solid var(--color-border)',
@@ -162,10 +162,10 @@ export default function LatestBidCard() {
                 style={{ background: 'color-mix(in srgb, var(--color-red) 6%, var(--color-surface2))', border: '1px solid color-mix(in srgb, var(--color-red) 20%, var(--color-border))' }}
               >
                 <Sparkles className="w-5 h-5 mb-1" style={{ color: 'var(--color-red)' }} />
-                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--color-red)' }}>
+                <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--color-red)' }}>
                   {t('AI Pitch Bid')}
                 </span>
-                <span className="text-[10px] mt-1 text-center" style={{ color: 'var(--color-muted)' }}>
+                <span className="text-xs mt-1 text-center" style={{ color: 'var(--color-muted)' }}>
                   {t('Generate proposal in seconds')}
                 </span>
               </div>

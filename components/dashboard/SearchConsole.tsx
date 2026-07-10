@@ -152,7 +152,7 @@ export default function SearchConsole({
               ))}
             </select>
             {vertical && verticalMatrix[vertical] && isActive && (
-              <div className="mt-2 p-2 rounded-lg text-[10px] leading-relaxed bg-surface2 text-muted border border-border">
+              <div className="mt-2 p-2 rounded-lg text-xs leading-relaxed bg-surface2 text-muted border border-border">
                 {activePane === 'disposal' ? verticalMatrix[vertical].disposalDesc : verticalMatrix[vertical].laborDesc}
               </div>
             )}

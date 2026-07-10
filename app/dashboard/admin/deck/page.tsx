@@ -199,7 +199,7 @@ export default function AdminDeck() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-850 text-[10px] font-mono tracking-wider uppercase text-slate-400">
+                      <tr className="border-b border-slate-850 text-xs font-mono tracking-wider uppercase text-slate-400">
                         <th className="pb-3">Table</th>
                         <th className="pb-3">Rows</th>
                         <th className="pb-3">Index</th>
@@ -222,7 +222,7 @@ export default function AdminDeck() {
                             </div>
                           </td>
                           <td className="py-3 text-right">
-                            <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-emerald-950 text-emerald-400 border border-emerald-800/50">
+                            <span className="px-2 py-0.5 rounded text-xs uppercase font-bold bg-emerald-950 text-emerald-400 border border-emerald-800/50">
                               {t.rls_enabled ? 'RLS On' : 'RLS Off'}
                             </span>
                           </td>
@@ -242,7 +242,7 @@ export default function AdminDeck() {
                     <span className="text-xs text-slate-400 block mb-1">Displayed API Spend</span>
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-3xl font-mono font-extrabold text-rose-500">${totalCost.toFixed(3)}</span>
-                      <span className="text-[10px] font-mono text-slate-500">USD</span>
+                      <span className="text-xs font-mono text-slate-500">USD</span>
                     </div>
                   </div>
                   <div>
@@ -270,7 +270,7 @@ export default function AdminDeck() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-slate-200 font-extrabold text-base">{v.industry_name}</span>
-                      <span className="bg-slate-950 border border-slate-850 px-2 py-0.5 text-[10px] text-slate-400 font-mono rounded">slug: {v.slug}</span>
+                      <span className="bg-slate-950 border border-slate-850 px-2 py-0.5 text-xs text-slate-400 font-mono rounded">slug: {v.slug}</span>
                     </div>
                     <p className="text-xs text-slate-400 font-mono">NAICS: {v.target_naics_codes.join(', ')}</p>
                   </div>
@@ -396,11 +396,11 @@ export default function AdminDeck() {
               </div>
               <div className="flex gap-4 text-xs font-mono bg-slate-950 p-3 rounded-lg border border-slate-850">
                 <div>
-                  <span className="text-slate-500 block uppercase text-[10px]">Avg Latency</span>
+                  <span className="text-slate-500 block uppercase text-xs">Avg Latency</span>
                   <span className="text-emerald-400 font-bold">{avgLatency}ms</span>
                 </div>
                 <div className="border-l border-slate-800 pl-4">
-                  <span className="text-slate-500 block uppercase text-[10px]">Total Cost</span>
+                  <span className="text-slate-500 block uppercase text-xs">Total Cost</span>
                   <span className="text-rose-400 font-bold">${totalCost.toFixed(3)}</span>
                 </div>
               </div>
@@ -408,7 +408,7 @@ export default function AdminDeck() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-850 text-[10px] font-mono tracking-wider uppercase text-slate-400">
+                  <tr className="border-b border-slate-850 text-xs font-mono tracking-wider uppercase text-slate-400">
                     <th className="pb-3">Time</th>
                     <th className="pb-3">Provider</th>
                     <th className="pb-3">Action</th>
@@ -422,7 +422,7 @@ export default function AdminDeck() {
                     <tr key={log.id} className="hover:bg-slate-900/30 transition-colors">
                       <td className="py-3 text-slate-400">{log.timestamp}</td>
                       <td className="py-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] uppercase ${
+                        <span className={`px-2 py-0.5 rounded text-xs uppercase ${
                           log.provider === 'google' ? 'bg-blue-950/45 text-blue-300 border border-blue-900/35' :
                           log.provider === 'apollo' ? 'bg-indigo-950/45 text-indigo-300 border border-indigo-900/35' :
                           'bg-amber-950/45 text-amber-300 border border-amber-900/35'
@@ -434,7 +434,7 @@ export default function AdminDeck() {
                       <td className="py-3 text-right text-slate-300">{log.latency_ms}ms</td>
                       <td className="py-3 text-right text-slate-300">{log.cost_usd > 0 ? `$${log.cost_usd.toFixed(3)}` : '—'}</td>
                       <td className="py-3 text-right">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold ${log.is_success ? 'text-emerald-400 bg-emerald-950/30 border border-emerald-900/30' : 'text-rose-400 bg-rose-950/30 border border-rose-900/30'}`}>
+                        <span className={`px-1.5 py-0.5 rounded text-xs uppercase font-bold ${log.is_success ? 'text-emerald-400 bg-emerald-950/30 border border-emerald-900/30' : 'text-rose-400 bg-rose-950/30 border border-rose-900/30'}`}>
                           {log.is_success ? 'OK' : 'Fail'}
                         </span>
                       </td>

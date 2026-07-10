@@ -28,12 +28,12 @@ export default function CallSheet({ companies, isOpen, onClose }: CallSheetProps
                         </div>
                         <div>
                             <h2 className="text-2xl font-black tracking-tighter uppercase">Call Sheet Generated</h2>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
                                 {companies.length} Targeted Prospects
                             </p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-gray-400 hover:text-black dark:hover:text-white font-bold uppercase text-[10px] tracking-widest border border-gray-100 dark:border-gray-800 px-4 py-2 rounded-xl">
+                    <button onClick={onClose} className="text-gray-400 hover:text-black dark:hover:text-white font-bold uppercase text-xs tracking-widest border border-gray-100 dark:border-gray-800 px-4 py-2 rounded-xl">
                         Close Sheet
                     </button>
                 </div>
@@ -55,7 +55,7 @@ export default function CallSheet({ companies, isOpen, onClose }: CallSheetProps
                                         Priority {priority} <span className="font-medium normal-case ml-2">({priorityLabel(priority)})</span>
                                     </h3>
                                     <div className="h-[1px] flex-1 bg-gray-100 dark:bg-gray-800" />
-                                    <span className="text-[10px] font-bold text-gray-400">{priorityCompanies.length} companies</span>
+                                    <span className="text-xs font-bold text-gray-400">{priorityCompanies.length} companies</span>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -79,7 +79,7 @@ export default function CallSheet({ companies, isOpen, onClose }: CallSheetProps
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                    <div className="text-xs text-gray-400 font-bold uppercase tracking-widest">
                         Ready for outreach campaign
                     </div>
                     <button className="px-8 py-3 bg-red-600 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-red-700 transition-all shadow-lg shadow-red-600/20">

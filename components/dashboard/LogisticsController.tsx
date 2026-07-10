@@ -71,7 +71,7 @@ export default function LogisticsController({ targetVolume, onVolumeChange, vert
             {t('adjust parameters to see live cost projections')}
           </div>
         </div>
-        <span className="text-[10px] font-bold px-2 py-1 rounded" style={{
+        <span className="text-xs font-bold px-2 py-1 rounded" style={{
           background: 'color-mix(in srgb, var(--color-green) 12%, transparent)',
           color: 'var(--color-green)',
         }}>
@@ -83,7 +83,7 @@ export default function LogisticsController({ targetVolume, onVolumeChange, vert
       <div className="p-5 space-y-5">
         {/* Volume */}
         <div>
-          <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: 'var(--color-muted)' }}>
+          <label className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: 'var(--color-muted)' }}>
             {t('target volume')}
           </label>
           <div className="flex items-center gap-4">
@@ -122,7 +122,7 @@ export default function LogisticsController({ targetVolume, onVolumeChange, vert
         {/* Job variables — traffic + crew */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: 'var(--color-muted)' }}>
+            <label className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: 'var(--color-muted)' }}>
               {t('traffic conditions')}
             </label>
             <div className="flex gap-1.5">
@@ -144,7 +144,7 @@ export default function LogisticsController({ targetVolume, onVolumeChange, vert
               </div>
             </div>
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest mb-2 block" style={{ color: 'var(--color-muted)' }}>
+              <label className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: 'var(--color-muted)' }}>
                 {t('crew size')}
               </label>
               <div className="flex gap-1.5">
@@ -170,46 +170,46 @@ export default function LogisticsController({ targetVolume, onVolumeChange, vert
         {/* Output matrix */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
-            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('truck capacity')}</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('truck capacity')}</div>
             <div className="text-lg font-black tabular-nums mt-0.5" style={{ color: 'var(--color-text)' }}>
               {config.truckCapacityGallons.toLocaleString()}
             </div>
-            <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>GAL</div>
+            <div className="text-xs" style={{ color: 'var(--color-muted)' }}>GAL</div>
           </div>
           <div className="p-3 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
-            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('hauls required')}</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('hauls required')}</div>
             <div className="text-lg font-black tabular-nums mt-0.5" style={{ color: 'var(--color-red)' }}>
               {metrics.trips}
             </div>
           </div>
           <div className="p-3 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
-            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('total transit')}</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('total transit')}</div>
             <div className="text-lg font-black tabular-nums mt-0.5" style={{ color: 'var(--color-text)' }}>
               {metrics.totalTransit}
             </div>
-            <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>MI</div>
+            <div className="text-xs" style={{ color: 'var(--color-muted)' }}>MI</div>
           </div>
           <div className="p-3 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
-            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('operation time')}</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('operation time')}</div>
             <div className="text-lg font-black tabular-nums mt-0.5" style={{ color: 'var(--color-text)' }}>
               {metrics.totalOpHours.toFixed(1)}
             </div>
-            <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>HRS</div>
+            <div className="text-xs" style={{ color: 'var(--color-muted)' }}>HRS</div>
           </div>
           <div className="p-3 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
-            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('fuel estimate')}</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('fuel estimate')}</div>
             <div className="text-lg font-black tabular-nums mt-0.5" style={{ color: 'var(--color-yellow)' }}>
               ${metrics.fuelEst.toLocaleString()}
             </div>
           </div>
           <div className="p-3 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
-            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('hauling cost')}</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('hauling cost')}</div>
             <div className="text-lg font-black tabular-nums mt-0.5" style={{ color: 'var(--color-text)' }}>
               ${metrics.haulingCost.toLocaleString()}
             </div>
           </div>
           <div className="p-3 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
-            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('disposal fee')}</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('disposal fee')}</div>
             <div className="text-lg font-black tabular-nums mt-0.5" style={{ color: 'var(--color-yellow)' }}>
               ${metrics.disposalFee.toLocaleString()}
             </div>
@@ -218,11 +218,11 @@ export default function LogisticsController({ targetVolume, onVolumeChange, vert
             background: 'color-mix(in srgb, var(--color-green) 8%, var(--color-surface2))',
             border: '1px solid color-mix(in srgb, var(--color-green) 25%, var(--color-border))',
           }}>
-            <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-green)' }}>{t('total cost')}</div>
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-green)' }}>{t('total cost')}</div>
             <div className="text-lg font-black tabular-nums mt-0.5" style={{ color: 'var(--color-green)' }}>
               ${metrics.total.toLocaleString()}
             </div>
-            <div className="text-[10px]" style={{ color: 'var(--color-green)' }}>${metrics.perGal.toFixed(3)}/GAL</div>
+            <div className="text-xs" style={{ color: 'var(--color-green)' }}>${metrics.perGal.toFixed(3)}/GAL</div>
           </div>
         </div>
 

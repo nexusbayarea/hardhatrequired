@@ -93,10 +93,10 @@ export default function ComplianceAlertStrip() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: isActive ? 'var(--color-green)' : 'var(--color-red)' }}>
+                        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: isActive ? 'var(--color-green)' : 'var(--color-red)' }}>
                           {alert.vertical?.replace(/_/g, ' ') || 'Facility'}
                         </span>
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{
+                        <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{
                           background: isActive
                             ? 'color-mix(in srgb, var(--color-green) 12%, transparent)'
                             : 'color-mix(in srgb, var(--color-red) 12%, transparent)',
@@ -108,7 +108,7 @@ export default function ComplianceAlertStrip() {
                       <h3 className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>
                         {alert.facility_name}
                       </h3>
-                      <div className="flex items-center gap-3 mt-2 text-[11px]" style={{ color: 'var(--color-muted)' }}>
+                      <div className="flex items-center gap-3 mt-2 text-xs" style={{ color: 'var(--color-muted)' }}>
                         <span>{alert.city}{alert.city && alert.county ? ', ' : ''}{alert.county}</span>
                         {alert.imported_at && (
                           <>
@@ -139,7 +139,7 @@ export default function ComplianceAlertStrip() {
                       >
                         <ShieldCheck className="w-4 h-4 mt-0.5 shrink-0" style={{ color: isActive ? 'var(--color-green)' : 'var(--color-red)' }} />
                         <div>
-                          <span className="text-[10px] font-bold uppercase tracking-widest block mb-0.5" style={{ color: isActive ? 'var(--color-green)' : 'var(--color-red)' }}>
+                          <span className="text-xs font-bold uppercase tracking-widest block mb-0.5" style={{ color: isActive ? 'var(--color-green)' : 'var(--color-red)' }}>
                             {isActive ? 'Active Facility' : 'Regulatory Status'}
                           </span>
                           <span className="text-xs" style={{ color: 'var(--color-muted)' }}>

@@ -53,7 +53,7 @@ export default function LogisticsSnapshot() {
                 {t('How much will it cost to haul?')}
               </span>
             </div>
-            <span className="text-[10px] font-bold px-2 py-1 rounded" style={{
+            <span className="text-xs font-bold px-2 py-1 rounded" style={{
               background: 'color-mix(in srgb, var(--color-green) 12%, transparent)',
               color: 'var(--color-green)',
             }}>
@@ -63,7 +63,7 @@ export default function LogisticsSnapshot() {
 
           <div className="p-6 space-y-6">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest mb-3 block" style={{ color: 'var(--color-muted)' }}>
+              <label className="text-xs font-bold uppercase tracking-widest mb-3 block" style={{ color: 'var(--color-muted)' }}>
                 {t('target volume')}
               </label>
               <div className="flex gap-2 mb-3">
@@ -98,26 +98,26 @@ export default function LogisticsSnapshot() {
               <div className="p-4 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <Route className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('trips')}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('trips')}</span>
                 </div>
                 <div className="text-2xl font-black tabular-nums" style={{ color: 'var(--color-text)' }}>{metrics.trips}</div>
-                <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{config.truckCapacityGallons.toLocaleString()} {t('GAL capacity')}</div>
+                <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{config.truckCapacityGallons.toLocaleString()} {t('GAL capacity')}</div>
               </div>
               <div className="p-4 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <Gauge className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('transit')}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('transit')}</span>
                 </div>
                 <div className="text-2xl font-black tabular-nums" style={{ color: 'var(--color-text)' }}>{metrics.totalTransit}</div>
-                <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{t('total miles')}</div>
+                <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('total miles')}</div>
               </div>
               <div className="p-4 rounded-lg" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingDown className="w-3.5 h-3.5" style={{ color: 'var(--color-muted)' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('hauling')}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('hauling')}</span>
                 </div>
                 <div className="text-2xl font-black tabular-nums" style={{ color: 'var(--color-text)' }}>${metrics.haulingCost.toLocaleString()}</div>
-                <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{t('labor + truck')}</div>
+                <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('labor + truck')}</div>
               </div>
               <div className="p-4 rounded-lg" style={{
                 background: 'color-mix(in srgb, var(--color-green) 8%, var(--color-surface2))',
@@ -125,14 +125,14 @@ export default function LogisticsSnapshot() {
               }}>
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className="w-3.5 h-3.5" style={{ color: 'var(--color-green)' }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-green)' }}>{t('total')}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-green)' }}>{t('total')}</span>
                 </div>
                 <div className="text-2xl font-black tabular-nums" style={{ color: 'var(--color-green)' }}>${metrics.total.toLocaleString()}</div>
-                <div className="text-[10px]" style={{ color: 'var(--color-green)' }}>${metrics.perGal.toFixed(3)}/{t('GAL')}</div>
+                <div className="text-xs" style={{ color: 'var(--color-green)' }}>${metrics.perGal.toFixed(3)}/{t('GAL')}</div>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-[11px] flex-wrap" style={{ color: 'var(--color-muted)' }}>
+            <div className="flex items-center gap-4 text-xs flex-wrap" style={{ color: 'var(--color-muted)' }}>
               <span className="flex items-center gap-1">
                 <Droplets className="w-3 h-3" />
                 {gallons.toLocaleString()} GAL × {config.disposalFeePerGallon}/{t('GAL')} {t('disposal')}

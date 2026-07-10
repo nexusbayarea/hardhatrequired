@@ -27,16 +27,16 @@ export default function MarketIntelligenceReport({ report, onClose }: MarketInte
       <div className="result-panel-body">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)]">
-            <div className="flex items-center gap-2 text-[var(--fg-muted)] text-[10px] font-bold uppercase tracking-wider mb-2">
+            <div className="flex items-center gap-2 text-[var(--fg-muted)] text-xs font-bold uppercase tracking-wider mb-2">
               <Users size={12} />
               Total Companies
             </div>
             <div className="text-3xl font-extrabold text-[var(--fg)]">{report.totalCompanies}</div>
-            <div className="text-[10px] text-[var(--fg-muted)] mt-1">Indexed on {report.searchDate}</div>
+            <div className="text-xs text-[var(--fg-muted)] mt-1">Indexed on {report.searchDate}</div>
           </div>
           
           <div className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)]">
-            <div className="flex items-center gap-2 text-[var(--fg-muted)] text-[10px] font-bold uppercase tracking-wider mb-2">
+            <div className="flex items-center gap-2 text-[var(--fg-muted)] text-xs font-bold uppercase tracking-wider mb-2">
               <TrendingUp size={12} />
               Priority Tiers
             </div>
@@ -57,19 +57,19 @@ export default function MarketIntelligenceReport({ report, onClose }: MarketInte
           </div>
 
           <div className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)]">
-            <div className="flex items-center gap-2 text-[var(--fg-muted)] text-[10px] font-bold uppercase tracking-wider mb-2">
+            <div className="flex items-center gap-2 text-[var(--fg-muted)] text-xs font-bold uppercase tracking-wider mb-2">
               <Zap size={12} />
               Market Density
             </div>
             <div className="text-3xl font-extrabold text-[var(--fg)]">
               {report.totalCompanies > 0 ? Math.round((report.priorityA / report.totalCompanies) * 100) : 0}%
             </div>
-            <div className="text-[10px] text-[var(--fg-muted)] mt-1">High-value local density</div>
+            <div className="text-xs text-[var(--fg-muted)] mt-1">High-value local density</div>
           </div>
         </div>
 
         <div className="space-y-4">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-[var(--fg-muted)] flex items-center gap-2">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-[var(--fg-muted)] flex items-center gap-2">
             <CheckCircle2 size={12} className="text-[var(--accent)]" />
             Data Enrichment Coverage
           </h4>

@@ -153,7 +153,7 @@ export default function CampaignsPage() {
                   <div className="flex items-center gap-3 flex-wrap">
                     <h3 className="font-semibold" style={{ color: 'var(--color-text)' }}>{campaign.name}</h3>
                     <span
-                      className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                      className="rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider"
                       style={{
                         background: statusBgColors[campaign.status] || 'var(--color-surface2)',
                         color: statusColors[campaign.status] || 'var(--color-muted)',

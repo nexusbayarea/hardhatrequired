@@ -191,7 +191,7 @@ Include: introduction, three reasons we are uniquely positioned (certifications,
         {aiDraft && (
           <div className="mb-6 bg-surface2 border border-border rounded-lg p-5 relative">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-red flex items-center gap-1">
+              <span className="text-xs uppercase font-bold tracking-wider text-red flex items-center gap-1">
                 <Sparkles className="w-3 h-3 animate-spin" /> AI Generated Proposal Draft
               </span>
               <div className="flex items-center gap-2">
@@ -222,7 +222,7 @@ Include: introduction, three reasons we are uniquely positioned (certifications,
               <div key={item.id} className={`p-5 bg-surface2 border border-border rounded-lg flex flex-col justify-between hover:border-border/80 transition-colors ${landing ? 'landing-result' : ''}`}>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className={`font-bold text-muted uppercase tracking-wider ${landing ? 'text-[20px]' : 'text-[10px]'}`}>{item.source}</span>
+                    <span className={`font-bold text-muted uppercase tracking-wider ${landing ? 'text-[20px]' : 'text-xs'}`}>{item.source}</span>
                     <span className={`px-3 py-1 rounded font-bold ${landing ? 'text-[40px]' : 'text-xl'} ${
                       item.impact === 'High' ? 'bg-red/10 text-red' : 'bg-surface text-muted'
                     }`}>
@@ -234,7 +234,7 @@ Include: introduction, three reasons we are uniquely positioned (certifications,
                 </div>
 
                 <div className="pt-3 border-t border-border bg-surface/40 p-3 rounded-md">
-                  <span className={`font-extrabold text-red uppercase block tracking-wider mb-1 ${landing ? 'text-[20px]' : 'text-[10px]'}`}>Our Actionable Advice</span>
+                  <span className={`font-extrabold text-red uppercase block tracking-wider mb-1 ${landing ? 'text-[20px]' : 'text-xs'}`}>Our Actionable Advice</span>
                   <p className={`text-muted italic ${landing ? 'text-2xl' : 'text-xs'}`}>"{item.actionableTakeaway}"</p>
                 </div>
               </div>
@@ -251,11 +251,11 @@ Include: introduction, three reasons we are uniquely positioned (certifications,
                 </div>
                 <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-3">
                   <div>
-                    <span className={`font-bold text-red uppercase tracking-wide ${landing ? 'text-[20px]' : 'text-[10px]'}`}>{rule.authority} update</span>
+                    <span className={`font-bold text-red uppercase tracking-wide ${landing ? 'text-[20px]' : 'text-xs'}`}>{rule.authority} update</span>
                     <h3 className={`font-extrabold text-text mt-0.5 ${landing ? 'text-[32px]' : 'text-base'}`}>{rule.title}</h3>
                   </div>
                   <div className="text-right self-stretch sm:self-auto bg-red/10 p-2 rounded border border-red/20">
-                    <span className={`block text-red uppercase font-bold tracking-wider ${landing ? 'text-[18px]' : 'text-[9px]'}`}>Audit Fine Risk</span>
+                    <span className={`block text-red uppercase font-bold tracking-wider ${landing ? 'text-[18px]' : 'text-xs'}`}>Audit Fine Risk</span>
                     <span className={`font-bold text-text whitespace-nowrap ${landing ? 'text-2xl' : 'text-xs'}`}>{rule.penaltyRisk}</span>
                   </div>
                 </div>
@@ -282,10 +282,10 @@ Include: introduction, three reasons we are uniquely positioned (certifications,
                 <div key={bid.id} className={`p-5 bg-surface2 border border-border hover:border-border/80 rounded-lg transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group ${landing ? 'landing-result' : ''}`}>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className={`px-2 py-0.5 rounded font-bold bg-surface text-muted border border-border ${landing ? 'text-[20px]' : 'text-[10px]'}`}>
+                      <span className={`px-2 py-0.5 rounded font-bold bg-surface text-muted border border-border ${landing ? 'text-[20px]' : 'text-xs'}`}>
                         {bid.agency}
                       </span>
-                      <span className={`px-2 py-0.5 rounded font-bold ${landing ? 'text-[20px]' : 'text-[10px]'} ${
+                      <span className={`px-2 py-0.5 rounded font-bold ${landing ? 'text-[20px]' : 'text-xs'} ${
                         bid.difficulty === 'Easy' ? 'bg-green/10 text-green' :
                         bid.difficulty === 'Medium' ? 'bg-yellow/10 text-yellow' : 'bg-blue/10 text-blue'
                       }`}>

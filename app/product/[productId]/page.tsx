@@ -99,7 +99,7 @@ export default function ProductPage() {
           >
             <Search className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{t('Search...')}</span>
-            <kbd className="text-[10px] px-1 py-0.5 rounded font-mono" style={{ background: 'var(--color-bg)' }}>
+            <kbd className="text-xs px-1 py-0.5 rounded font-mono" style={{ background: 'var(--color-bg)' }}>
               ⌘K
             </kbd>
           </button>
@@ -123,7 +123,7 @@ export default function ProductPage() {
             <button
               key={item.id}
               onClick={() => setWorkspace(item.id as any)}
-              className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-semibold transition-colors"
+              className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-semibold transition-colors"
               style={{
                 color: workspace === item.id ? 'var(--color-red, #ef4444)' : 'var(--color-muted)',
               }}

@@ -139,7 +139,7 @@ export default function Sidebar({ slim = false }: SidebarProps) {
                 className="px-4 my-3 pt-3 border-t flex items-center justify-between"
                 style={{ borderColor: 'var(--color-border)' }}
               >
-                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>
+                <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>
                   {t('projects')}
                 </span>
                 <button
@@ -166,7 +166,7 @@ export default function Sidebar({ slim = false }: SidebarProps) {
                       <div className="font-bold truncate" style={{ color: isSelected ? 'var(--color-text)' : 'var(--color-muted)' }}>
                         {p.name}
                       </div>
-                      <div className="flex items-center gap-2 text-[10px] mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                      <div className="flex items-center gap-2 text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>
                         <span>{p.volume.toLocaleString()} gal</span>
                         <span>ZIP {p.zip}</span>
                         {isSelected && (
@@ -219,7 +219,7 @@ export default function Sidebar({ slim = false }: SidebarProps) {
                 {planTier} {t('plan')}
               </div>
               {creditsUsed !== null && (
-                <div className="text-[10px] mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>
                   {creditsUsed.toLocaleString()} {t('credits')} {t('used')}
                 </div>
               )}

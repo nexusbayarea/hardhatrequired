@@ -119,19 +119,19 @@ export default function BookingModal({ open, onClose, equipment, onBooked }: Boo
             {/* Budget projection */}
             <div className="rounded-xl p-4 mb-5 grid grid-cols-2 gap-4" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}>
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{t('daily rate')}</div>
+                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{t('daily rate')}</div>
                 <div className="text-lg font-black" style={{ color: 'var(--color-text)' }}>${equipment.daily_rate.toLocaleString()}</div>
               </div>
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{t('delivery fee')}</div>
+                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{t('delivery fee')}</div>
                 <div className="text-lg font-black" style={{ color: 'var(--color-text)' }}>${equipment.delivery_fee.toLocaleString()}</div>
               </div>
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{t('total budget')}</div>
+                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{t('total budget')}</div>
                 <div className="text-lg font-black" style={{ color: 'var(--color-red)' }}>${totalBudget.toLocaleString()}</div>
               </div>
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{t('weekly estimate')}</div>
+                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{t('weekly estimate')}</div>
                 <div className="text-lg font-black" style={{ color: 'var(--color-text)' }}>${weeklyEstimate.toLocaleString()}</div>
               </div>
             </div>

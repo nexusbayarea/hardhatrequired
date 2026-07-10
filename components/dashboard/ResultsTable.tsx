@@ -88,7 +88,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                   ? [t('company'), t('permit status'), t('distance'), t('score'), t('confidence'), t('signals'), t('accurate?'), '']
                   : [t('company'), t('grade'), t('distance'), t('score'), t('confidence'), t('signals'), t('accurate?'), '']
               ).map((h) => (
-                <th key={h} className="text-left text-[10px] font-semibold text-muted uppercase tracking-wider px-4 py-3">
+                <th key={h} className="text-left text-xs font-semibold text-muted uppercase tracking-wider px-4 py-3">
                   {h}
                 </th>
               ))}
@@ -225,7 +225,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                               <div className="p-5 space-y-5">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                                   <div className="space-y-2">
-                                    <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('contact')}</div>
+                                    <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('contact')}</div>
                                     {company.address && (
                                       <div className="flex items-start gap-2 text-sm">
                                         <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color: 'var(--color-blue)' }} />
@@ -274,7 +274,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                   </div>
 
                                   <div className="space-y-2">
-                                    <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('lead score')}</div>
+                                    <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('lead score')}</div>
                                     <div className="flex items-center gap-3">
                                       <div className="w-full max-w-[120px] h-2 rounded-full bg-surface2 overflow-hidden">
                                         <div className="h-full bg-red rounded-full" style={{ width: `${company.leadScore}%` }} />
@@ -285,12 +285,12 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                                   </div>
 
                                   <div className="space-y-2">
-                                    <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('distance')}</div>
+                                    <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('distance')}</div>
                                     <div className="text-sm">{formatDistance(company.distanceMiles)}</div>
                                   </div>
 
                                   <div className="space-y-2">
-                                    <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('confidence')}</div>
+                                    <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('confidence')}</div>
                                     <div className="flex items-center gap-2">
                                       <div className="w-full max-w-[80px] h-2 rounded-full bg-surface2 overflow-hidden">
                                         <div className="h-full rounded-full" style={{
@@ -314,7 +314,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
 
                             {company.permits && company.permits.length > 0 && (
                               <div className="space-y-2">
-                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('permits')}</div>
+                                <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('permits')}</div>
                                 <div className="flex flex-wrap gap-2">
                                   {company.permits.map((p, i) => (
                                     <span
@@ -336,7 +336,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                             )}
                             {company.scrapedLicenseNumbers && company.scrapedLicenseNumbers.length > 0 && (
                               <div className="space-y-2">
-                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('licenses')}</div>
+                                <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('licenses')}</div>
                                 <div className="flex flex-wrap gap-2">
                                   {company.scrapedLicenseNumbers.map((lic, i) => (
                                     <span key={i}
@@ -355,7 +355,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                             {((company.extractedServices && company.extractedServices.length > 0) ||
                               (company.extractedEquipment && company.extractedEquipment.length > 0)) && (
                               <div className="space-y-2">
-                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('detected services & equipment')}</div>
+                                <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('detected services & equipment')}</div>
                                 <div className="flex flex-wrap gap-2">
                                   {company.extractedServices?.map((s, i) => (
                                     <span key={`s-${i}`}
@@ -384,11 +384,11 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                             )}
                             {company.matchedSignals && company.matchedSignals.length > 0 && (
                               <div className="space-y-2">
-                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('matched keywords')}</div>
+                                <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('matched keywords')}</div>
                                 <div className="flex flex-wrap gap-2">
                                   {company.matchedSignals.map((s, i) => (
                                     <span key={i}
-                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium"
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium"
                                       style={{
                                         background: 'color-mix(in srgb, var(--color-green) 10%, transparent)',
                                         color: 'var(--color-green)',
@@ -402,11 +402,11 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                             )}
                             {company.scrapedKeywords && company.scrapedKeywords.length > 0 && (
                               <div className="space-y-2">
-                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('scraped keywords')}</div>
+                                <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('scraped keywords')}</div>
                                 <div className="flex flex-wrap gap-2">
                                   {company.scrapedKeywords.map((kw, i) => (
                                     <span key={i}
-                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium"
+                                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium"
                                       style={{
                                         background: 'color-mix(in srgb, var(--color-yellow) 10%, transparent)',
                                         color: 'var(--color-yellow)',
@@ -420,13 +420,13 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
                             )}
                             {company.capabilitySummary && (
                               <div className="space-y-2">
-                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('signals')}</div>
+                                <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('signals')}</div>
                                 <p className="text-sm text-muted leading-relaxed">{company.capabilitySummary}</p>
                               </div>
                             )}
                             {company.aiSummary && (
                               <div className="space-y-2">
-                                <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('ai summary')}</div>
+                                <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('ai summary')}</div>
                                 <p className="text-sm text-muted leading-relaxed italic">{company.aiSummary}</p>
                               </div>
                             )}
@@ -443,7 +443,7 @@ export default function ResultsTable({ companies, contacts: allContacts, loading
 
                               return (
                                 <div className="space-y-2">
-                                  <div className="text-[10px] font-semibold text-muted uppercase tracking-wider">{t('hauling & disposal estimate')}</div>
+                                  <div className="text-xs font-semibold text-muted uppercase tracking-wider">{t('hauling & disposal estimate')}</div>
                                   <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
                                     <div className="flex justify-between">
                                       <span className="text-muted">{t('trips required')}</span>

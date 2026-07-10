@@ -61,7 +61,7 @@ export default function CompaniesPage() {
                   <td className="py-3">{c.industry}</td>
                   <td className="py-3">{c.city}, {c.state}</td>
                   <td className="py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                       c.priority === 'A' ? 'bg-emerald-500/20 text-emerald-400' :
                       c.priority === 'B' ? 'bg-amber-500/20 text-amber-400' :
                       'bg-gray-800 text-gray-400'

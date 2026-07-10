@@ -405,9 +405,9 @@ html[data-theme="day"] .theme-toggle-knob {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 32px;
-  background: color-mix(in srgb, var(--color-accent) 28%, transparent);
-  border-right: 1px solid color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  width: 48px;
+  background: color-mix(in srgb, var(--color-accent) 42%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--color-accent) 68%, var(--color-border));
   opacity: 0.9;
   pointer-events: none;
   overflow: hidden;
@@ -428,7 +428,7 @@ html[data-theme="day"] .theme-toggle-knob {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 28px;
+  width: 42px;
   background:
     /* Foot marks (tallest - extend furthest right) */
     repeating-linear-gradient(
@@ -453,11 +453,11 @@ html[data-theme="day"] .theme-toggle-knob {
     0 0,
     0 0;
   background-size:
-    28px 100%,
-    18px 100%,
-    10px 100%;
+    42px 100%,
+    27px 100%,
+    15px 100%;
   background-repeat: no-repeat;
-  opacity: 0.35;
+  opacity: 0.53;
   mask-image: linear-gradient(
     180deg,
     transparent 0%,
@@ -477,12 +477,12 @@ html[data-theme="day"] .theme-toggle-knob {
 /* Number labels */
 .tape-measure-num {
   position: absolute;
-  left: 4px;
+  left: 6px;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 0.5625rem;
+  font-size: 0.844rem;
   font-weight: 800;
   color: var(--color-accent);
-  opacity: 0.5;
+  opacity: 0.75;
   transform: translateY(-50%);
   line-height: 1;
   white-space: nowrap;

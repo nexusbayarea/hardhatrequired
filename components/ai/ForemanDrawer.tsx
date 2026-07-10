@@ -119,14 +119,14 @@ export default function ForemanDrawer() {
             </div>
             <div>
               <div className="font-bold text-sm" style={{ color: 'var(--color-text)' }}>Foreman</div>
-              <div className="text-[10px] font-medium" style={{ color: 'var(--color-muted)' }}>{modeMeta.label}</div>
+              <div className="text-xs font-medium" style={{ color: 'var(--color-muted)' }}>{modeMeta.label}</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {messages.length > 0 && (
               <button
                 onClick={() => foremanStore.setState({ messages: [], isExecuting: false })}
-                className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg"
+                className="text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-lg"
                 style={{ color: 'var(--color-muted)', background: 'var(--color-surface)', cursor: 'pointer', border: 'none' }}
               >
                 Clear
@@ -164,7 +164,7 @@ export default function ForemanDrawer() {
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3" style={{ maxHeight: 'calc(100vh - 260px)' }}>
           {messages.length === 0 && (
             <div className="space-y-2">
-              <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('suggestions')}</div>
+              <div className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>{t('suggestions')}</div>
               {SUGGESTIONS[mode].map((text, i) => (
                 <button
                   key={i}
@@ -219,7 +219,7 @@ export default function ForemanDrawer() {
                   }}
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-red)' }}>{t('you')}</span>
+                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-red)' }}>{t('you')}</span>
                   </div>
                   {msg.text}
                 </div>
@@ -239,9 +239,9 @@ export default function ForemanDrawer() {
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Bot className="w-4 h-4" style={{ color: 'var(--color-blue)' }} />
-                      <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-blue)' }}>Foreman</span>
+                      <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-blue)' }}>Foreman</span>
                       {msg.intent && (
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{ background: 'var(--color-surface)', color: 'var(--color-muted)' }}>
+                        <span className="text-xs font-mono px-1.5 py-0.5 rounded" style={{ background: 'var(--color-surface)', color: 'var(--color-muted)' }}>
                           {msg.intent}
                         </span>
                       )}

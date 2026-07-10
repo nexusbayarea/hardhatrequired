@@ -143,7 +143,7 @@ export default function SavedItems({ type }: SavedItemsProps) {
                   <div className="flex items-center gap-3 flex-wrap">
                     <h3 className="font-semibold truncate" style={{ color: 'var(--color-text)' }}>{search.name}</h3>
                     <span
-                      className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider shrink-0"
+                      className="rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider shrink-0"
                       style={{ background: 'var(--color-surface2)', color: 'var(--color-muted)' }}
                     >
                       {search.verticalId.replace(/_/g, ' ')}

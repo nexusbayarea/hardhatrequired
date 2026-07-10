@@ -21,7 +21,7 @@ export default function CompanyTable({ companies, onGenerateCallSheet, onExportC
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h2 className="text-2xl font-black uppercase tracking-tighter">Market Index</h2>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
                         {companies.length} companies matched in your area
                     </p>
                 </div>
@@ -44,7 +44,7 @@ export default function CompanyTable({ companies, onGenerateCallSheet, onExportC
             <div className="overflow-x-auto">
                 <table className="w-full">
                     <thead>
-                        <tr className="text-left text-[10px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100 dark:border-gray-800">
+                        <tr className="text-left text-xs font-black uppercase tracking-widest text-gray-400 border-b border-gray-100 dark:border-gray-800">
                             <th className="pb-4 pr-4">Company</th>
                             <th className="pb-4 pr-4">Priority</th>
                             <th className="pb-4 pr-4">Distance</th>
@@ -63,12 +63,12 @@ export default function CompanyTable({ companies, onGenerateCallSheet, onExportC
                                         </div>
                                         <div>
                                             <div className="font-bold text-sm leading-tight">{company.companyName}</div>
-                                            <div className="text-[10px] text-gray-400 mt-0.5">{company.city}, {company.zip}</div>
+                                            <div className="text-xs text-gray-400 mt-0.5">{company.city}, {company.zip}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="py-4 pr-4">
-                                    <div className={`inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-black uppercase ${company.priority === 'A' ? 'bg-green-100 text-green-700' :
+                                    <div className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-black uppercase ${company.priority === 'A' ? 'bg-green-100 text-green-700' :
                                         company.priority === 'B' ? 'bg-blue-100 text-blue-700' :
                                             'bg-gray-100 text-gray-700'
                                         }`}>
@@ -84,7 +84,7 @@ export default function CompanyTable({ companies, onGenerateCallSheet, onExportC
                                 <td className="py-4 pr-4">
                                     <div className="flex flex-col gap-0.5">
                                         <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{company.phone}</span>
-                                        <span className="text-[10px] italic text-gray-400 truncate max-w-[120px]">{company.email}</span>
+                                        <span className="text-xs italic text-gray-400 truncate max-w-[120px]">{company.email}</span>
                                     </div>
                                 </td>
                                 <td className="py-4 pr-4">
@@ -96,7 +96,7 @@ export default function CompanyTable({ companies, onGenerateCallSheet, onExportC
                                 </td>
                                 <td className="py-4 text-right">
                                     <select
-                                        className={`text-[10px] font-black uppercase py-1.5 px-3 rounded-lg border focus:ring-2 focus:ring-red-500/20 outline-none transition-all appearance-none cursor-pointer ${company.status === 'WON' ? 'bg-green-600 text-white border-green-700' :
+                                        className={`text-xs font-black uppercase py-1.5 px-3 rounded-lg border focus:ring-2 focus:ring-red-500/20 outline-none transition-all appearance-none cursor-pointer ${company.status === 'WON' ? 'bg-green-600 text-white border-green-700' :
                                             company.status === 'INTERESTED' ? 'bg-blue-600 text-white border-blue-700' :
                                                 company.status === 'NOT_CONTACTED' ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 border-gray-200 dark:border-gray-700' :
                                                     'bg-red-50 dark:bg-red-900/10 text-red-600 border-red-100 dark:border-red-900/30'

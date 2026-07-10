@@ -124,7 +124,7 @@ export function CommandPalette({
             className="flex-1 bg-transparent text-sm outline-none"
             style={{ color: 'var(--color-text)' }}
           />
-          <kbd className="text-[10px] px-1.5 py-0.5 rounded font-mono text-slate-400"
+          <kbd className="text-xs px-1.5 py-0.5 rounded font-mono text-slate-400"
             style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
           >
             <Command className="w-3 h-3 inline" />K
@@ -152,7 +152,7 @@ export function CommandPalette({
                 <div className="font-medium truncate">{t(action.label)}</div>
                 <div className="text-[11px] text-slate-500 truncate">{action.description}</div>
               </div>
-              <span className="text-[10px] uppercase tracking-wider text-slate-500 shrink-0">
+              <span className="text-xs uppercase tracking-wider text-slate-500 shrink-0">
                 {action.type === 'workspace' ? t('Workspace') : t('Page')}
               </span>
             </button>

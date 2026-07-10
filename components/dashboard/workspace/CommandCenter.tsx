@@ -124,7 +124,7 @@ export default function CommandCenter() {
               {t(s.label)}
             </div>
             {s.trend && (
-              <div className="text-[10px] font-medium mt-0.5" style={{ color: 'var(--color-green)' }}>
+              <div className="text-xs font-medium mt-0.5" style={{ color: 'var(--color-green)' }}>
                 {s.trend}
               </div>
             )}
@@ -189,7 +189,7 @@ export default function CommandCenter() {
                     {a.subtitle}
                   </div>
                 </div>
-                <div className="text-[10px] font-medium shrink-0 pt-0.5" style={{ color: 'var(--color-muted)' }}>
+                <div className="text-xs font-medium shrink-0 pt-0.5" style={{ color: 'var(--color-muted)' }}>
                   {a.time}
                 </div>
               </div>
@@ -288,7 +288,7 @@ export default function CommandCenter() {
                 <div key={p.id} className="flex items-center justify-between py-1.5">
                   <div>
                     <div className="text-xs font-bold" style={{ color: 'var(--color-text)' }}>{p.name}</div>
-                    <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{p.vertical.replace(/_/g, ' ')} · {p.volume.toLocaleString()} gal</div>
+                    <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{p.vertical.replace(/_/g, ' ')} · {p.volume.toLocaleString()} gal</div>
                   </div>
                   <div className="text-xs font-bold font-mono" style={{ color: 'var(--color-yellow)' }}>${(p.contractRevenue || 0).toLocaleString()}</div>
                 </div>

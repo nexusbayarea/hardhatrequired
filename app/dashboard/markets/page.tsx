@@ -28,7 +28,7 @@ export default function MarketsPage() {
           <thead>
             <tr className="border-b border-border">
               {['Market', 'Region', 'Companies', 'Campaigns', ''].map(h => (
-                <th key={h} className="text-left text-[10px] font-semibold text-muted uppercase tracking-wider px-4 py-3">{h}</th>
+                <th key={h} className="text-left text-xs font-semibold text-muted uppercase tracking-wider px-4 py-3">{h}</th>
               ))}
             </tr>
           </thead>

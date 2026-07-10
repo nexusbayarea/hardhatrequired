@@ -262,7 +262,7 @@ Extract the work spec and write a bid proposal.`,
                 style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
                 <Upload className="w-4 h-4" /> {t('upload plans')}
               </button>
-              <span className="text-[10px]" style={{ color: 'var(--color-muted)' }}>
+              <span className="text-xs" style={{ color: 'var(--color-muted)' }}>
                 {t('or type scope details above')}
               </span>
             </div>
@@ -292,7 +292,7 @@ Extract the work spec and write a bid proposal.`,
               <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-border)' }}>
                 <div className="h-full rounded-full transition-all duration-500" style={{ width: `${extractProgress}%`, background: 'var(--color-indigo)' }} />
               </div>
-              <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>{extractStep}</div>
+              <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{extractStep}</div>
             </div>
           )}
 
@@ -307,11 +307,11 @@ Extract the work spec and write a bid proposal.`,
               </h4>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="p-2 rounded" style={{ background: 'var(--color-surface)' }}>
-                  <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('work spec')}</div>
+                  <div className="text-xs font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('work spec')}</div>
                   <div className="font-bold mt-0.5" style={{ color: 'var(--color-text)' }}>{activeProject.extractedSpec}</div>
                 </div>
                 <div className="p-2 rounded" style={{ background: 'var(--color-surface)' }}>
-                  <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('volume')}</div>
+                  <div className="text-xs font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('volume')}</div>
                   <div className="font-bold mt-0.5" style={{ color: 'var(--color-text)' }}>{activeProject.volume.toLocaleString()} gal</div>
                 </div>
               </div>
@@ -386,19 +386,19 @@ Extract the work spec and write a bid proposal.`,
           >
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
-                <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('gross profit')}</div>
+                <div className="text-xs font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('gross profit')}</div>
                 <div className="text-lg font-bold font-mono" style={{ color: 'var(--color-text)' }}>
                   ${Math.round(grossProfit).toLocaleString()}
                 </div>
               </div>
               <div>
-                <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('margin')}</div>
+                <div className="text-xs font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('margin')}</div>
                 <div className="text-lg font-bold font-mono" style={{ color: margin > 30 ? 'var(--color-green)' : margin > 10 ? 'var(--color-yellow)' : 'var(--color-red)' }}>
                   {margin.toFixed(1)}%
                 </div>
               </div>
               <div>
-                <div className="text-[10px] font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('risk score')}</div>
+                <div className="text-xs font-bold uppercase" style={{ color: 'var(--color-muted)' }}>{t('risk score')}</div>
                 <span className="text-xs font-bold uppercase px-2 py-0.5 rounded inline-block mt-1"
                   style={{ background: risk.bg, color: risk.color, border: `1px solid color-mix(in srgb, ${risk.color} 25%, transparent)` }}>
                   {risk.label}
@@ -406,7 +406,7 @@ Extract the work spec and write a bid proposal.`,
               </div>
             </div>
 
-            <div className="text-[10px] pt-2 border-t flex items-center gap-2" style={{ borderColor: 'var(--color-border)', color: 'var(--color-muted)' }}>
+            <div className="text-xs pt-2 border-t flex items-center gap-2" style={{ borderColor: 'var(--color-border)', color: 'var(--color-muted)' }}>
               <AlertTriangle className="w-3 h-3" style={{ color: risk.color }} />
               {margin < 10
                 ? t('margin critical — zero contingency safety net')
@@ -448,10 +448,10 @@ Extract the work spec and write a bid proposal.`,
                   <div className="text-xs font-bold truncate" style={{ color: 'var(--color-text)' }}>
                     {bid.title}
                   </div>
-                  <div className="text-[10px] mt-0.5" style={{ color: 'var(--color-muted)' }}>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>
                     {bid.agencyOrClient}{bid.locationCity ? ` · ${bid.locationCity}` : ''}
                   </div>
-                  <div className="text-[10px] mt-1 leading-relaxed line-clamp-2" style={{ color: 'var(--color-muted2)' }}>
+                  <div className="text-xs mt-1 leading-relaxed line-clamp-2" style={{ color: 'var(--color-muted2)' }}>
                     {bid.extractedScope}
                   </div>
                 </div>

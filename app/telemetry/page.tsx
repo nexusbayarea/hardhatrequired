@@ -196,44 +196,44 @@ export default function SystemTelemetryMonitor() {
         
         <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 relative overflow-hidden backdrop-blur flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Workspace API Spend</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Workspace API Spend</span>
             <span className="text-3xl font-mono font-extrabold text-cyan-400 mt-2 block">${stats.accumulatedCost.toFixed(5)}</span>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-800 text-[10px] text-slate-500 font-mono">
+          <div className="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-500 font-mono">
             Accumulated over {stats.totalApiCalls} transaction traces
           </div>
         </div>
 
         <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 relative overflow-hidden backdrop-blur flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Mean Queue Latency</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Mean Queue Latency</span>
             <span className="text-3xl font-mono font-extrabold text-white mt-2 block">{stats.averageLatencyMs}ms</span>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-800 text-[10px] text-slate-500 font-mono">
+          <div className="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-500 font-mono">
             Google/Apollo/System base averages
           </div>
         </div>
 
         <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 relative overflow-hidden backdrop-blur flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Average LLM Grounding</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Average LLM Grounding</span>
             <span className="text-3xl font-mono font-extrabold text-cyan-300 mt-2 block">{stats.averageGeminiLatencyMs}ms</span>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-800 text-[10px] text-slate-500 font-mono">
+          <div className="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-500 font-mono">
             Direct Gemini-2.5 crawling cycle speed
           </div>
         </div>
 
         <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 relative overflow-hidden backdrop-blur flex flex-col justify-between">
           <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Crawler Error Rate</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Crawler Error Rate</span>
             <span className={`text-3xl font-mono font-extrabold mt-2 block ${stats.failureRatePercentage > 3.0 ? 'text-rose-400' : 'text-emerald-400'}`}>
               {stats.failureRatePercentage}%
             </span>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-800 text-[10px] text-slate-500 font-mono flex justify-between items-center">
+          <div className="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-500 font-mono flex justify-between items-center">
             <span>SLA Standard &le; 5.0%</span>
-            <span className="text-emerald-400 font-bold uppercase tracking-widest text-[8px] bg-emerald-950 px-1 rounded border border-emerald-800/40">Healthy</span>
+            <span className="text-emerald-400 font-bold uppercase tracking-widest text-xs bg-emerald-950 px-1 rounded border border-emerald-800/40">Healthy</span>
           </div>
         </div>
 
@@ -270,7 +270,7 @@ export default function SystemTelemetryMonitor() {
                   Worker Backpressure ({backpressureCount})
                 </button>
               </div>
-              <span className="text-[10px] font-mono text-slate-500">
+              <span className="text-xs font-mono text-slate-500">
                 Viewing telemetry slice mapped to: <span className="text-cyan-400">{activeVertical}</span>
               </span>
             </div>
@@ -279,7 +279,7 @@ export default function SystemTelemetryMonitor() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="text-[10px] font-mono text-slate-400 tracking-wider uppercase border-b border-slate-850">
+                    <tr className="text-xs font-mono text-slate-400 tracking-wider uppercase border-b border-slate-850">
                       <th className="pb-3 font-semibold">Time</th>
                       <th className="pb-3 font-semibold">ID</th>
                       <th className="pb-3 font-semibold">System Instance</th>
@@ -294,7 +294,7 @@ export default function SystemTelemetryMonitor() {
                         <td className="py-3 text-slate-500">{t.timestamp}</td>
                         <td className="py-3 text-slate-400 font-bold">{t.id}</td>
                         <td className="py-3">
-                          <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold border ${
+                          <span className={`px-2 py-0.5 rounded text-xs uppercase font-bold border ${
                             t.provider === 'gemini_grounding' ? 'bg-amber-950/30 text-amber-400 border-amber-800/40' :
                             t.provider === 'google_places' ? 'bg-blue-950/30 text-blue-400 border-blue-800/40' :
                             t.provider === 'apollo' ? 'bg-indigo-950/30 text-indigo-400 border-indigo-800/40' :
@@ -323,17 +323,17 @@ export default function SystemTelemetryMonitor() {
                   <div key={name} className="bg-slate-950/60 p-4 rounded-xl border border-slate-850 flex flex-col justify-between">
                     <div className="flex justify-between items-center">
                       <span className="text-xs uppercase font-bold font-mono text-cyan-400">{name.replace(/_/g, ' ')}</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded font-bold bg-slate-900 border border-slate-800 text-slate-300">
+                      <span className="text-xs px-1.5 py-0.5 rounded font-bold bg-slate-900 border border-slate-800 text-slate-300">
                         SR: {data.success_rate}%
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mt-4">
                       <div>
-                        <span className="text-[9px] text-slate-500 block">Avg Response Time</span>
+                        <span className="text-xs text-slate-500 block">Avg Response Time</span>
                         <span className="text-lg font-mono font-bold text-white">{data.avg_latency}ms</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-[9px] text-slate-500 block">Accumulated Spend</span>
+                        <span className="text-xs text-slate-500 block">Accumulated Spend</span>
                         <span className="text-lg font-mono font-bold text-cyan-400">${data.total_cost.toFixed(6)}</span>
                       </div>
                     </div>
@@ -361,7 +361,7 @@ export default function SystemTelemetryMonitor() {
                       />
                     ))}
                   </div>
-                  <div className="flex justify-between text-[9px] text-slate-500 mt-2">
+                  <div className="flex justify-between text-xs text-slate-500 mt-2">
                     <span>Low Queue Backpressure</span>
                     <span>Buffer Bound Limits (Max 8 concurrent)</span>
                   </div>
@@ -376,12 +376,12 @@ export default function SystemTelemetryMonitor() {
                   </div>
                   <div className="flex justify-between text-xs text-slate-500">
                     <span className="text-slate-300">edge_compute_hourly_sweep</span>
-                    <span className="font-mono text-[10px]">0 * * * *</span>
+                    <span className="font-mono text-xs">0 * * * *</span>
                     <span className="text-cyan-500 font-bold">Queued</span>
                   </div>
                   <div className="flex justify-between text-xs text-slate-500">
                     <span className="text-slate-300">gas_deli_weekly_sweep</span>
-                    <span className="font-mono text-[10px]">0 0 * * 5</span>
+                    <span className="font-mono text-xs">0 0 * * 5</span>
                     <span className="text-slate-500">Sleeping</span>
                   </div>
                 </div>
@@ -397,19 +397,19 @@ export default function SystemTelemetryMonitor() {
             <ul className="space-y-3 font-mono text-xs">
               <li className="flex justify-between items-center bg-slate-950/40 p-2.5 rounded border border-slate-850">
                 <span className="text-slate-400">NEXT_PUBLIC_SUPABASE_URL</span>
-                <span className="text-emerald-400 font-bold uppercase text-[10px] bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/40">Linked</span>
+                <span className="text-emerald-400 font-bold uppercase text-xs bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/40">Linked</span>
               </li>
               <li className="flex justify-between items-center bg-slate-950/40 p-2.5 rounded border border-slate-850">
                 <span className="text-slate-400">GOOGLE_PLACES_API_KEY</span>
-                <span className="text-emerald-400 font-bold uppercase text-[10px] bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/40">Linked</span>
+                <span className="text-emerald-400 font-bold uppercase text-xs bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/40">Linked</span>
               </li>
               <li className="flex justify-between items-center bg-slate-950/40 p-2.5 rounded border border-slate-850">
                 <span className="text-slate-400">APOLLO_API_KEY</span>
-                <span className="text-emerald-400 font-bold uppercase text-[10px] bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/40">Linked</span>
+                <span className="text-emerald-400 font-bold uppercase text-xs bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/40">Linked</span>
               </li>
               <li className="flex justify-between items-center bg-slate-950/40 p-2.5 rounded border border-slate-850">
                 <span className="text-slate-400">GEMINI_API_KEY</span>
-                <span className="text-emerald-400 font-bold uppercase text-[10px] bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/40">Linked</span>
+                <span className="text-emerald-400 font-bold uppercase text-xs bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800/40">Linked</span>
               </li>
             </ul>
           </div>

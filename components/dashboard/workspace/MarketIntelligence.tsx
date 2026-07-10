@@ -114,7 +114,7 @@ export default function MarketIntelligence() {
             </div>
             <div className="text-2xl font-bold font-mono" style={{ color: 'var(--color-text)' }}>{s.value}</div>
             <div className="text-[11px] font-semibold mt-1" style={{ color: 'var(--color-muted)' }}>{t(s.label)}</div>
-            <div className="text-[10px] font-medium mt-0.5" style={{ color: 'var(--color-green)' }}>{s.trend}</div>
+            <div className="text-xs font-medium mt-0.5" style={{ color: 'var(--color-green)' }}>{s.trend}</div>
           </div>
         ))}
       </div>
@@ -140,7 +140,7 @@ export default function MarketIntelligence() {
                 <div key={i} className="p-3 rounded-lg transition-colors"
                   style={{ background: 'var(--color-surface2)' }}>
                   <div className="text-xs font-bold" style={{ color: 'var(--color-text)' }}>{item.title}</div>
-                  <div className="text-[10px] mt-0.5" style={{ color: 'var(--color-muted)' }}>{item.subtitle}</div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>{item.subtitle}</div>
                 </div>
               ))}
             </div>

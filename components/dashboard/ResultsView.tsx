@@ -78,7 +78,7 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
                           {r.fitType && (
                             <span
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider"
                               style={{ background: fitColor.bg, color: fitColor.text }}
                             >
                               {FIT_ICONS[r.fitType]} {getFitTypeLabel(r.fitType)}
@@ -98,7 +98,7 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                         {isDisposal && r.permits && r.permits.length > 0 && (
                           <div className="mt-1">
                             <span
-                              className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                              className={`text-xs font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
                                 r.permits.some(p => p.status === 'Active') ? 'tag-green-active' : 'tag-red-active'
                               }`}
                             >
@@ -283,7 +283,7 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                           <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('matched keywords')}</div>
                           <div className="flex flex-wrap gap-2">
                             {r.matchedSignals.map((s, i) => (
-                              <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium tag-green">
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium tag-green">
                                 {s}
                               </span>
                             ))}
@@ -295,7 +295,7 @@ function ResultsCards({ results, onFeedback, activePane, projectVolume, vertical
                           <div className="text-xs font-black uppercase tracking-widest mb-2 text-muted">{t('scraped keywords')}</div>
                           <div className="flex flex-wrap gap-2">
                             {r.scrapedKeywords.map((kw, i) => (
-                              <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium tag-yellow">
+                              <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium tag-yellow">
                                 {kw}
                               </span>
                             ))}
@@ -425,7 +425,7 @@ export default function ResultsView({ results, loading, error, vertical, project
             <Share2 className="w-3 h-3" />
             {t('graph')}
           </button>
-          <span className="text-[11px] font-medium ml-auto text-muted">
+          <span className="text-xs font-medium ml-auto text-muted">
             {results!.length} {t('results')}
           </span>
         </div>

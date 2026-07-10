@@ -17,7 +17,7 @@ export default function SavedSearches({ searches, onSelect, onDelete }: SavedSea
         <div className="mb-8">
             <div className="flex items-center gap-2 mb-4">
                 <Bookmark size={14} className="text-red-600" />
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Saved Searches</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Saved Searches</h3>
             </div>
             <div className="flex flex-wrap gap-3">
                 {searches.map(search => (
@@ -29,13 +29,13 @@ export default function SavedSearches({ searches, onSelect, onDelete }: SavedSea
                         <div className="flex flex-col">
                             <span className="text-xs font-black uppercase tracking-tight">{search.name}</span>
                             <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{search.zipCode} • {search.radiusMiles}mi • {search.verticalId}</span>
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{search.zipCode} • {search.radiusMiles}mi • {search.verticalId}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 ml-2 border-l border-gray-100 dark:border-gray-800 pl-4">
                             <div className="flex flex-col items-center">
                                 <span className="text-xs font-black text-red-600">{search.resultCount}</span>
-                                <span className="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">Results</span>
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Results</span>
                             </div>
                             <button
                                 onClick={(e) => {

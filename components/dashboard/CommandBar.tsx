@@ -45,7 +45,7 @@ export default function CommandBar() {
           style={{ color: 'var(--color-text)' }}
           data-agent-intent="execute-foreman-command"
         />
-        <kbd className="hidden md:inline-flex text-[10px] font-bold px-1.5 py-0.5 rounded"
+        <kbd className="hidden md:inline-flex text-xs font-bold px-1.5 py-0.5 rounded"
           style={{
             background: 'var(--color-surface2)',
             color: 'var(--color-muted)',

@@ -22,7 +22,7 @@ function BadgeList({ badges }: { badges: string[] | null }) {
       {badges.map(b => (
         <span
           key={b}
-          className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+          className="text-xs font-semibold px-1.5 py-0.5 rounded"
           style={{
             background: 'color-mix(in srgb, #a855f7 10%, transparent)',
             color: '#a855f7',

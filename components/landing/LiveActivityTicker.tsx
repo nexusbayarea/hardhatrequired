@@ -51,7 +51,7 @@ export default function LiveActivityTicker() {
       }}
     >
       <div className="max-w-[1400px] mx-auto px-5 md:px-8 flex items-center gap-4">
-        <span className="text-[10px] font-black uppercase tracking-widest shrink-0" style={{ color: 'var(--color-red)' }}>
+        <span className="text-xs font-black uppercase tracking-widest shrink-0" style={{ color: 'var(--color-red)' }}>
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-red animate-pulse mr-1.5 align-middle" />
           {t('LIVE')}
         </span>
@@ -60,7 +60,7 @@ export default function LiveActivityTicker() {
           <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>
             {active.text}
           </p>
-          <span className="text-[11px] shrink-0 ml-auto tabular-nums" style={{ color: 'var(--color-muted)' }}>
+          <span className="text-xs shrink-0 ml-auto tabular-nums" style={{ color: 'var(--color-muted)' }}>
             {active.time}
           </span>
         </div>
