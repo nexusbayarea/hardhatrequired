@@ -8,7 +8,7 @@ import { Droplets, Users, Truck } from 'lucide-react';
 const PANE_COLORS: Record<string, string> = {
   disposal: 'var(--color-green)',
   labor: 'var(--color-red)',
-  equipment: 'var(--color-blue)',
+  equipment: 'var(--color-purple)',
 };
 
 export default function QuickActions() {

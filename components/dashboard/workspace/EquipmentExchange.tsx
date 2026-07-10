@@ -11,7 +11,7 @@ import BookingModal from '@/components/equipment/BookingModal';
 import type { EquipmentRentalResult, EquipmentRentalSearchResponse } from '@iie/sdk';
 
 const EQUIPMENT_CLASSES = [
-  { id: '', label: 'all types' },
+  { id: '', label: '(select)' },
   { id: 'vacuum_truck_5k', label: 'Vacuum Truck 5K' },
   { id: 'vacuum_truck_3k', label: 'Vacuum Truck 3K' },
   { id: 'excavator_heavy', label: 'Excavator (Heavy)' },
@@ -28,7 +28,7 @@ export default function EquipmentExchange() {
   const [longitude, setLongitude] = useState<number>(-122.4194);
   const [radiusMiles, setRadiusMiles] = useState(25);
   const [equipmentClass, setEquipmentClass] = useState('');
-  const [targetDate, setTargetDate] = useState(new Date().toISOString().split('T')[0]);
+  const [targetDate, setTargetDate] = useState('');
   const [results, setResults] = useState<EquipmentRentalResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -66,7 +66,7 @@ export default function EquipmentExchange() {
           longitude,
           radius_miles: radiusMiles,
           equipment_class: equipmentClass || undefined,
-          target_date: targetDate,
+          target_date: targetDate || undefined,
         }),
       });
       const data: EquipmentRentalSearchResponse = await res.json();
@@ -148,7 +148,14 @@ export default function EquipmentExchange() {
 
           <div>
             <label className="field-label text-sm"><Calendar className="w-5 h-5" />{t('target date')}</label>
-            <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} className="field-input text-base" />
+            <div className="relative">
+              <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} className="field-input text-base" />
+              {!targetDate && (
+                <span className="absolute left-4 top-0 bottom-0 flex items-center text-sm pointer-events-none" style={{ color: 'var(--color-muted)' }}>
+                  {t('(select)')}
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-end">
