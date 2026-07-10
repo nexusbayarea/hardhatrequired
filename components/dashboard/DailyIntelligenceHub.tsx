@@ -273,7 +273,7 @@ export default function DailyIntelligenceHub({
           )}
           <button
             onClick={fetchFeed}
-            className="px-2.5 py-1 rounded font-semibold text-xs hover:text-white transition-colors"
+            className="px-2.5 py-1 rounded font-semibold text-xs hover:text-text transition-colors"
             style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
           >
             {t('Refresh')}
@@ -327,7 +327,7 @@ export default function DailyIntelligenceHub({
               <span className="text-lg font-black uppercase tracking-widest text-red-500">
                 {t("Today's AI Briefing")}
               </span>
-              <p className="text-lg mt-1.5 font-black text-white">
+              <p className="text-lg mt-1.5 font-black text-text">
                 {feed[0].type === 'bid' ? `${feed[0].subtitle} ${t('published a new bid.')} ` : ''}
                 {sourceCompliance.length > 0 ? `${sourceCompliance.length} ${t('compliance update')}${sourceCompliance.length > 1 ? 's' : ''} ${t('to review.')} ` : ''}
                 {sourceNews.filter((n: any) => n.impact === 'High').length > 0 ? `${t('High-impact market changes detected.')} ` : ''}
@@ -336,14 +336,14 @@ export default function DailyIntelligenceHub({
               {briefingExpanded && (
                 <div className="mt-3 space-y-2 border-t border-slate-700 pt-3">
                   {feed.slice(0, 5).map(f => (
-                    <div key={f.id} className="flex items-center gap-2 text-sm font-medium text-slate-300">
+                    <div key={f.id} className="flex items-center gap-2 text-sm font-medium text-muted">
                       <span className="w-2 h-2 rounded-full shrink-0" style={{ background: TYPE_META[f.type].dot }} />
                       <span className="truncate">{f.title}</span>
                     </div>
                   ))}
                 </div>
               )}
-              <span className="text-sm mt-2 inline-block font-semibold text-slate-300">
+              <span className="text-sm mt-2 inline-block font-semibold text-muted">
                 {briefingExpanded ? t('Collapse ↑') : t('Expand ↓')}
               </span>
             </div>
@@ -394,10 +394,10 @@ export default function DailyIntelligenceHub({
                         </span>
                       )}
                     </div>
-                    <h3 className="text-lg font-bold text-white leading-snug">
+                    <h3 className="text-lg font-bold text-text leading-snug">
                       {item.title}
                     </h3>
-                    <span className="text-sm font-medium text-slate-300">
+                    <span className="text-sm font-medium text-muted">
                       {item.subtitle}
                     </span>
                   </div>
@@ -427,8 +427,8 @@ export default function DailyIntelligenceHub({
                       className="px-3 py-2 rounded text-sm"
                       style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
                     >
-                      <span className="block font-bold text-slate-100">{val}</span>
-                      <span className="block text-xs text-slate-400 mt-0.5 capitalize">{t(key)}</span>
+                      <span className="block font-bold text-text">{val}</span>
+                      <span className="block text-xs text-muted mt-0.5 capitalize">{t(key)}</span>
                     </div>
                   ))}
                 </div>
@@ -442,9 +442,9 @@ export default function DailyIntelligenceHub({
                     <Network className="w-5 h-5 shrink-0 text-red-500" />
                     {GRAPH_EXAMPLES.map((g, i) => (
                       <div key={g.labelKey} className="flex items-center gap-1.5 text-sm">
-                        <g.icon className="w-4 h-4 text-slate-300" />
-                        <span className="text-slate-300">{t(g.labelKey)}:</span>
-                        <span className="font-semibold text-slate-100">
+                        <g.icon className="w-4 h-4 text-muted" />
+                        <span className="text-muted">{t(g.labelKey)}:</span>
+                        <span className="font-semibold text-text">
                           {g.count} {g.unitKey ? t(g.unitKey) : ''}
                         </span>
                         {i < GRAPH_EXAMPLES.length - 1 && (
@@ -462,10 +462,10 @@ export default function DailyIntelligenceHub({
                     style={{ background: 'rgba(239, 68, 68, 0.06)', border: '1px solid rgba(239, 68, 68, 0.15)' }}
                   >
                     <DollarSign className="w-5 h-5 shrink-0 text-red-500" />
-                    <span className="text-sm font-medium text-slate-300">
-                      {t('Impacts')} <strong className="text-slate-100">{item.detail['impacted'] || t('N/A')}</strong> · 
+                    <span className="text-sm font-medium text-muted">
+                      {t('Impacts')} <strong className="text-text">{item.detail['impacted'] || t('N/A')}</strong> · 
                       {t('Avg penalty')} <strong className="text-red-400">{item.detail['avg penalty'] || item.detail.penalty}</strong> · 
-                      {t('Est.')} <strong className="text-slate-100">{item.detail['est. compliance'] || t('N/A')}</strong> {t('compliance work')}
+                      {t('Est.')} <strong className="text-text">{item.detail['est. compliance'] || t('N/A')}</strong> {t('compliance work')}
                     </span>
                   </div>
                 )}
@@ -516,7 +516,7 @@ export default function DailyIntelligenceHub({
                   onClick={() => { setShowAIPanel(false); setAiDraft(null); }}
                   className="p-1.5 rounded hover:bg-slate-800 transition-colors"
                 >
-                  <X className="w-5 h-5 text-slate-300" />
+                  <X className="w-5 h-5 text-muted" />
                 </button>
               </div>
 
@@ -536,7 +536,7 @@ export default function DailyIntelligenceHub({
               </div>
 
               <pre
-                className="text-sm leading-relaxed whitespace-pre-wrap rounded-lg p-5 overflow-y-auto max-h-[400px] font-mono text-slate-200"
+                className="text-sm leading-relaxed whitespace-pre-wrap rounded-lg p-5 overflow-y-auto max-h-[400px] font-mono text-text"
                 style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
               >
                 {aiDraft}
@@ -552,7 +552,7 @@ export default function DailyIntelligenceHub({
           className="mx-5 mb-4 p-5 rounded-xl"
           style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)' }}
         >
-          <span className="text-sm font-black uppercase tracking-widest flex items-center gap-1.5 mb-2 text-slate-300">
+          <span className="text-sm font-black uppercase tracking-widest flex items-center gap-1.5 mb-2 text-muted">
             <ArrowUpRight className="w-4 h-4" />
             {t('Because you searched')} "{t(vertical.replace(/_/g, ' '))}"
           </span>
@@ -570,7 +570,7 @@ export default function DailyIntelligenceHub({
                 { label: t('regulations'), count: counts.regulations },
                 { label: t('facilities'), count: Math.max(1, Math.round(Math.random() * 2)) },
               ].filter(c => c.count > 0).map(c => (
-                <span key={c.label} className="text-sm flex items-center gap-1 text-slate-200">
+                <span key={c.label} className="text-sm flex items-center gap-1 text-muted">
                   <span className="font-bold text-red-500">+{c.count}</span>
                   {c.label}
                 </span>
