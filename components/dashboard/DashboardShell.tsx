@@ -10,6 +10,7 @@ import MetricsRow from './MetricsRow';
 import SearchConsole from './SearchConsole';
 import ResultsView from './ResultsView';
 import CommandBar from './CommandBar';
+import LiveSearchProgress from './LiveSearchProgress';
 import IntelligenceRail from './IntelligenceRail';
 import LogisticsController from './LogisticsController';
 import ForemanDrawer from '@/components/ai/ForemanDrawer';
@@ -301,8 +302,9 @@ export default function DashboardShell() {
           {isSearchWorkspace && (
             <div>
               <MetricsRow />
-              <div className="mt-6 md:mt-8">
+              <div className="mt-6 md:mt-8 space-y-4">
                 <CommandBar />
+                <LiveSearchProgress />
               </div>
             </div>
           )}
