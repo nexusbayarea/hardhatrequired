@@ -48,6 +48,7 @@ export default function QuickActions() {
         <button
           className={`quick-action-btn${activePane === 'equipment' ? ' primary' : ''}`}
           onClick={() => {
+            setActivePane('equipment');
             setWorkspace('equipment');
           }}
           style={activePane === 'equipment' ? { background: PANE_COLORS.equipment, borderColor: PANE_COLORS.equipment } : {}}

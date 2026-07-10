@@ -146,12 +146,18 @@ export default function EquipmentExchange() {
             </div>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <label className="field-label text-sm"><Calendar className="w-5 h-5" />{t('target date')}</label>
             <div className="relative">
-              <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} className="field-input text-base" />
+              <input
+                type="date"
+                value={targetDate}
+                onChange={e => setTargetDate(e.target.value)}
+                className="field-input text-base"
+                style={!targetDate ? { color: 'transparent' } : {}}
+              />
               {!targetDate && (
-                <span className="absolute left-4 top-0 bottom-0 flex items-center text-sm pointer-events-none" style={{ color: 'var(--color-muted)' }}>
+                <span className="absolute left-4 top-0 bottom-0 flex items-center text-sm pointer-events-none select-none" style={{ color: 'var(--color-muted)' }}>
                   {t('(select)')}
                 </span>
               )}

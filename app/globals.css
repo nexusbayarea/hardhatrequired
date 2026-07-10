@@ -17,6 +17,7 @@ html:not([data-theme]) {
   --color-green:     #15803D;
   --color-yellow:    #B45309;
   --color-accent:    #fdb813;
+  --color-purple:    #7C3AED;
   --color-indigo:    #4F46E5;
   --shadow-card:     0 0 0 1px rgba(0,0,0,0.08);
   --shadow-glow:     0 0 60px rgba(255,206,68,0.08);
@@ -37,6 +38,7 @@ html[data-theme="night"] {
   --color-yellow:    #fdb813;
   --color-blue:      #3B82F6;
   --color-accent:    #fdb813;
+  --color-purple:    #A855F7;
   --shadow-card:     0 0 0 1px rgba(255,255,255,0.04);
   --shadow-glow:     0 0 60px rgba(255,206,68,0.12);
   --color-indigo:    #6366F1;
@@ -56,6 +58,7 @@ html[data-theme="night"] {
   --color-green:   var(--color-green);
   --color-yellow:  var(--color-yellow);
   --color-blue:    var(--color-blue);
+  --color-purple:  var(--color-purple);
   --color-indigo:  var(--color-indigo);
 }
 
