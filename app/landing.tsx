@@ -668,31 +668,134 @@ function LandingInner() {
       </section>
 
       {/* ───── FOOTER ───── */}
-      <footer
-        className="py-12 border-t"
-        style={{ borderColor: 'var(--color-border)' }}
-      >
-        <div className="max-w-[1400px] mx-auto px-5 md:px-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center"
-                style={{ background: 'var(--color-red)' }}
-              >
-                <HardHat className="w-4 h-4 text-white" />
-              </div>
-              <span
-                className="font-black text-lg"
-                style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '-0.01em' }}
-              >
-                HARD HATS REQUIRED
-              </span>
-            </Link>
+      <footer style={{ background: 'var(--color-bg)', borderTop: '2px solid var(--color-border)' }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '72px 32px 40px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 48, marginBottom: 64 }}>
+            
+            {/* Brand column */}
+            <div style={{ gridColumn: 'span 1' }}>
+              <Link href="/" className="flex items-center gap-3" style={{ marginBottom: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--color-red)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <HardHat className="w-4 h-4 text-white" />
+                </div>
+                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 22, color: 'var(--color-text)', letterSpacing: '-0.02em' }}>
+                  HHR
+                </span>
+              </Link>
+              <p style={{ fontSize: 14, color: 'var(--color-muted)', lineHeight: 1.8, marginBottom: 24, maxWidth: 240, fontWeight: 500 }}>
+                {t('Find every job. Win every bid. — AI-powered market intelligence built for the field.')}
+              </p>
 
-            <span className="text-sm" style={{ color: 'var(--color-muted)' }}>
-              © 2026 Hard Hat Required. All rights reserved.
+              {/* App store badges */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
+                <button className="btn-primary" style={{ width: 'fit-content', height: 48, padding: '0 20px', fontSize: 13, gap: 8, borderRadius: 10 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                  App Store
+                </button>
+                <button className="btn-primary" style={{ width: 'fit-content', height: 48, padding: '0 20px', fontSize: 13, gap: 8, borderRadius: 10 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.595-2.09.91-3.21.9C10.18 21.17 7 18 7 14c0-3.31 2.69-6 6-6 1.52 0 2.87.57 3.9 1.49L14.57 12H20v-2h-6.14c-.48-.77-1.24-1.36-2.14-1.65C10.73 8.12 9.35 8 8 8.14 5.63 8.43 3.74 9.94 3.14 12c-.73 2.47.43 5.13 2.86 6.26.53.24 1.09.4 1.66.46-1.69-.39-3.16-1.64-3.66-3.31C3.39 12.85 4.74 10.14 7.31 9.19c1.04-.4 2.17-.5 3.25-.24 1.11.27 2.07.89 2.74 1.77.67.88 1 1.98.94 3.11-.05 1.06-.45 2.06-1.15 2.83-.7.77-1.66 1.26-2.7 1.37-1.04.11-2.1-.16-2.97-.76-.87-.6-1.49-1.53-1.72-2.57-.5-2.19.93-4.39 3.11-4.89.49-.11 1-.14 1.5-.07-.7.28-1.26.79-1.61 1.45-.35.66-.44 1.43-.25 2.15.37 1.38 1.7 2.22 3.09 1.97.66-.12 1.25-.47 1.67-.99.42-.52.65-1.17.62-1.84C12.05 11.69 11 10.91 9.84 10.91h-.37c.82-.54 1.83-.71 2.78-.47 2.08.53 3.39 2.55 3.14 4.71-.12 1.04-.61 2.01-1.41 2.71-.8.7-1.84 1.09-2.91 1.11-.52.01-1.04-.06-1.54-.22-.19.23-.39.45-.59.66.57.19 1.16.3 1.76.3 1.49 0 2.96-.56 4.06-1.55l.29.28z"/></svg>
+                  Google Play
+                </button>
+              </div>
+
+              {/* Social icons */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: 12 }}>Follow Us</div>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {[
+                    { label: 'X', href: '#', path: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' },
+                    { label: 'LinkedIn', href: '#', path: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z' },
+                    { label: 'Instagram', href: '#', path: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z' },
+                    { label: 'YouTube', href: '#', path: 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z' },
+                  ].map(s => (
+                    <a key={s.label} href={s.href} aria-label={s.label}
+                      style={{
+                        width: 36, height: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'var(--color-surface2)', border: '1px solid var(--color-border)', color: 'var(--color-muted)',
+                        transition: 'all 0.2s', cursor: 'pointer',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-red)'; e.currentTarget.style.borderColor = 'var(--color-red)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = 'var(--color-muted)'; e.currentTarget.style.borderColor = 'var(--color-border)'; }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d={s.path}/></svg>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Product links */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: 20 }}>Product</div>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {['Company Discovery','Lead Scoring','Contact Enrichment','Campaign Engine','Market Intelligence','API Access','Pricing'].map(link => (
+                  <li key={link}>
+                    <Link href="#" style={{ fontSize: 14, color: 'var(--color-muted)', fontWeight: 500, textDecoration: 'none', transition: 'color 0.2s' }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--color-text)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--color-muted)'}
+                    >{link}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company links */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: 20 }}>Company</div>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {['About Us','Blog','Careers','Press','Partners','Contact'].map(link => (
+                  <li key={link}>
+                    <Link href="#" style={{ fontSize: 14, color: 'var(--color-muted)', fontWeight: 500, textDecoration: 'none', transition: 'color 0.2s' }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--color-text)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--color-muted)'}
+                    >{link}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Legal links */}
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: 20 }}>Legal</div>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {['Privacy Policy','Terms of Service','Cookie Policy','Accessibility','Security','Sitemap'].map(link => (
+                  <li key={link}>
+                    <Link href="#" style={{ fontSize: 14, color: 'var(--color-muted)', fontWeight: 500, textDecoration: 'none', transition: 'color 0.2s' }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--color-text)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--color-muted)'}
+                    >{link}</Link>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => alert('Cookie preferences panel would open here')}
+                style={{
+                  marginTop: 20, display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '8px 14px', borderRadius: 8, border: '1px solid var(--color-border)',
+                  background: 'transparent', color: 'var(--color-muted)', fontSize: 13, fontWeight: 600,
+                  cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-red)'; e.currentTarget.style.color = 'var(--color-red)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-muted)'; }}
+              >
+                🍪 Cookie Preferences
+              </button>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: 'var(--color-border)', marginBottom: 28 }} />
+
+          {/* Bottom bar */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ fontSize: 14, color: 'var(--color-muted)' }}>© 2026 Hard Hat Required. All rights reserved.</span>
+              <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>Made with 🏗️ in the USA</span>
+            </div>
+            <span style={{ fontSize: 12, color: 'var(--color-muted)', maxWidth: 400, textAlign: 'center' }}>
+              Data sourced from public records, permits, and licensed business registries. Verify independently for final decisions.
             </span>
+            <LanguageToggle />
           </div>
         </div>
       </footer>
