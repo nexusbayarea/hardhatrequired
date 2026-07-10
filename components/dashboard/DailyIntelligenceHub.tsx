@@ -327,7 +327,7 @@ export default function DailyIntelligenceHub({
               <span className="text-lg font-black uppercase tracking-widest text-red-500">
                 {t("Today's AI Briefing")}
               </span>
-              <p className="text-base mt-1.5 font-semibold text-slate-100">
+              <p className="text-lg mt-1.5 font-black text-white">
                 {feed[0].type === 'bid' ? `${feed[0].subtitle} ${t('published a new bid.')} ` : ''}
                 {sourceCompliance.length > 0 ? `${sourceCompliance.length} ${t('compliance update')}${sourceCompliance.length > 1 ? 's' : ''} ${t('to review.')} ` : ''}
                 {sourceNews.filter((n: any) => n.impact === 'High').length > 0 ? `${t('High-impact market changes detected.')} ` : ''}
