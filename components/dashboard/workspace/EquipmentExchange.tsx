@@ -154,13 +154,13 @@ export default function EquipmentExchange() {
                 value={targetDate}
                 onChange={e => setTargetDate(e.target.value)}
                 className="field-input text-base"
-                style={!targetDate ? { color: 'transparent' } : {}}
+                style={!targetDate ? { opacity: 0, position: 'absolute', inset: 0, zIndex: 1 } : {}}
               />
-              {!targetDate && (
-                <span className="absolute left-4 top-0 bottom-0 flex items-center text-sm pointer-events-none select-none" style={{ color: 'var(--color-muted)' }}>
+              {!targetDate ? (
+                <div className="flex items-center h-[46px] px-4 rounded-lg text-sm pointer-events-none select-none" style={{ background: 'var(--color-surface2)', border: '1px solid var(--color-border)', color: 'var(--color-muted)' }}>
                   {t('(select)')}
-                </span>
-              )}
+                </div>
+              ) : null}
             </div>
           </div>
 
