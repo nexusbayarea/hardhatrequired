@@ -12,8 +12,8 @@ import type { EquipmentRentalResult, EquipmentRentalSearchResponse } from '@iie/
 
 const EQUIPMENT_CLASSES = [
   { id: '', label: 'all types' },
-  { id: 'vacuum_truck_3k', label: 'Vacuum Truck 3K' },
   { id: 'vacuum_truck_5k', label: 'Vacuum Truck 5K' },
+  { id: 'vacuum_truck_3k', label: 'Vacuum Truck 3K' },
   { id: 'excavator_heavy', label: 'Excavator (Heavy)' },
   { id: 'end_dump_trailer', label: 'End Dump Trailer' },
   { id: 'frac_tank_21k', label: 'Frac Tank 21K' },
@@ -220,22 +220,19 @@ export default function EquipmentExchange() {
             ))}
           </div>
 
-          {/* Desktop: Comparative table */}
+          {/* Desktop: Comparative table matching the SlurryFlow prototype */}
           <div className="hidden sm:block rounded-xl overflow-hidden" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b" style={{ background: 'var(--color-surface2)', borderColor: 'var(--color-border)' }}>
-                    <th className="p-3.5 font-semibold" style={{ color: 'var(--color-muted)' }}>{t('provider')}</th>
-                    <th className="p-3.5 font-semibold text-center" style={{ color: 'var(--color-muted)' }}>{t('class')}</th>
-                    <th className="p-3.5 font-semibold text-center" style={{ color: 'var(--color-muted)' }}>{t('distance')}</th>
+                    <th className="p-3.5 font-semibold" style={{ color: 'var(--color-muted)' }}>{t('rental partner')}</th>
+                    <th className="p-3.5 font-semibold text-center" style={{ color: 'var(--color-muted)' }}>{t('distance (s_prox)')}</th>
+                    <th className="p-3.5 font-semibold text-center" style={{ color: 'var(--color-muted)' }}>{t('trust index (t)')}</th>
+                    <th className="p-3.5 font-semibold text-center" style={{ color: 'var(--color-muted)' }}>{t('composite rank')}</th>
                     <th className="p-3.5 font-semibold text-right" style={{ color: 'var(--color-muted)' }}>{t('daily rate')}</th>
-                    <th className="p-3.5 font-semibold text-right hidden lg:table-cell" style={{ color: 'var(--color-muted)' }}>{t('weekly')}</th>
                     <th className="p-3.5 font-semibold text-right hidden lg:table-cell" style={{ color: 'var(--color-muted)' }}>{t('delivery')}</th>
-                    <th className="p-3.5 font-semibold text-right" style={{ color: 'var(--color-muted)' }}>{t('total budget')}</th>
-                    <th className="p-3.5 font-semibold text-center" style={{ color: 'var(--color-muted)' }}>{t('confidence')}</th>
-                    <th className="p-3.5 font-semibold text-center hidden xl:table-cell" style={{ color: 'var(--color-muted)' }}>{t('trust')}</th>
-                    <th className="p-3.5 font-semibold text-center hidden xl:table-cell" style={{ color: 'var(--color-muted)' }}>{t('partner')}</th>
+                    <th className="p-3.5 font-semibold text-right" style={{ color: 'var(--color-muted)' }}>{t('estimated total')}</th>
                     <th className="p-3.5 font-semibold text-center">{t('action')}</th>
                   </tr>
                 </thead>
@@ -245,47 +242,40 @@ export default function EquipmentExchange() {
                       <td className="p-3.5">
                         <div className="font-bold" style={{ color: 'var(--color-text)' }}>{item.provider_name}</div>
                         <div className="text-[10px]" style={{ color: 'var(--color-muted)' }}>
-                          {[item.city, item.state].filter(Boolean).join(', ')}
+                          {item.equipment_class.replace(/_/g, ' ')}
                         </div>
                       </td>
                       <td className="p-3.5 text-center">
-                        <span className="text-[10px] font-mono capitalize" style={{ color: 'var(--color-muted)' }}>
-                          {item.equipment_class.replace(/_/g, ' ')}
-                        </span>
+                        <div className="font-mono" style={{ color: 'var(--color-text)' }}>{item.distance_miles} mi</div>
+                        <div className="text-[9px] font-semibold" style={{ color: 'var(--color-indigo)' }}>Prox: {item.proximity_score}</div>
                       </td>
-                      <td className="p-3.5 text-center font-mono" style={{ color: 'var(--color-text)' }}>{item.distance_miles} {t('mi')}</td>
+                      <td className="p-3.5 text-center">
+                        <div className="font-semibold font-mono" style={{ color: 'var(--color-text)' }}>{item.trust_index}%</div>
+                        <div className="text-[9px]" style={{ color: 'var(--color-muted)' }}>
+                          {item.is_verified_partner ? 'Insured' : 'No Ins.'}
+                        </div>
+                      </td>
+                      <td className="p-3.5 text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-surface2)' }}>
+                            <div className="h-full rounded-full" style={{
+                              width: `${item.composite_confidence_rating}%`,
+                              background: confidenceColor(item.composite_confidence_rating),
+                            }} />
+                          </div>
+                          <span className="font-mono text-[11px] font-bold" style={{ color: confidenceColor(item.composite_confidence_rating) }}>
+                            {item.composite_confidence_rating}
+                          </span>
+                        </div>
+                      </td>
                       <td className="p-3.5 text-right font-mono font-bold" style={{ color: 'var(--color-text)' }}>
                         ${item.daily_rate.toLocaleString()}
-                      </td>
-                      <td className="p-3.5 text-right font-mono hidden lg:table-cell" style={{ color: 'var(--color-muted)' }}>
-                        {item.weekly_rate ? `$${item.weekly_rate.toLocaleString()}` : '—'}
                       </td>
                       <td className="p-3.5 text-right font-mono hidden lg:table-cell" style={{ color: 'var(--color-muted)' }}>
                         ${item.delivery_fee.toLocaleString()}
                       </td>
                       <td className="p-3.5 text-right font-mono font-bold" style={{ color: 'var(--color-indigo)' }}>
-                        ${totalBudget(item).toLocaleString()}
-                      </td>
-                      <td className="p-3.5 text-center">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{
-                          background: `color-mix(in srgb, ${confidenceColor(item.composite_confidence_rating)} 12%, transparent)`,
-                          color: confidenceColor(item.composite_confidence_rating),
-                        }}>
-                          {item.composite_confidence_rating}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-center hidden xl:table-cell">
-                        <div className="flex items-center justify-center gap-1">
-                          <Shield className="w-3 h-3" style={{ color: item.trust_index >= 70 ? 'var(--color-green)' : 'var(--color-yellow)' }} />
-                          <span className="text-[10px] font-mono" style={{ color: 'var(--color-muted)' }}>{item.trust_index}</span>
-                        </div>
-                      </td>
-                      <td className="p-3.5 text-center hidden xl:table-cell">
-                        {item.is_verified_partner ? (
-                          <CheckCircle className="w-4 h-4 mx-auto" style={{ color: 'var(--color-green)' }} />
-                        ) : (
-                          <XCircle className="w-4 h-4 mx-auto" style={{ color: 'var(--color-muted)' }} />
-                        )}
+                        ${(item.daily_rate + item.delivery_fee).toLocaleString()}
                       </td>
                       <td className="p-3.5 text-center">
                         <div className="flex items-center gap-1.5 justify-center">
@@ -440,22 +430,28 @@ function EquipmentCard({
       </div>
 
       {/* Scores */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1.5">
-          <Shield className="w-3.5 h-3.5" style={{ color: confidenceColor }} />
-          <span className="text-xs font-bold font-mono" style={{ color: 'var(--color-text)' }}>{item.composite_confidence_rating}</span>
-          <span className="text-[9px]" style={{ color: 'var(--color-muted)' }}>{t('confidence')}</span>
+      <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-1">
+          <div className="w-8 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--color-surface2)' }}>
+            <div className="h-full rounded-full" style={{
+              width: `${item.composite_confidence_rating}%`,
+              background: confidenceColor,
+            }} />
+          </div>
+          <span className="text-xs font-bold font-mono" style={{ color: confidenceColor }}>{item.composite_confidence_rating}</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <GripVertical className="w-3.5 h-3.5" style={{ color: 'var(--color-yellow)' }} />
-          <span className="text-xs font-bold font-mono" style={{ color: 'var(--color-text)' }}>{item.proximity_score}</span>
-          <span className="text-[9px]" style={{ color: 'var(--color-muted)' }}>{t('proximity')}</span>
+        <div className="flex items-center gap-1">
+          <GripVertical className="w-3 h-3" style={{ color: 'var(--color-indigo)' }} />
+          <span className="text-xs font-mono" style={{ color: 'var(--color-text)' }}>{t('prox')}: {item.proximity_score}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Shield className="w-3 h-3" style={{ color: item.trust_index >= 70 ? 'var(--color-green)' : 'var(--color-yellow)' }} />
+          <span className="text-xs font-mono" style={{ color: 'var(--color-text)' }}>{t('trust')}: {item.trust_index}%</span>
         </div>
         {item.is_verified_partner && (
-          <div className="flex items-center gap-1">
-            <CheckCircle className="w-3 h-3" style={{ color: 'var(--color-green)' }} />
-            <span className="text-[9px] font-bold uppercase" style={{ color: 'var(--color-green)' }}>{t('verified')}</span>
-          </div>
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'color-mix(in srgb, var(--color-green) 12%, transparent)', color: 'var(--color-green)' }}>
+            {t('insured')}
+          </span>
         )}
         {item.requires_cdl && (
           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: 'color-mix(in srgb, var(--color-yellow) 12%, transparent)', color: 'var(--color-yellow)' }}>

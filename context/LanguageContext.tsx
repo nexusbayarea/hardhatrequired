@@ -501,6 +501,13 @@ const esDictionary: Record<string, string> = {
   '© 2026 hard hat required. all rights reserved.': '© 2026 Hard Hat Required. Todos los derechos reservados.',
 
   // ─── Equipment Rental Search ───
+  'distance (s_prox)': 'Distancia (S_prox)',
+  'trust index (t)': 'Índice de Confianza (T)',
+  'composite rank': 'Rango Compuesto',
+  'estimated total': 'Total Estimado',
+  'rental partner': 'Socio de Alquiler',
+  'insured': 'Asegurado',
+  'prox': 'Prox',
   'equipment search & discovery': 'Búsqueda y Descubrimiento de Equipos',
   'geospatial rental search with proximity scoring and confidence ratings': 'Búsqueda geoespacial con puntuación de proximidad y calificaciones de confianza',
   'equipment class': 'Clase de Equipo',
@@ -908,6 +915,13 @@ const zhDictionary: Record<string, string> = {
   '© 2026 hard hat required. all rights reserved.': '© 2026 Hard Hat Required. 保留所有权利。',
 
   // ─── Equipment Rental Search ───
+  'distance (s_prox)': '距离（S_prox）',
+  'trust index (t)': '信任指数（T）',
+  'composite rank': '综合排名',
+  'estimated total': '估算总计',
+  'rental partner': '租赁合作伙伴',
+  'insured': '已投保',
+  'prox': '邻近',
   'equipment search & discovery': '设备搜索与发现',
   'geospatial rental search with proximity scoring and confidence ratings': '具有邻近评分和置信评级的地理空间租赁搜索',
   'equipment class': '设备类别',
@@ -1315,6 +1329,13 @@ const viDictionary: Record<string, string> = {
   '© 2026 hard hat required. all rights reserved.': '© 2026 Hard Hat Required. Mọi quyền được bảo lưu.',
 
   // ─── Equipment Rental Search ───
+  'distance (s_prox)': 'Khoảng cách (S_prox)',
+  'trust index (t)': 'Chỉ số tin cậy (T)',
+  'composite rank': 'Xếp hạng tổng hợp',
+  'estimated total': 'Tổng ước tính',
+  'rental partner': 'Đối tác cho thuê',
+  'insured': 'Đã bảo hiểm',
+  'prox': 'Gần',
   'equipment search & discovery': 'Tìm kiếm & Khám phá Thiết bị',
   'geospatial rental search with proximity scoring and confidence ratings': 'Tìm kiếm cho thuê theo không gian địa lý với điểm gần và xếp hạng tin cậy',
   'equipment class': 'Loại Thiết bị',
