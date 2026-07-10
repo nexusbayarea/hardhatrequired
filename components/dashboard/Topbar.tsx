@@ -1,6 +1,7 @@
 'use client';
 
-import { Bell } from 'lucide-react';
+import { Bell, HardHat } from 'lucide-react';
+import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { useWorkspace } from '@/context/WorkspaceContext';
 import LanguageToggle from '@/components/shared/LanguageToggle';
@@ -10,24 +11,11 @@ interface TopbarProps {
   mobile?: boolean;
 }
 
-const WORKSPACE_LABELS: Record<string, string> = {
-  'command-center': 'Command Center',
-  'search': 'Search Intelligence',
-  'logistics': 'Logistics Intelligence',
-  'equipment': 'Equipment Exchange',
-  'bids': 'Bid Intelligence',
-  'market': 'Market Intelligence',
-  'saved-searches': 'Saved Searches',
-  'saved-vendors': 'Saved Vendors',
-  'projects': 'Projects',
-  'settings': 'Settings',
-};
-
 export default function Topbar({ mobile = false }: TopbarProps) {
   const { t } = useLanguage();
   const { workspace } = useWorkspace();
 
-  /* ── Mobile: compact actions only (no search bar) ── */
+  /* ── Mobile: compact actions only ── */
   if (mobile) {
     return (
       <div className="flex items-center gap-3">
@@ -57,7 +45,7 @@ export default function Topbar({ mobile = false }: TopbarProps) {
     );
   }
 
-  /* ── Desktop full topbar ── */
+  /* ── Desktop full topbar — matches landing nav ── */
   return (
     <header
       className="h-20 border-b flex items-center justify-between px-8"
@@ -67,35 +55,30 @@ export default function Topbar({ mobile = false }: TopbarProps) {
         backdropFilter: 'blur(12px)',
       }}
     >
-      {/* Page title — injected by route context in future, generic for now */}
-      <div className="min-w-0 flex-1 overflow-hidden">
-        <h1
-          className="font-black leading-none truncate"
-          style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: '1.75rem',
-            letterSpacing: '-0.01em',
-            color: 'var(--color-text)',
-          }}
+      {/* Logo — matches landing */}
+      <Link href="/" className="flex items-center gap-3 shrink-0">
+        <div
+          className="w-12 h-12 rounded-lg flex items-center justify-center shadow-lg"
+          style={{ background: 'var(--color-red)' }}
         >
-          {t(WORKSPACE_LABELS[workspace] || 'dashboard').toUpperCase()}
-        </h1>
-        <p className="text-sm font-medium mt-0.5 truncate" style={{ color: 'var(--color-muted)' }}>
-          {workspace === 'command-center' ? t('construction market intelligence dashboard') :
-           workspace === 'search' ? t('find operators, facilities, equipment, and regulatory records') :
-           workspace === 'logistics' ? t('route analysis, cost modeling, and crew planning') :
-           workspace === 'equipment' ? t('rental comparison, availability, and rate intelligence') :
-           workspace === 'bids' ? t('scope analysis, cost breakdown, and proposal generation') :
-           workspace === 'market' ? t('daily intelligence hub, bid feed, and market trends') :
-           t('construction market intelligence')}
-        </p>
-      </div>
+          <HardHat className="w-6 h-6 text-white" />
+        </div>
+        <div className="flex flex-col leading-none">
+          <span
+            className="font-display text-2xl tracking-tight"
+            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, letterSpacing: '-0.01em', color: 'var(--color-text)' }}
+          >
+            HHR
+          </span>
+          <span className="text-[15px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>
+            Hard Hat Required
+          </span>
+        </div>
+      </Link>
 
       <div className="flex items-center gap-4">
         <LanguageToggle />
-
         <ThemeToggle />
-
         <button
           className="relative p-2.5 rounded-xl transition-all"
           style={{ background: 'var(--color-surface2)' }}
@@ -107,7 +90,6 @@ export default function Topbar({ mobile = false }: TopbarProps) {
             style={{ background: 'var(--color-red)' }}
           />
         </button>
-
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center font-black text-sm text-white"
           style={{ background: 'linear-gradient(135deg, var(--color-red), color-mix(in srgb, var(--color-red) 60%, black))' }}

@@ -49,12 +49,14 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                     >
                       <HardHat className="w-5 h-5 text-white" />
                     </div>
-                    <span
-                      className="font-black text-2xl"
-                      style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '-0.01em', color: 'var(--color-text)' }}
-                    >
-                      HHR
-                    </span>
+                    <div className="flex flex-col leading-none">
+                      <span className="font-black text-2xl tracking-tight" style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '-0.01em', color: 'var(--color-text)' }}>
+                        HHR
+                      </span>
+                      <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>
+                        Hard Hat Required
+                      </span>
+                    </div>
                   </Link>
                   <Topbar mobile />
                 </header>
