@@ -1,12 +1,12 @@
-import type { CopilotRequest, CopilotResponse, ExtractedIntent } from '../types';
+import type { ForemanRequest, ForemanResponse, ExtractedIntent } from '../types';
 
-export async function sendMessage(request: CopilotRequest): Promise<CopilotResponse> {
-  const res = await fetch('/api/copilot', {
+export async function sendMessage(request: ForemanRequest): Promise<ForemanResponse> {
+  const res = await fetch('/api/foreman', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(request),
   });
-  if (!res.ok) throw new Error(`Copilot request failed: ${res.status}`);
+  if (!res.ok) throw new Error(`Foreman request failed: ${res.status}`);
   return res.json();
 }
 

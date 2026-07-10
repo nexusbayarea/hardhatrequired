@@ -1,4 +1,4 @@
-import type { CopilotIntent, ExtractedIntent } from '@/types/copilot';
+import type { ForemanIntent, ExtractedIntent } from '@/types/foreman';
 
 const VERTICAL_PATTERNS: [string, RegExp[]][] = [
   ['slurry_processing', [/slurry/, /concrete slurry/]],

@@ -1,4 +1,4 @@
-import type { AgentContext, AgentResult, CopilotIntent } from '@/types/copilot';
+import type { AgentContext, AgentResult, ForemanIntent } from '@/types/foreman';
 import { searchAgent } from './search-agent';
 import { logisticsAgent } from './logistics-agent';
 import { equipmentAgent } from './equipment-agent';
@@ -10,7 +10,7 @@ interface Agent {
 }
 
 class AgentRegistry {
-  private agents = new Map<CopilotIntent, Agent>();
+  private agents = new Map<ForemanIntent, Agent>();
 
   constructor() {
     this.agents.set('search', searchAgent);
@@ -20,11 +20,11 @@ class AgentRegistry {
     this.agents.set('compliance', complianceAgent);
   }
 
-  get(intent: CopilotIntent): Agent | undefined {
+  get(intent: ForemanIntent): Agent | undefined {
     return this.agents.get(intent);
   }
 
-  has(intent: CopilotIntent): boolean {
+  has(intent: ForemanIntent): boolean {
     return this.agents.has(intent);
   }
 }

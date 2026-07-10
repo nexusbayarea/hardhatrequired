@@ -1,26 +1,26 @@
 'use client';
 
 import { createContext, useContext, useCallback, useRef, useEffect, ReactNode } from 'react';
-import type { PageAction, CopilotEvent, CopilotEventName } from '@/types/copilot';
+import type { PageAction, ForemanEvent, ForemanEventName } from '@/types/foreman';
 import { pageAgent } from '@/lib/page-agent';
-import { copilotStore, useCopilotStore } from '@/stores/copilot.store';
+import { foremanStore, useForemanStore } from '@/stores/foreman.store';
 import { eventBus } from '@/lib/event-bus';
 import { frontendOrchestrator } from '@/lib/api/orchestrator/FrontendOrchestrator';
 
-interface CopilotContextValue {
-  messages: ReturnType<typeof useCopilotStore>['messages'];
+interface ForemanContextValue {
+  messages: ReturnType<typeof useForemanStore>['messages'];
   isExecuting: boolean;
   open: boolean;
   send: (message: string) => Promise<void>;
   clear: () => void;
   setOpen: (v: boolean) => void;
-  onEvent: (handler: (event: CopilotEvent) => void) => () => void;
+  onEvent: (handler: (event: ForemanEvent) => void) => () => void;
 }
 
-const CopilotContext = createContext<CopilotContextValue | null>(null);
+const ForemanContext = createContext<ForemanContextValue | null>(null);
 
-export function CopilotProvider({ children }: { children: ReactNode }) {
-  const { messages, isExecuting, open } = useCopilotStore();
+export function ForemanProvider({ children }: { children: ReactNode }) {
+  const { messages, isExecuting, open } = useForemanStore();
   const actionHandlerRef = useRef<(action: PageAction) => Promise<void>>(undefined);
 
   useEffect(() => {
@@ -34,14 +34,14 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
   const send = useCallback(async (text: string) => {
     if (!text.trim() || isExecuting) return;
 
-    copilotStore.getState().messages; // touch
-    copilotStore.setState({ isExecuting: true });
-    copilotStore.setState({
-      messages: [...copilotStore.getState().messages, { id: `msg-${Date.now()}`, text, isUser: true }],
+    foremanStore.getState().messages; // touch
+    foremanStore.setState({ isExecuting: true });
+    foremanStore.setState({
+      messages: [...foremanStore.getState().messages, { id: `msg-${Date.now()}`, text, isUser: true }],
     });
 
     try {
-      const res = await fetch('/api/copilot', {
+      const res = await fetch('/api/foreman', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text }),
@@ -51,8 +51,8 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
       const actions: PageAction[] = data.actions ?? [];
       const msgId = `msg-${Date.now()}`;
 
-      copilotStore.setState({
-        messages: [...copilotStore.getState().messages, {
+      foremanStore.setState({
+        messages: [...foremanStore.getState().messages, {
           id: msgId, text: data.message || '', isUser: false, actions, intent: data.intent, done: true,
         }],
         isExecuting: false,
@@ -62,8 +62,8 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
         await pageAgent.execute(actions);
       }
     } catch (err: any) {
-      copilotStore.setState({
-        messages: [...copilotStore.getState().messages, {
+      foremanStore.setState({
+        messages: [...foremanStore.getState().messages, {
           id: `msg-${Date.now()}`, text: `Error: ${err.message}`, isUser: false, done: true,
         }],
         isExecuting: false,
@@ -71,25 +71,25 @@ export function CopilotProvider({ children }: { children: ReactNode }) {
     }
   }, [isExecuting]);
 
-  const clear = useCallback(() => copilotStore.setState({ messages: [], isExecuting: false }), []);
-  const setOpen = useCallback((v: boolean) => copilotStore.setState({ open: v }), []);
+  const clear = useCallback(() => foremanStore.setState({ messages: [], isExecuting: false }), []);
+  const setOpen = useCallback((v: boolean) => foremanStore.setState({ open: v }), []);
 
-  const onEvent = useCallback((handler: (event: CopilotEvent) => void) => {
-    const names: CopilotEventName[] = ['SEARCH_STARTED', 'SEARCH_FINISHED', 'VENDOR_OPENED', 'VENDOR_SAVED',
+  const onEvent = useCallback((handler: (event: ForemanEvent) => void) => {
+    const names: ForemanEventName[] = ['SEARCH_STARTED', 'SEARCH_FINISHED', 'VENDOR_OPENED', 'VENDOR_SAVED',
       'EQUIPMENT_COMPARED', 'BID_CREATED', 'PROJECT_CREATED', 'INTENT_ROUTED', 'AGENT_ACTION', 'ERROR'];
     const unsubs = names.map(e => eventBus.on(e, handler));
     return () => unsubs.forEach(u => u());
   }, []);
 
   return (
-    <CopilotContext.Provider value={{ messages, isExecuting, open, send, clear, setOpen, onEvent }}>
+    <ForemanContext.Provider value={{ messages, isExecuting, open, send, clear, setOpen, onEvent }}>
       {children}
-    </CopilotContext.Provider>
+    </ForemanContext.Provider>
   );
 }
 
-export function useCopilot() {
-  const ctx = useContext(CopilotContext);
-  if (!ctx) throw new Error('useCopilot must be used within CopilotProvider');
+export function useForeman() {
+  const ctx = useContext(ForemanContext);
+  if (!ctx) throw new Error('useForeman must be used within ForemanProvider');
   return ctx;
 }

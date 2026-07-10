@@ -9,14 +9,14 @@ import { HardHat } from 'lucide-react';
 import { SearchStateProvider } from '@/context/SearchStateContext';
 import { WorkspaceProvider } from '@/context/WorkspaceContext';
 import { ProjectProvider } from '@/context/ProjectContext';
-import { AgentCopilotProvider } from '@/components/ai/agent-copilot-provider';
+import { AgentForemanProvider } from '@/components/ai/agent-foreman-provider';
 
 function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <SearchStateProvider>
       <WorkspaceProvider>
         <ProjectProvider>
-            <AgentCopilotProvider />
+            <AgentForemanProvider />
             <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
               {/* Desktop: sidebar + topbar */}
               <div className="hidden lg:flex">

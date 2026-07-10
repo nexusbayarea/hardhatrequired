@@ -28,7 +28,7 @@ export default function CommandBar() {
         background: 'var(--color-surface)',
         border: `1px solid ${focused ? 'var(--color-red)' : 'var(--color-border)'}`,
       }}
-      data-agent-context="copilot-console"
+      data-agent-context="foreman-console"
     >
       <div className="flex items-center gap-3 px-5 py-3.5">
         <Sparkles className="w-5 h-5 shrink-0" style={{ color: 'var(--color-muted)' }} />
@@ -40,10 +40,10 @@ export default function CommandBar() {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           onKeyDown={e => e.key === 'Enter' && value.trim() && setValue('')}
-          placeholder={t('ask hhr copilot...')}
+          placeholder={t('ask foreman...')}
           className="flex-1 bg-transparent text-sm font-medium focus:outline-none"
           style={{ color: 'var(--color-text)' }}
-          data-agent-intent="execute-copilot-command"
+          data-agent-intent="execute-foreman-command"
         />
         <kbd className="hidden md:inline-flex text-[10px] font-bold px-1.5 py-0.5 rounded"
           style={{

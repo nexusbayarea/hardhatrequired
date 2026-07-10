@@ -1,4 +1,4 @@
-import type { PageAction, CopilotIntent } from '../types';
+import type { PageAction, ForemanIntent } from '../types';
 
 export interface PageAgentConfig {
   onStoreAction: (actions: PageAction[]) => Promise<void>;
@@ -47,7 +47,7 @@ export class PageAgent {
     this.executeDOMActions(actions);
   }
 
-  async executeIntent(intent: CopilotIntent, params: Record<string, any>): Promise<void> {
+  async executeIntent(intent: ForemanIntent, params: Record<string, any>): Promise<void> {
     this.config?.onEvent?.('intent:execute', { intent, params });
   }
 

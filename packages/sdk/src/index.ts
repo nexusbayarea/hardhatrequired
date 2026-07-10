@@ -30,7 +30,7 @@ export type { OntologyNode, OntologyMatch, VectorSearchResult } from './ontology
 export { PageAgent, pageAgent } from './page-agent';
 export type { PageAgentConfig } from './page-agent';
 
-export { sendMessage, extractIntent } from './copilot';
+export { sendMessage, extractIntent } from './foreman';
 
 export { ApiClient, ApiError, apiClient } from './api-client';
 export type { ApiClientConfig, HttpMethod } from './api-client';
@@ -48,7 +48,7 @@ export type { WorkspaceComponentEntry, SearchProvider, SearchProviderParams, Sea
 
 export type {
   Language, DeviceType, WorkspaceId, SearchPane,
-  CopilotIntent, PageAction, CopilotRequest, CopilotResponse,
-  ExtractedIntent, CopilotEventName, CopilotEvent,
-  CopilotEventHandler, AgentContext, AgentResult,
+  ForemanIntent, PageAction, ForemanRequest, ForemanResponse,
+  ExtractedIntent, ForemanEventName, ForemanEvent,
+  ForemanEventHandler, AgentContext, AgentResult,
 } from './types';

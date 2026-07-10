@@ -15,7 +15,7 @@
     "./ui": "./src/ui/index.ts",
     "./ontology": "./src/ontology/index.ts",
     "./page-agent": "./src/page-agent/index.ts",
-    "./copilot": "./src/copilot/index.ts",
+    "./foreman": "./src/foreman/index.ts",
     "./api-client": "./src/api-client/index.ts",
     "./types": "./src/types/index.ts",
     "./event-bus": "./src/event-bus/index.ts",

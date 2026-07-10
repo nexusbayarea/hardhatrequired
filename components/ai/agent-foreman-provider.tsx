@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from 'react';
 import { pageAgent } from '@/lib/page-agent';
-import type { PageAction } from '@/types/copilot';
+import type { PageAction } from '@/types/foreman';
 
-export function AgentCopilotProvider({ onAction }: { onAction?: (action: PageAction) => Promise<void> }) {
+export function AgentForemanProvider({ onAction }: { onAction?: (action: PageAction) => Promise<void> }) {
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function AgentCopilotProvider({ onAction }: { onAction?: (action: PageAct
       pageAgent.setActionHandler(onAction);
     }
 
-    (window as any).uiCopilot = pageAgent;
+    (window as any).uiForeman = pageAgent;
   }, [onAction]);
 
   return null;
@@ -52,6 +52,6 @@ export function AgentCopilotProvider({ onAction }: { onAction?: (action: PageAct
 declare global {
   interface Window {
     triggerAgentInputChange: (element: HTMLElement, targetValue: string) => void;
-    uiCopilot: any;
+    uiForeman: any;
   }
 }

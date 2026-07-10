@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       success: result.success,
     });
   } catch (err: any) {
-    console.error('[COPILOT_ROUTE_ERROR]', err);
+    console.error('[FOREMAN_ROUTE_ERROR]', err);
     return NextResponse.json(
       { intent: 'unknown', actions: [], message: err.message, success: false },
       { status: 500 }

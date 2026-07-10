@@ -1,4 +1,4 @@
-import type { AgentContext, AgentResult, PageAction } from '@/types/copilot';
+import type { AgentContext, AgentResult, PageAction } from '@/types/foreman';
 import { eventBus } from '@/lib/event-bus';
 
 export class LogisticsAgent {

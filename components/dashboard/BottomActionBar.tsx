@@ -6,11 +6,11 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Users, Truck, Route, Bot } from 'lucide-react';
 import type { SearchPane } from './SearchConsole';
 
-const ACTIONS: { id: SearchPane | 'route' | 'copilot'; label: string; icon: typeof Users }[] = [
+const ACTIONS: { id: SearchPane | 'route' | 'foreman'; label: string; icon: typeof Users }[] = [
   { id: 'labor', label: 'Labor', icon: Users },
   { id: 'equipment', label: 'Equipment', icon: Truck },
   { id: 'route', label: 'Route', icon: Route },
-  { id: 'copilot', label: 'AI', icon: Bot },
+  { id: 'foreman', label: 'AI', icon: Bot },
 ];
 
 export default function BottomActionBar() {
@@ -27,8 +27,8 @@ export default function BottomActionBar() {
           <button
             key={id}
             onClick={() => {
-              if (id === 'copilot') {
-                window.dispatchEvent(new CustomEvent('open-copilot'));
+              if (id === 'foreman') {
+                window.dispatchEvent(new CustomEvent('open-foreman'));
                 return;
               }
               if (id === 'route') {

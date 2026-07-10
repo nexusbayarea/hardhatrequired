@@ -1,4 +1,4 @@
-import type { PageAction, CopilotIntent } from '@/types/copilot';
+import type { PageAction, ForemanIntent } from '@/types/foreman';
 import { searchAgent } from '@/lib/api/agents/SearchAgent';
 import { equipmentAgent } from '@/lib/api/agents/EquipmentAgent';
 import { logisticsAgent } from '@/lib/api/agents/LogisticsAgent';
@@ -9,7 +9,7 @@ import { searchStore } from '@/stores/search.store';
 import { eventBus } from './eventBus';
 
 interface OrchestratorAction {
-  intent: CopilotIntent;
+  intent: ForemanIntent;
   params: Record<string, any>;
 }
 

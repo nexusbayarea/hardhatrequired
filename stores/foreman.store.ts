@@ -1,63 +1,63 @@
-import type { PageAction, CopilotIntent } from '@/types/copilot';
+import type { PageAction, ForemanIntent } from '@/types/foreman';
 import { createStore, useStore } from './index';
 
-export interface CopilotMessage {
+export interface ForemanMessage {
   id: string;
   text: string;
   isUser: boolean;
   actions?: PageAction[];
-  intent?: CopilotIntent;
+  intent?: ForemanIntent;
   done?: boolean;
 }
 
-interface CopilotState {
-  messages: CopilotMessage[];
+interface ForemanState {
+  messages: ForemanMessage[];
   isExecuting: boolean;
   open: boolean;
 }
 
 let msgCounter = 0;
 
-export const copilotStore = createStore<CopilotState>({
+export const foremanStore = createStore<ForemanState>({
   messages: [],
   isExecuting: false,
   open: false,
 });
 
-export function useCopilotStore() {
-  const state = useStore(copilotStore, s => s);
+export function useForemanStore() {
+  const state = useStore(foremanStore, s => s);
   return {
     ...state,
-    setOpen: (open: boolean) => copilotStore.setState({ open }),
+    setOpen: (open: boolean) => foremanStore.setState({ open }),
     addUserMessage: (text: string) => {
-      const { messages } = copilotStore.getState();
-      copilotStore.setState({
+      const { messages } = foremanStore.getState();
+      foremanStore.setState({
         messages: [...messages, { id: `msg-${++msgCounter}`, text, isUser: true }],
         isExecuting: true,
       });
     },
-    addResponse: (text: string, actions?: PageAction[], intent?: CopilotIntent) => {
-      const { messages } = copilotStore.getState();
-      copilotStore.setState({
+    addResponse: (text: string, actions?: PageAction[], intent?: ForemanIntent) => {
+      const { messages } = foremanStore.getState();
+      foremanStore.setState({
         messages: [...messages, { id: `msg-${++msgCounter}`, text, isUser: false, actions, intent, done: true }],
         isExecuting: false,
       });
     },
     markActionsDone: (messageId: string) => {
-      const { messages } = copilotStore.getState();
-      copilotStore.setState({
+      const { messages } = foremanStore.getState();
+      foremanStore.setState({
         messages: messages.map(m =>
           m.id === messageId ? { ...m, done: true, actions: m.actions?.map(a => ({ ...a, done: true as any })) } : m
         ),
       });
     },
     addError: (error: string) => {
-      const { messages } = copilotStore.getState();
-      copilotStore.setState({
+      const { messages } = foremanStore.getState();
+      foremanStore.setState({
         messages: [...messages, { id: `msg-${++msgCounter}`, text: error, isUser: false, done: true }],
         isExecuting: false,
       });
     },
-    clear: () => copilotStore.setState({ messages: [], isExecuting: false }),
+    clear: () => foremanStore.setState({ messages: [], isExecuting: false }),
   };
 }

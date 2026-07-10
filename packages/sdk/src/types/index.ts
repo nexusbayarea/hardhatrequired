@@ -13,7 +13,7 @@ export type WorkspaceId =
 
 export type SearchPane = 'disposal' | 'labor' | 'equipment' | 'regulatory' | 'deep-profiles';
 
-export type CopilotIntent =
+export type ForemanIntent =
   | 'search'
   | 'logistics'
   | 'equipment'
@@ -42,26 +42,26 @@ export type PageAction =
   | { type: 'showNotification'; message: string; severity: 'info' | 'success' | 'error' }
   | { type: 'searchResults'; results: any[]; count: number };
 
-export interface CopilotRequest {
+export interface ForemanRequest {
   message: string;
   workspace?: WorkspaceId;
   device?: DeviceType;
   language?: string;
 }
 
-export interface CopilotResponse {
-  intent: CopilotIntent;
+export interface ForemanResponse {
+  intent: ForemanIntent;
   actions: PageAction[];
   message?: string;
 }
 
 export interface ExtractedIntent {
-  intent: CopilotIntent;
+  intent: ForemanIntent;
   confidence: number;
   params: Record<string, any>;
 }
 
-export type CopilotEventName =
+export type ForemanEventName =
   | 'SEARCH_STARTED'
   | 'SEARCH_FINISHED'
   | 'VENDOR_OPENED'
@@ -78,18 +78,18 @@ export type CopilotEventName =
   | 'LOGISTICS_ESTIMATED'
   | 'COMPLIANCE_CHECKED';
 
-export interface CopilotEvent {
-  name: CopilotEventName;
+export interface ForemanEvent {
+  name: ForemanEventName;
   timestamp: number;
   payload?: Record<string, unknown>;
   source?: string;
 }
 
-export type CopilotEventHandler = (event: CopilotEvent) => void;
+export type ForemanEventHandler = (event: ForemanEvent) => void;
 
 export interface AgentContext {
   message: string;
-  intent: CopilotIntent;
+  intent: ForemanIntent;
   params: Record<string, any>;
   workspace?: WorkspaceId;
   language?: string;

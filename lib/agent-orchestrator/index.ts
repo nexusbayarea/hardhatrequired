@@ -1,4 +1,4 @@
-import type { AgentContext, AgentResult, CopilotIntent, ExtractedIntent, PageAction } from '@/types/copilot';
+import type { AgentContext, AgentResult, ForemanIntent, ExtractedIntent, PageAction } from '@/types/foreman';
 import { agentRegistry } from '@/lib/agents';
 import { eventBus } from '@/lib/event-bus';
 

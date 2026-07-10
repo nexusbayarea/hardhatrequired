@@ -3,11 +3,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Bot, X, Truck, FileText, Search, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { copilotStore, useCopilotStore } from '@/stores/copilot.store';
+import { foremanStore, useForemanStore } from '@/stores/foreman.store';
 
-type CopilotMode = 'search' | 'logistics' | 'bid';
+type ForemanMode = 'search' | 'logistics' | 'bid';
 
-const SUGGESTIONS: Record<CopilotMode, string[]> = {
+const SUGGESTIONS: Record<ForemanMode, string[]> = {
   search: [
     'Find slurry disposal near Fremont',
     'Show direct operators only',
@@ -22,22 +22,22 @@ const SUGGESTIONS: Record<CopilotMode, string[]> = {
   ],
 };
 
-const MODE_META: Record<CopilotMode, { icon: typeof Search; label: string; accent: string }> = {
+const MODE_META: Record<ForemanMode, { icon: typeof Search; label: string; accent: string }> = {
   search: { icon: Search, label: 'Search Mode', accent: 'var(--color-red)' },
   logistics: { icon: Truck, label: 'Logistics Mode', accent: 'var(--color-green)' },
   bid: { icon: FileText, label: 'Bid Mode', accent: 'var(--color-yellow)' },
 };
 
-export default function CopilotDrawer() {
+export default function ForemanDrawer() {
   const { t } = useLanguage();
-  const { messages, isExecuting, open } = useCopilotStore();
-  const [mode, setMode] = useState<CopilotMode>('search');
+  const { messages, isExecuting, open } = useForemanStore();
+  const [mode, setMode] = useState<ForemanMode>('search');
   const [input, setInput] = useState('');
 
   useEffect(() => {
-    const onOpenCopilot = () => copilotStore.setState({ open: true });
-    window.addEventListener('open-copilot', onOpenCopilot);
-    return () => window.removeEventListener('open-copilot', onOpenCopilot);
+    const onOpenForeman = () => foremanStore.setState({ open: true });
+    window.addEventListener('open-foreman', onOpenForeman);
+    return () => window.removeEventListener('open-foreman', onOpenForeman);
   }, []);
 
   const modeMeta = MODE_META[mode];
@@ -48,22 +48,22 @@ export default function CopilotDrawer() {
     const text = input;
     setInput('');
 
-    copilotStore.setState({ open: true });
-    const msgs = copilotStore.getState().messages;
-    copilotStore.setState({
+    foremanStore.setState({ open: true });
+    const msgs = foremanStore.getState().messages;
+    foremanStore.setState({
       messages: [...msgs, { id: `msg-${Date.now()}`, text, isUser: true }],
       isExecuting: true,
     });
 
-    fetch('/api/copilot', {
+    fetch('/api/foreman', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text }),
     })
       .then(r => r.json())
       .then(data => {
-        const msgs = copilotStore.getState().messages;
-        copilotStore.setState({
+        const msgs = foremanStore.getState().messages;
+        foremanStore.setState({
           messages: [
             ...msgs,
             {
@@ -79,8 +79,8 @@ export default function CopilotDrawer() {
         });
       })
       .catch(err => {
-        const msgs = copilotStore.getState().messages;
-        copilotStore.setState({
+        const msgs = foremanStore.getState().messages;
+        foremanStore.setState({
           messages: [
             ...msgs,
             { id: `msg-${Date.now()}`, text: `Error: ${err.message}`, isUser: false, done: true },
@@ -93,15 +93,15 @@ export default function CopilotDrawer() {
   return (
     <>
       <button
-        onClick={() => copilotStore.setState({ open: true })}
+        onClick={() => foremanStore.setState({ open: true })}
         className="fixed bottom-20 right-6 z-[60] w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
         style={{ background: 'var(--color-red)', border: 'none', cursor: 'pointer' }}
-        data-agent-intent="open-copilot"
+        data-agent-intent="open-foreman"
       >
         <Bot className="w-7 h-7 text-white" />
       </button>
 
-      {open && <div className="fixed inset-0 z-[55] bg-black/40 backdrop-blur-sm" onClick={() => copilotStore.setState({ open: false })} />}
+      {open && <div className="fixed inset-0 z-[55] bg-black/40 backdrop-blur-sm" onClick={() => foremanStore.setState({ open: false })} />}
 
       <div
         className="fixed top-0 right-0 z-[60] h-full w-full max-w-md transition-transform duration-300 shadow-2xl"
@@ -110,7 +110,7 @@ export default function CopilotDrawer() {
           background: 'var(--color-surface)',
           borderLeft: '1px solid var(--color-border)',
         }}
-        data-agent-context="copilot-drawer"
+        data-agent-context="foreman-drawer"
       >
         <div className="flex items-center justify-between px-6 py-5 border-b" style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface2)' }}>
           <div className="flex items-center gap-3">
@@ -118,28 +118,28 @@ export default function CopilotDrawer() {
               <Bot className="w-5 h-5" style={{ color: 'var(--color-red)' }} />
             </div>
             <div>
-              <div className="font-bold text-sm" style={{ color: 'var(--color-text)' }}>HHR Copilot</div>
+              <div className="font-bold text-sm" style={{ color: 'var(--color-text)' }}>Foreman</div>
               <div className="text-[10px] font-medium" style={{ color: 'var(--color-muted)' }}>{modeMeta.label}</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {messages.length > 0 && (
               <button
-                onClick={() => copilotStore.setState({ messages: [], isExecuting: false })}
+                onClick={() => foremanStore.setState({ messages: [], isExecuting: false })}
                 className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg"
                 style={{ color: 'var(--color-muted)', background: 'var(--color-surface)', cursor: 'pointer', border: 'none' }}
               >
                 Clear
               </button>
             )}
-            <button onClick={() => copilotStore.setState({ open: false })} className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--color-surface)', cursor: 'pointer', border: 'none' }}>
+            <button onClick={() => foremanStore.setState({ open: false })} className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--color-surface)', cursor: 'pointer', border: 'none' }}>
               <X className="w-4 h-4" style={{ color: 'var(--color-muted)' }} />
             </button>
           </div>
         </div>
 
         <div className="flex gap-2 px-6 py-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
-          {(Object.entries(MODE_META) as [CopilotMode, typeof MODE_META['search']][]).map(([key, meta]) => {
+          {(Object.entries(MODE_META) as [ForemanMode, typeof MODE_META['search']][]).map(([key, meta]) => {
             const Icon = meta.icon;
             const isActive = mode === key;
             return (
@@ -170,20 +170,20 @@ export default function CopilotDrawer() {
                   key={i}
                   onClick={() => {
                     setInput('');
-                    const msgs = copilotStore.getState().messages;
-                    copilotStore.setState({
+                    const msgs = foremanStore.getState().messages;
+                    foremanStore.setState({
                       messages: [...msgs, { id: `msg-${Date.now()}`, text, isUser: true }],
                       isExecuting: true,
                     });
-                    fetch('/api/copilot', {
+                    fetch('/api/foreman', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ message: text }),
                     })
                       .then(r => r.json())
                       .then(data => {
-                        const msgs = copilotStore.getState().messages;
-                        copilotStore.setState({
+                        const msgs = foremanStore.getState().messages;
+                        foremanStore.setState({
                           messages: [...msgs, {
                             id: `msg-${Date.now()}`, text: data.message || '', isUser: false,
                             actions: data.actions ?? [], intent: data.intent, done: true,
@@ -191,7 +191,7 @@ export default function CopilotDrawer() {
                           isExecuting: false,
                         });
                       })
-                      .catch(() => copilotStore.setState({ isExecuting: false }));
+                      .catch(() => foremanStore.setState({ isExecuting: false }));
                   }}
                   className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-between gap-2"
                   style={{
@@ -239,7 +239,7 @@ export default function CopilotDrawer() {
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Bot className="w-4 h-4" style={{ color: 'var(--color-blue)' }} />
-                      <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-blue)' }}>HHR Copilot</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-blue)' }}>Foreman</span>
                       {msg.intent && (
                         <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{ background: 'var(--color-surface)', color: 'var(--color-muted)' }}>
                           {msg.intent}
@@ -292,10 +292,10 @@ export default function CopilotDrawer() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-              placeholder={t('ask hhr copilot...')}
+              placeholder={t('ask foreman...')}
               className="flex-1 bg-transparent text-sm font-medium focus:outline-none px-2"
               style={{ color: 'var(--color-text)' }}
-              data-agent-intent="copilot-chat-input"
+              data-agent-intent="foreman-chat-input"
             />
             <button
               onClick={handleSubmit}

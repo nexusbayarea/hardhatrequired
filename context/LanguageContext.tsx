@@ -488,7 +488,7 @@ const esDictionary: Record<string, string> = {
   'multi crew': 'Múltiples Cuadrillas',
 
   // ─── Command bar ───
-  'ask hhr copilot...': 'Pregunte al copiloto de HHR...',
+  'ask foreman...': 'Pregunte al capataz de HHR...',
   'try: find slurry disposal near fremont': 'Intente: buscar eliminación de lodos cerca de Fremont',
   'show disposal only': 'Mostrar solo eliminación',
   'increase radius to 50 mi': 'Aumentar radio a 50 mi',
@@ -847,7 +847,7 @@ const zhDictionary: Record<string, string> = {
   'multi crew': '多团队',
 
   // ─── Command bar ───
-  'ask hhr copilot...': '询问HHR助手...',
+  'ask foreman...': '询问HHR领班...',
   'try: find slurry disposal near fremont': '尝试：查找弗里蒙特附近的泥浆处置',
   'show disposal only': '仅显示处置',
   'increase radius to 50 mi': '将半径增加到50英里',
@@ -1206,7 +1206,7 @@ const viDictionary: Record<string, string> = {
   'multi crew': 'Nhiều nhân công',
 
   // ─── Command bar ───
-  'ask hhr copilot...': 'Hỏi trợ lý HHR...',
+  'ask foreman...': 'Hỏi quản đốc HHR...',
   'try: find slurry disposal near fremont': 'Thử: tìm bãi xử lý bùn gần Fremont',
   'show disposal only': 'Chỉ hiển thị xử lý',
   'increase radius to 50 mi': 'Tăng bán kính lên 50 dặm',

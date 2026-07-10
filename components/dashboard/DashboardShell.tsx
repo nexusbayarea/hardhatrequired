@@ -12,7 +12,7 @@ import ResultsView from './ResultsView';
 import CommandBar from './CommandBar';
 import IntelligenceRail from './IntelligenceRail';
 import LogisticsController from './LogisticsController';
-import CopilotDrawer from '@/components/ai/CopilotDrawer';
+import ForemanDrawer from '@/components/ai/ForemanDrawer';
 import Toast from '@/components/shared/Toast';
 import QuickActions from './QuickActions';
 import CommandCenter from './workspace/CommandCenter';
@@ -25,7 +25,7 @@ import SavedItems from './workspace/SavedItems';
 import { getVerticalEstimatorConfig } from '@/lib/logistics/normalizer';
 import { pageAgent } from '@/lib/page-agent';
 import { frontendOrchestrator } from '@/lib/api/orchestrator/FrontendOrchestrator';
-import type { PageAction } from '@/types/copilot';
+import type { PageAction } from '@/types/foreman';
 import type { SearchPane } from './SearchConsole';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
@@ -318,7 +318,7 @@ export default function DashboardShell() {
           </aside>
         )}
 
-        <CopilotDrawer />
+        <ForemanDrawer />
       </div>
 
       <Toast message={toast} onClose={clearToast} />
