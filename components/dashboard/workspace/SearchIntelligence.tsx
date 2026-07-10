@@ -43,8 +43,8 @@ export default function SearchIntelligence({
     }
   }, [activePane]);
   const [internalVertical, setInternalVertical] = useState('');
-  const [zip, setZip] = useState('94538');
-  const [radius, setRadius] = useState('25');
+  const [zip, setZip] = useState('');
+  const [radius, setRadius] = useState('');
   const [gallons, setGallons] = useState('10000');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -194,6 +194,7 @@ export default function SearchIntelligence({
                 className="field-input"
                 data-agent-intent="set-radius"
               >
+                <option value="">{t('(select)')}</option>
                 <option value="10">10 miles</option>
                 <option value="15">15 miles</option>
                 <option value="25">25 miles</option>
