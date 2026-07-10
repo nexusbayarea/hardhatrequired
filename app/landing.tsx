@@ -380,74 +380,6 @@ function LandingInner() {
 
       <div className="palantir-rule" />
 
-      {/* ───── HOW IT WORKS ───── */}
-      <section id="how-it-works" className="py-24 md:py-36">
-        <div className="max-w-[1400px] mx-auto px-5 md:px-8">
-          <div className="mb-16 md:mb-24">
-            <p className="section-label mb-4">{t('how it works')}</p>
-            <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
-              {t('three steps.')}<br />
-              <span style={{ color: 'var(--color-muted)' }}>{t('zero guesswork.')}</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-            {steps.map((step, i) => (
-              <div
-                key={step.n}
-                className="relative p-8 md:p-10"
-                style={{
-                  borderRight: i < steps.length - 1 ? '1px solid var(--color-border)' : 'none',
-                  borderBottom: '1px solid var(--color-border)',
-                }}
-              >
-                {/* Step number — huge, faded */}
-                <div
-                  className="font-display text-8xl font-black mb-6 select-none"
-                  style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    color: 'color-mix(in srgb, var(--color-red) 20%, transparent)',
-                    lineHeight: 1,
-                  }}
-                >
-                  {step.n}
-                </div>
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
-                  style={{ background: 'color-mix(in srgb, var(--color-red) 12%, var(--color-surface2))' }}
-                >
-                  <step.icon className="w-6 h-6" style={{ color: 'var(--color-red)' }} />
-                </div>
-                <h3
-                  className="font-bold mb-4"
-                  style={{
-                    fontSize: 'clamp(1.25rem, 2.5vw, 1.625rem)',
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    color: 'var(--color-text)',
-                  }}
-                >
-                  {t(step.titleKey)}
-                </h3>
-                <p style={{ fontSize: '1.0625rem', lineHeight: 1.6, color: 'var(--color-muted)', fontWeight: 500 }}>
-                  {t(step.bodyKey)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className="palantir-rule" />
-
-      <div className="h-16" />
-
-      {/* ───── EQUIPMENT STRIP ───── */}
-      <EquipmentStrip />
-
-      <div className="palantir-rule" />
-
-      <div className="h-16" />
-
       {/* ───── ENGINES ───── */}
       <section id="engines" className="py-24 md:py-36">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
@@ -515,6 +447,72 @@ function LandingInner() {
           </div>
         </div>
       </section>
+
+      <div className="palantir-rule" />
+
+      {/* ───── HOW IT WORKS ───── */}
+      <section id="how-it-works" className="py-24 md:py-36">
+        <div className="max-w-[1400px] mx-auto px-5 md:px-8">
+          <div className="mb-16 md:mb-24">
+            <p className="section-label mb-4">{t('how it works')}</p>
+            <h2 className="text-section" style={{ color: 'var(--color-text)' }}>
+              {t('three steps.')}<br />
+              <span style={{ color: 'var(--color-muted)' }}>{t('zero guesswork.')}</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+            {steps.map((step, i) => (
+              <div
+                key={step.n}
+                className="relative p-8 md:p-10"
+                style={{
+                  borderRight: i < steps.length - 1 ? '1px solid var(--color-border)' : 'none',
+                  borderBottom: '1px solid var(--color-border)',
+                }}
+              >
+                {/* Step number — huge, faded */}
+                <div
+                  className="font-display text-8xl font-black mb-6 select-none"
+                  style={{
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    color: 'color-mix(in srgb, var(--color-red) 20%, transparent)',
+                    lineHeight: 1,
+                  }}
+                >
+                  {step.n}
+                </div>
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+                  style={{ background: 'color-mix(in srgb, var(--color-red) 12%, var(--color-surface2))' }}
+                >
+                  <step.icon className="w-6 h-6" style={{ color: 'var(--color-red)' }} />
+                </div>
+                <h3
+                  className="font-bold mb-4"
+                  style={{
+                    fontSize: 'clamp(1.25rem, 2.5vw, 1.625rem)',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    color: 'var(--color-text)',
+                  }}
+                >
+                  {t(step.titleKey)}
+                </h3>
+                <p style={{ fontSize: '1.0625rem', lineHeight: 1.6, color: 'var(--color-muted)', fontWeight: 500 }}>
+                  {t(step.bodyKey)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="palantir-rule" />
+
+      <div className="h-16" />
+
+      {/* ───── EQUIPMENT STRIP ───── */}
+      <EquipmentStrip />
 
       <div className="palantir-rule" />
 
