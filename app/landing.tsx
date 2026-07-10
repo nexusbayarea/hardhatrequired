@@ -116,19 +116,19 @@ function LandingInner() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 shrink-0">
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center shadow-lg"
+              className="w-12 h-12 rounded-lg flex items-center justify-center shadow-lg"
               style={{ background: 'var(--color-red)' }}
             >
-              <HardHat className="w-5 h-5 text-white" />
+              <HardHat className="w-6 h-6 text-white" />
             </div>
             <div className="flex flex-col leading-none">
               <span
-                className="font-display text-lg tracking-tight"
+                className="font-display text-2xl tracking-tight"
                 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, letterSpacing: '-0.01em' }}
               >
                 HHR
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>
+              <span className="text-[15px] font-bold uppercase tracking-widest" style={{ color: 'var(--color-muted)' }}>
                 Hard Hat Required
               </span>
             </div>
@@ -675,10 +675,10 @@ function LandingInner() {
             {/* Brand column */}
             <div style={{ gridColumn: 'span 1' }}>
               <Link href="/" className="flex items-center gap-3" style={{ marginBottom: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--color-red)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <HardHat className="w-4 h-4 text-white" />
+                <div style={{ width: 44, height: 44, borderRadius: 10, background: 'var(--color-red)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <HardHat className="w-5 h-5 text-white" />
                 </div>
-                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 22, color: 'var(--color-text)', letterSpacing: '-0.02em' }}>
+                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 33, color: 'var(--color-text)', letterSpacing: '-0.02em' }}>
                   HHR
                 </span>
               </Link>

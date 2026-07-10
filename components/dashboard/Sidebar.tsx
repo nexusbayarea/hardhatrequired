@@ -73,14 +73,14 @@ export default function Sidebar({ slim = false }: SidebarProps) {
         >
           <button onClick={() => router.push('/')} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+              className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
               style={{ background: 'var(--color-red)' }}
             >
-              <HardHat className="w-5 h-5 text-white" />
+              <HardHat className="w-6 h-6 text-white" />
             </div>
             {!slim && (
               <span
-                className="font-black text-lg leading-none"
+                className="font-black text-2xl leading-none"
                 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
                   letterSpacing: '-0.01em',

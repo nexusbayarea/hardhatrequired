@@ -31,10 +31,10 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="bg-[#111] border border-gray-800 rounded-2xl p-8">
         <Link href="/" className="flex items-center gap-2 mb-8 hover:opacity-80 transition-opacity">
-          <div className="h-8 w-8 rounded-lg bg-[#dc2626] flex items-center justify-center">
-            <span className="text-white font-bold text-sm">HHR</span>
+          <div className="h-11 w-11 rounded-lg bg-[#dc2626] flex items-center justify-center">
+            <span className="text-white font-bold text-xl">HHR</span>
           </div>
-          <span className="text-white font-semibold">Hard Hat Required</span>
+          <span className="text-white font-semibold text-lg">Hard Hat Required</span>
         </Link>
 
         <form onSubmit={handleLogin} className="space-y-4">
