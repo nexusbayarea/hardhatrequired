@@ -11,7 +11,7 @@ import { verticalMatrix } from '@/lib/verticals/matrix';
 import type { SearchResult } from '@/types/search';
 import type { VoteType } from '@/types/feedback';
 
-export type SearchMode = 'labor' | 'disposal' | 'equipment' | 'regulatory' | 'deep-profiles';
+export type SearchMode = 'labor' | 'disposal' | 'equipment';
 
 interface SearchIntelligenceProps {
   onResults: (data: { companies: SearchResult[]; count: number }) => void;
@@ -26,8 +26,6 @@ const MODE_META: Record<SearchMode, { title: string; desc: string; color: string
   disposal: { title: 'Disposal Facilities', desc: 'Search permitted disposal sites, reclamation yards, and treatment facilities.', color: 'var(--color-green)', icon: Droplets },
   labor: { title: 'Labor / Operators', desc: 'Find certified crews, operators, and specialty contractors.', color: 'var(--color-red)', icon: Search },
   equipment: { title: 'Equipment Rentals', desc: 'Browse heavy equipment, vac trucks, and specialty tools by type and capacity.', color: 'var(--color-purple)', icon: Search },
-  regulatory: { title: 'Regulatory / Permits', desc: 'Search regulated facilities with active permits, waste profiles, and compliance records.', color: 'var(--color-purple)', icon: Shield },
-  'deep-profiles': { title: 'Deep Profiles', desc: 'View enriched company profiles with scraped services, equipment, license numbers, and AI summary.', color: 'var(--color-pink)', icon: Search },
 };
 
 export default function SearchIntelligence({
@@ -112,10 +110,10 @@ export default function SearchIntelligence({
       {/* Workspace header */}
       <div>
         <h1 className="text-2xl font-black tracking-tight" style={{ color: 'var(--color-text)' }}>
-          {t('search intelligence')}
+          {t('Search Intelligence')}
         </h1>
         <p className="text-sm font-medium mt-1" style={{ color: 'var(--color-muted)' }}>
-          {t('find operators, disposal facilities, equipment, or regulatory records')}
+          {t('find operators, disposal facilities, and equipment')}
         </p>
       </div>
 
