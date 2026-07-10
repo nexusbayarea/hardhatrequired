@@ -51,4 +51,6 @@ export type {
   ForemanIntent, PageAction, ForemanRequest, ForemanResponse,
   ExtractedIntent, ForemanEventName, ForemanEvent,
   ForemanEventHandler, AgentContext, AgentResult,
+  EquipmentClass, EquipmentRentalSearchRequest,
+  EquipmentRentalResult, EquipmentRentalSearchResponse,
 } from './types';

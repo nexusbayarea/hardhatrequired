@@ -101,3 +101,53 @@ export interface AgentResult {
   data?: any;
   message?: string;
 }
+
+// Equipment Rental Discovery types
+export type EquipmentClass =
+  | 'vacuum_truck_3k'
+  | 'vacuum_truck_5k'
+  | 'excavator_heavy'
+  | 'end_dump_trailer'
+  | 'frac_tank_21k'
+  | 'dewatering_pump';
+
+export interface EquipmentRentalSearchRequest {
+  latitude: number;
+  longitude: number;
+  radius_miles?: number;
+  equipment_class?: EquipmentClass;
+  target_date?: string;
+}
+
+export interface EquipmentRentalResult {
+  id: string;
+  provider_name: string;
+  equipment_class: string;
+  distance_miles: number;
+  daily_rate: number;
+  weekly_rate: number | null;
+  monthly_rate: number | null;
+  delivery_fee: number;
+  proximity_score: number;
+  trust_index: number;
+  composite_confidence_rating: number;
+  is_verified_partner: boolean;
+  contact_phone: string | null;
+  dispatch_email: string | null;
+  city: string | null;
+  state: string | null;
+  operator_included: boolean;
+  requires_cdl: boolean;
+  minimum_rental_days: number;
+}
+
+export interface EquipmentRentalSearchResponse {
+  results: EquipmentRentalResult[];
+  meta: {
+    total: number;
+    latitude: number;
+    longitude: number;
+    radius_miles: number;
+    execution_ms: number;
+  };
+}
